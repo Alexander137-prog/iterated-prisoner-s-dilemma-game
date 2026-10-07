@@ -464,7 +464,6 @@ def reset_think_memory():
             [
                 0,
                 {
-                    # keyword : [list reaksi]
                     'wondering': [
                         'Why is [REPLACE] on your mind?',
                         'Hmm, [REPLACE] keeps crossing your mind, doesn\'t it?',
