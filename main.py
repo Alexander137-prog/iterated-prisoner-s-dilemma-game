@@ -100,9 +100,9 @@ def plot_tournament_results(sorted_result, strategies_category, strategies_creat
     plt.savefig('tournament_result.png', dpi=150)
     plt.show()
 
-def timeout_input_instant(detik):
+def timeout_input_instant(second):
     start = time.time()
-    while time.time() - start < detik:
+    while time.time() - start < second:
         if msvcrt.kbhit():
             char = msvcrt.getch().decode()
             return char
