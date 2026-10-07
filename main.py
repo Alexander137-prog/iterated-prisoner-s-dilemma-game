@@ -9,15 +9,6 @@ import multiprocessing as mp
 
 def plot_tournament_results(hasil_urut, strategies_category, strategies_creator,
                              tournament_divider, time_divider, top_n=30, show_worst=False):
-    """
-    hasil_urut          : list hasil sorted [(score, name, win, draw, lose), ...]
-    strategies_category  : dict nama -> 'NICE'/'NASTY'
-    strategies_creator    : dict nama -> nama pencipta
-    tournament_divider   : pembagi untuk skor rata-rata
-    time_divider         : pembagi untuk win/draw/lose rata-rata
-    top_n             : jumlah strategi teratas yang ditampilkan
-    show_worst        : True -> ambil dari bawah (strategi terburuk) alih-alih teratas
-    """
     data = hasil_urut[-top_n:][::-1] if show_worst else hasil_urut[:top_n]
 
     names  = [item[1] for item in data]
