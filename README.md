@@ -2,7 +2,7 @@ iterated-prisoner-s-dilemma-game
 this is a iterated prisoner's dilemma game with the largest number of strategies
 the number of strategies in this project is 584
 
-"why this project about?" this project about iterated prisoner's dilemma game
+"what this project about?" this project about iterated prisoner's dilemma game
 "why are you make it?" to collecting every strategy that ever exist in this world
 
 this project have
