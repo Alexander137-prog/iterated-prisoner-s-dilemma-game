@@ -6,6 +6,7 @@ import math_matrix as mth_mtx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import multiprocessing as mp
+from scipy.stats import chisquare
 
 def plot_tournament_results(sorted_result, strategies_category, strategies_creator,
                              tournament_divider, time_divider, top_n=30, show_worst=False):
@@ -111,11 +112,11 @@ def update_score(x, y):
 def reset_think_memory():
     return [
             0, # 0
-            0, # 1
+            True, # 1
             ["Normal",0,0,None,False,0.25,np.zeros([4, 2]),0,3,False,0,[0,0],0,5,0,0], # 2
             [0,0], # 3
             0, # 4
-            [0,0,0], # 5
+            [0.3, 0, 0], # 5
             [0.5,0], # 6
             0, # 7
             [0,0], # 8
@@ -133,10 +134,10 @@ def reset_think_memory():
             [[0,0,0,0,1,0],[0,0,0,0,0,0],0], # 20
             [[30,0],[30,0],[0,30],[0,30],0], # 21
             [0,0,0,0], # 22
-            [[0,0,0,0],[0,0,0,0],[0,0,0,0]], # 23
+            [[0,0,0,0],[0,0,0,0],[0,0,0,0],True,[0.0, 4.0, 6.0, 6.0, 8.0, 12.0],[[36.0, 0.0, 0.0, 0.0],[16.0, 12.0, 12.0, 0.0],[0.0, 18.0, 24.0, 0.0],[12.0, 12.0, 9.0, 9.0],[0.0, 16.0, 16.0, 12.0],[0.0, 0.0, 0.0, 48.0],]], # 23
             [0.1,0,0,0], # 24
             0, # 25
-            [0,0], # 26
+            0, # 26
             [0,0], # 27
             '2', # 28
             0, # 29
@@ -165,7 +166,7 @@ def reset_think_memory():
                 }
             ], # 31
             0, # 32
-            [0,0,0], # 33
+            [0,0], # 33
             [
                 {
                     ("CCCCC","CCCCC"):["CCCCC",100]
@@ -357,13 +358,30 @@ def reset_think_memory():
             0, # 126
             [0,0,0], # 127
             [1, False, 1, 0], # 128
-            0, # 129
+            {
+                "step": 1,
+                "substp": 1,
+                "bothd": 0,
+                "titcnt": 0,
+                "tatcnt": 0,
+                "evil": 0,
+                "n": 1,
+                "f": 0,
+                "ok": [0, 0, 0, 0],
+                "totk": 0,
+                "oldmov": 0,
+                "count": 0,
+            }, # 129
             0, # 130
             [False,[]], # 131
             [0,0], # 132
             0, # 133
-            [0,0,0,0], # 134
-            [0,0,0,0], # 135
+            {"d_count": 0, "is_retaliating": False}, # 134
+            {
+                "s": 3,
+                "w": 0,
+                "q": 0.8,
+            }, # 135
             [0,0,0,0,0,0], # 136
             [
                 [
@@ -415,26 +433,139 @@ def reset_think_memory():
             0, # 150
             0, # 151
             0, # 152
-            [0,0], # 153
+            {
+                "z": 0,
+                "q6": 0.5,
+                "s": 0,
+                "h": 0,
+            }, # 153
             [7,0], # 154
             ["Normal",0], # 155
             [{'C': 0, 'D': 1}, {'C': 0, 'D': 1}, False], # 156
             True, # 157
-            0, # 158
-            0, # 159
-            [0,0], # 160
-            0, # 161
-            0, # 162
-            [0,0], # 163
-            [0, 'unknown'], # 164
-            [0,0,0,0], # 165
-            0, # 166
-            [0,0], # 167
-            [[0 for _ in range(15)], 0], # 168
-            [[0 for _ in range(10)], 0], # 169
-            0, # 170
-            [0 for _ in range(40)], # 171
-            0, # 172
+            {
+                "x": 0.999,
+                "px": 0.001,
+                "y": 0.001,
+                "py": 0.999,
+                "z": 0.999,
+                "pz": 0.001,
+                "w": 0.001,
+                "pw": 0.999,
+                "qc": [1.999, 1.999, 0.001, 0.001],
+                "qn": [2.0, 2.0, 2.0, 2.0],
+                "ipol": [
+                    [0, 0, 0, 0],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [0, 1, 0, 1],
+                    [0, 0, 1, 0],
+                    [0, 0, 0, 1],
+                    [0, 1, 0, 0],
+                    [1, 0, 1, 0],
+                ],
+                "iold": 0,
+                "n": 0,
+            }, # 158
+            {
+                "jz": 0,
+            }, # 159
+            {
+                "j0": 0.0,
+                "f0": 0.0,
+                "j2": 0,
+                "j4": 0,
+                "j8": 0.0,
+                "f4": 0,
+                "f8": 0.0,
+                "f1": 0,
+                "c": 0,
+                "d": 0,
+                "t": 0,
+                "i1": 0,
+                "i2": 0,
+                "i3": 0,
+                "i4": 0,
+            }, # 160
+            [0,0], # 161
+            {
+                "mode": 0,
+                "inod": 0,
+            }, # 162
+            {
+                "alpha": 1.0,
+                "beta": 0.0,
+                "iold": 0,
+                "qca": 0,
+                "qna": 0,
+                "qcb": 0,
+                "qnb": 0,
+                "mutdef": 0,
+            }, # 163
+            {
+                "lastd": 0,
+                "diff": 0,
+                "totd": 0,
+            }, # 164
+            {
+                "d8": 0,
+                "d9": 0,
+            }, # 165
+            {
+                "x": 0.75,
+                "i5": 0,
+                "d4": 0.0,
+                "i1": 0,
+                "i2": 0,
+                "i3": 1,
+            }, # 166
+            {
+                "jold": 0,
+                "iran": int(23 * rnd.random() + 1),
+            }, # 167
+            {
+                "good": 1.0,
+                "bad": 0.0,
+                "past": 0,
+                "totcop": 0,
+                "totdef": 0,
+                "nice1": 0,
+                "nice2": 0,
+            }, # 168
+            {
+                "sc": [0] * 6,
+                "sl": [1] * 6,
+                "st": [0] * 5,
+                "gt": [0] * 5,
+                "tm": [0] * 6,
+                "cn": 10,
+                "csrc": 5,
+                "mylm": 1,
+                "hlm": 0,
+            }, # 169
+            {
+                "s": 1,
+                "f": 0,
+                "d": 0,
+                "c": 0,
+            }, # 170
+            {
+                "opdef": 0,
+                "stdef": 0,
+                "dl": 0.20,
+                "coops": 0,
+                "okdef": True,
+                "mydef": False,
+                "nodef": 0,
+                "nd": 12,
+            }, # 171
+            {
+                "ia": 0,
+                "ib": 0,
+            }, # 172
             False, # 173
             0, # 174
             [{}], # 175
@@ -554,9 +685,27 @@ def reset_think_memory():
             0, # 192
             0, # 193
             0, # 194
-            0, # 195
+            {
+                "ncc": 0,
+                "ncd": 0,
+                "ndc": 0,
+                "ndd": 0,
+                "kount": 0,
+                "mytwin": 0,
+                "iold1": 0,
+                "iold2": 0,
+            }, # 195
             [0,False,0], # 196
-            False, # 197
+            {
+                "l4": [[0.0, 0.0] for _ in range(8)],  # Matriks frekuensi 8x2
+                "t0": 0,
+                "t4": 0,
+                "t5": 0,
+                "t6": 25,
+                "t8": 0,
+                "t9": 5,
+                "s1": 0,
+            }, # 197
             0, # 198
             [0,0], # 199
             0, # 200
@@ -891,8 +1040,94 @@ def reset_think_memory():
             min(rnd.random() * (rnd.random() + 1), 1), # 377
             1, # 378
             [min(rnd.random() * (rnd.random() + 1), 1), min(rnd.random() * (rnd.random() + 1), 1), rnd.random() * rnd.random(), rnd.random() * rnd.random()], # 379
-            0, # 380
-            0, # 381
+            {"jold": 0, "a": 0, "b": 0, "c": 0, "d": 0, "e": 0}, # 380
+            {
+                "iarray": [0, 0, 0, 0, 0],
+                "ipo2": [2, 4, 3, 5, 1],
+                "ipo1": 1,
+                "ichan": 1,
+                "kold": 0,
+                "k5": 0,
+                "klast": 0,
+            }, # 381
+            [0, 0, 0, 0], # 382
+            [0, 0, 0, 0], # 383
+            0, # 384
+            [rnd.randint(1, 25), rnd.randint(1, 25), rnd.randint(1, 25), rnd.randint(1, 25)], # 385
+            [0, {'CC':[0,0], 'CD':[0,0], 'DC':[0,0], 'DD':[0,0]}], # 386
+            {
+                "n": 0
+            }, # 387
+            {
+                "iaggd": 4,
+                "idunu": 0,
+                "idunb": 0,
+                "ipayb": 8,
+                "itest": 1,
+                "ipost": 0,
+            }, # 388
+            {
+                "alpha": 1.0,
+                "beta": 0.3,
+                "iold": 0,
+                "qca": 0.0,
+                "qna": 0.0,
+                "qcb": 0.0,
+                "qnb": 0.0,
+                "k74r_val": 0,
+                "jsw": 0,
+                "js4": 0,
+                "js11": 0,
+                "jr": 0,
+                "jl": 0,
+                "jt": 0,
+                "jsm": 1,
+            }, # 389
+            {
+                "alpha": 1.0,
+                "beta": 0.3,
+                "iold": 0,
+                "qca": 0.0,
+                "qna": 0.0,
+                "qcb": 0.0,
+                "qnb": 0.0,
+                "k74dummy": 0,
+                "jsw": 0,
+                "js4": 0,
+                "js11": 0,
+                "jr": 0,
+                "jl": 0,
+                "jt": 0,
+                "jsm": 1,
+            }, # 390
+            {
+                "jstr": 3,
+                "ktry": 0,
+                "kexp": [100, 100, 100, 100, 100],
+                "ki": 0,
+            }, # 391
+            '1', # 392
+            '1', # 393
+            '1', # 394
+            '1', # 395
+            '1', # 396
+            '1', # 397
+            '1', # 398
+            '1', # 399
+            '1', # 400
+            '1', # 401
+            '1', # 402
+            '1', # 403
+            {}, # 404
+            [0,0], # 405
+            [0, 0, 0, 0], # 406
+            {
+                "riwayat_gerakan": [0, 0, 0, 0],
+                "gerakan_terakhir": 0,
+                "status_game": 0,
+                "counter_acak": 0
+            }, # 407
+            False, # 408
            ]
 
 def reset_immortal_memory():
@@ -902,10 +1137,14 @@ def reset_immortal_memory():
             [],
             {},
             {},
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()},
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()},
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random(), 'Memory':{}},
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random(), 'Memory':{}},
            ]
 
 def cycle_detec(opp_index, min_ = 1, max_ = 12, offset = 0):
-    inp = [memory[-1 - i][opp_index] for i in range(offset, game_round)]
+    inp = [memory[-i][opp_index] for i in range(offset, game_round + 1)] 
     new_max_size = min(len(inp) // 2, max_)
     for i in range(min_, new_max_size + 1):
         has_cycle = True
@@ -942,7 +1181,7 @@ def frequency(myType, opType, opp_index):
 def choice_majority(samples, Type, tie = 'C'):
     A = samples.count(Type)
     if A != (len(samples) / 2):
-        return 'C' if A > (len(samples) / 2) else 'D'
+        return Type if A > (len(samples) / 2) else flip(Type)
     else:
         return tie
 
@@ -951,27 +1190,26 @@ avg_RPST = (RPST['R'] + RPST['P'] + RPST['S'] + RPST['T']) / 4
 strat_memory = [reset_think_memory(),reset_think_memory()]
 strat_immortal_memory = [reset_immortal_memory(), reset_immortal_memory()]
 
-def think(strategy,opp_index,opp_name):
+def call_strategy(strategy,opp_index,opp_name):
     global strat_memory, strat_immortal_memory, strategy_next_chat
     self_index = 1 - opp_index
     think_memory = strat_memory[self_index]
     immortal_memory = strat_immortal_memory[self_index]
     chats = [strategy_chat[0][0], strategy_chat[1][0]]
     next_chat = strategy_next_chat[self_index]
-    # Classic Strategies & Axelrod Library Strategies & Emergent Lab Strategies & Youtube Staretgies & so on
-    if strategy == 'Axelrod First By Tit For Tat':
+    # Strategies That Not From This Tournament
+    if strategy == 'First By Tit For Tat':
         if not game_round:
             return 'C'
         return memory[-1][opp_index]
-    elif strategy == 'Axelrod First By Joss / Naive Prober':
-        prob_choice_steal = rnd.randint(1,10)
-        if prob_choice_steal == 1:
+    elif strategy == 'First By Joss / Naive Prober':
+        if not game_round:
+            return 'C'
+        if rnd.random() <= 0.1:
             return 'D'
         else:
-            if not game_round:
-                return 'C'
             return memory[-1][opp_index]
-    elif strategy == 'Axelrod First By Grudger / Grim trigger':
+    elif strategy == 'First By Grudger / Grim Trigger':
         if not game_round:
             return 'C'
         if memory[-1][opp_index] == 'D' or think_memory[0] == 1:
@@ -979,28 +1217,27 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         else:
             return 'C'
-    elif strategy == 'Axelrod Second By Gladstein / Tester':
-        if think_memory[1] != 2 and ((memory[-1][opp_index] != 'D') if game_round > 0 else True):
-            if think_memory[1] == 0:
-                think_memory[1] = 1
+    elif strategy == 'Second By Gladstein / Tester':
+        if not game_round:
+            return 'D'
+        if think_memory[1]:
+            if memory[-1][opp_index] == 'D':
+                think_memory[1] = False
+                return 'C'
+            cooperation_ratio = sum((memory[i][self_index] == 'C') for i in range(game_round)) / game_round
+            if cooperation_ratio > 0.5:
                 return 'D'
-            else:
-                think_memory[1] = 0
-                return 'C'
+            return 'C'
         else:
-            if think_memory[1] != 2:
-                think_memory[1] = 2
-                return 'C'
-            else:
-                return 'C' if memory[-1][self_index] == 'D' else 'D'
-    elif strategy == 'Tit For 2 Tats / Sample':
-        if (game_round + 1) <= 2:
+            return memory[-1][opp_index]
+    elif strategy == 'Sample / Second By Tit For 2 Tats':
+        if (game_round) < 2:
             return 'C'
         if memory[-1][opp_index] == memory[-1-1][opp_index] and memory[-1][opp_index] == 'D':
             return 'D'
         else:
             return 'C'
-    elif strategy == 'Axelrod Second By Harrington':
+    elif strategy == 'Second By Harrington':
         if game_round > 0 and memory[-1][opp_index] == 'C':
             think_memory[2][15] += 1
         def try_return(to_return, lower_flags=True, inc_parity=False):
@@ -1173,32 +1410,36 @@ def think(strategy,opp_index,opp_name):
             return 'C'
         else:
             return 'D'
-    elif strategy == 'Axelrod First By Named Withheld':
-        P = think_memory[5][0]
-        if not game_round:
-            return 'C' if rnd.random() <= 0.3 else 'D'
-        if (game_round) % 10 == 0:
-            coop_rate = 0
-            for i in range(10):
-                if memory[-1-i][opp_index] == 'C':
-                    coop_rate += 1
-            coop_rate /= 10
+    elif strategy == 'First By Named Withheld':
+        data = (
+            think_memory[5]
+            if isinstance(think_memory[5], list)
+            else [0.3, 0, 0]
+        )
+        if len(data) < 3:
+            data = [0.3, 0, 0]
+        P = data[0]
+        if game_round > 0 and (game_round + 1) % 10 == 0:
+            lookback = min(10, len(memory))
+            recent_moves = [memory[-i][opp_index] for i in range(lookback, 0, -1)]
+            coop_count = recent_moves.count("C")
+            coop_rate = coop_count / lookback if lookback > 0 else 0.5
             if coop_rate >= 0.8:
                 P = min(P + 0.1, 0.9)
             elif coop_rate <= 0.2:
                 P = max(P - 0.1, 0.1)
             else:
-                P += rnd.uniform(-0.1,0.1)
-                P = max(min(P,0.9),0.1)
-            if (game_round + 1) > 130:
-                if think_memory[5][1] < think_memory[5][2]:
-                    P = max(P - 0.1,0.1)
-        think_memory[5][0] = P
+                P += rnd.uniform(-0.1, 0.1)
+                P = max(min(P, 0.9), 0.1)
+        if game_round >= 130:
+            if data[1] < data[2]:
+                P = max(P - 0.1, 0.1)
+        data[0] = P
+        think_memory[5] = data
         if rnd.random() < P:
-            return 'C'
-        else:
-            return 'D'
-    elif strategy == 'Axelrod First By Davis':
+            return "C"
+        return "D"
+    elif strategy == 'First By Davis':
         if (game_round + 1) > 10:
             if think_memory[7] == 1:
                 return 'D'
@@ -1211,55 +1452,28 @@ def think(strategy,opp_index,opp_name):
             if game_round > 0 and memory[-1][opp_index] == 'D':
                 think_memory[7] = 1
             return 'C'
-    elif strategy == 'Always Cooperate / Cooperator / Saint / Dove':
+    elif strategy == 'Always Cooperate / Cooperator / Dove / Saint':
         return 'C'
-    elif strategy == 'Always Defect / Defector / Shark / Hawk':
+    elif strategy == 'Always Defect / Defector / Hawk / Shark':
         return 'D'
-    elif strategy == 'Random / Moron':
+    elif strategy == 'Random':
         return rnd.choice(['C','D'])
-    elif strategy == 'Axelrod First By Graaskamp':
-        if (game_round + 1) <= 56:
-            if game_round > 0 and memory[-1][opp_index] == 'C':
-                think_memory[134][2] += 1
-            else:
-                think_memory[134][3] += 1
-        if (game_round + 1) <= 50:
-            if not game_round:
-                return 'C'
-            return memory[-1][opp_index]
-        elif (game_round + 1) <= 53:
-            if (game_round + 1) == 53:
-                think_memory[134][0] = (memory[-1][opp_index] == 'D')
-            return ('D','C','C')[(game_round + 1)-51]
-        elif (game_round + 1) <= 56:
-            return memory[-1][opp_index]
-        else:
-            if (game_round + 1) == 57:
-                E1 = 57
-                E2 = E1/2
-                H = ((((think_memory[134][2] - E2)*(think_memory[134][2] - E2)))/E2)+((((think_memory[134][3] - E2)*(think_memory[134][3] - E2)))/E2)
-                if H < 3.84:
-                    think_memory[134][1] = 1
-                    return 'D'
-                else:
-                    if think_memory[134][0] == 1:
-                        return memory[-1][opp_index]
-                    else:
-                        if ((game_round + 1) % rnd.randint(5, 15)) == 0:
-                            return 'D'
-                        else:
-                            return memory[-1][opp_index]
-            else:
-                if think_memory[134][1] == 1:
-                    return 'D'
-                else:
-                    if think_memory[134][0] == 1:
-                        return memory[-1][opp_index]
-                    else:
-                        if ((game_round + 1) % rnd.randint(5, 15)) == 0:
-                            return 'D'
-                        else:
-                            return memory[-1][opp_index]
+    elif strategy == 'First By Graaskamp / Second By Mauk':
+        alpha = 0.05
+        if (game_round + 1) == 1:
+            think_memory[134]["d_count"] = 0
+            think_memory[134]["is_retaliating"] = False
+            return 'C'
+        if memory[-1][opp_index] == 'D':
+            think_memory[134]["d_count"] += 1
+        if think_memory[134]["is_retaliating"]:
+            return 'D'
+        if (game_round + 1) == 51:
+            return 'D'
+        if (game_round + 1) > 50 and chisquare([think_memory[134]["d_count"], game_round - think_memory[134]["d_count"]]).pvalue >= alpha:
+            think_memory[134]["is_retaliating"] = True
+            return 'D'
+        return memory[-1][opp_index]
     elif strategy == '2 Tits For Tat':
         if not game_round:
             return 'C'
@@ -1272,7 +1486,7 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         else:
             return 'C'
-    elif strategy == 'Axelrod First By Stein & Rapoport':
+    elif strategy == 'First By Stein & Rapoport':
         data = think_memory[14][0] if isinstance(think_memory[14], list) else think_memory[14]
         if game_round >= tournament_avg_last_round - 1:
             return 'D'
@@ -1280,7 +1494,7 @@ def think(strategy,opp_index,opp_name):
             prev_self = 0 if memory[-1 - 1][self_index] == 'C' else 1
             prev_opp  = 0 if memory[-1][opp_index] == 'C' else 1
             data["matrix"][prev_self, prev_opp] += 1
-        if game_round > 0 and (game_round) % 15 == 0 and data["mode"] == "TFT":
+        if (game_round + 1) % 15 == 0 and data["mode"] == "TFT":
             O = data["matrix"]
             row_sums = O.sum(axis=1)
             col_sums = O.sum(axis=0)
@@ -1294,8 +1508,8 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         opp_last = memory[-1][opp_index] if game_round > 0 else 'C'
         return opp_last
-    elif strategy == 'Axelrod First By Downing':
-        if (game_round + 1) <= 2:
+    elif strategy == 'First By Downing':
+        if (game_round) < 2:
             return 'D'
         if memory[-1-1][self_index] == 'C':
             think_memory[16][2] += 1
@@ -1318,23 +1532,19 @@ def think(strategy,opp_index,opp_name):
         if not game_round:
             return 'D'
         return memory[-1][opp_index]
-    elif strategy == 'Axelrod First By Shubik':
+    elif strategy == 'First By Shubik':
         if not game_round:
             return 'C'
         if memory[-1][opp_index] == 'D' or think_memory[33][0] > 0:
             if memory[-1][opp_index] == 'D':
-                if think_memory[33][1] == 0:
-                    think_memory[33][0] = think_memory[33][2] + 1
-                else:
-                    think_memory[33][0] += 1
-                think_memory[33][2] += 1
+                think_memory[33][1] += 1
+                if think_memory[33][0] == 0:
+                    think_memory[33][0] = think_memory[33][1]
             think_memory[33][0] -= 1
-            think_memory[33][1] = 1
             return 'D'
         else:
-            think_memory[33][1] = 0
             return 'C'
-    elif strategy == 'Axelrod First By Nydegger':
+    elif strategy == 'First By Nydegger':
         if not game_round:
             return 'C'
         elif (game_round + 1) == 2:
@@ -1348,16 +1558,16 @@ def think(strategy,opp_index,opp_name):
             black_list = (1, 6, 7, 17, 22, 23, 26, 29, 30, 31, 33, 38, 39, 45, 49, 54, 55, 58, 61)
             input_power = [1, 4, 16]
             def give_poin(x):
-                opp = (memory[-1 - x][opp_index] == 'D') * 2
-                self = (memory[-1 - x][self_index] == 'D')
+                opp = (memory[-x][opp_index] == 'D') * 2
+                self = (memory[-x][self_index] == 'D')
                 return (opp + self)
-            inp = [give_poin(i) for i in range(3)]
+            inp = [give_poin(i) for i in range(1, 4)]
             A = sum(inp[i] * input_power[i] for i in range(3))
             if A in black_list:
                 return 'D'
             else:
                 return 'C'
-    elif strategy == 'Axelrod First By Grofman':
+    elif strategy == 'First By Grofman':
         if not game_round:
             return 'C'
         else:
@@ -1368,21 +1578,21 @@ def think(strategy,opp_index,opp_name):
                     return 'C'
                 else:
                     return 'D'
-    elif strategy == 'Axelrod Second By Champion':
+    elif strategy == 'Second By Champion':
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[81] += 1
             p_d = think_memory[81] / (game_round)
-        if (game_round + 1) <= 10:
+        if (game_round) < 10:
             return 'C'
-        elif (game_round + 1) <= 25:
+        if (game_round) < 25:
             return memory[-1][opp_index]
-        else:
-            if (memory[-1][opp_index] == 'D') and (p_d >= max(0.4, rnd.random())):
+        if memory[-1][opp_index] == 'D':
+            r = rnd.random()
+            if p_d >= max(0.4, r):
                 return 'D'
-            else:
-                return 'C'
-    elif strategy == 'Axelrod First By Tideman & Chieruzzi':
+        return 'C'
+    elif strategy == 'First By Tideman & Chieruzzi':
         def _decrease_retaliation_counter():
             """Lower the remaining owed retaliation count and flip to non-retaliate
             if the count drops to zero."""
@@ -1436,17 +1646,14 @@ def think(strategy,opp_index,opp_name):
             _decrease_retaliation_counter()
             return 'D'
         return 'C'
-    elif strategy == 'Axelrod First By Tullock':
+    elif strategy == 'First By Tullock':
         if (game_round + 1) < 11:
             return 'C'
         inp = [(memory[-i][opp_index] == 'C') for i in range(10, 0, -1)] 
         t_c = sum(inp)
-        p_c = (t_c / 10) - 0.1
-        if rnd.random() <= p_c:
-            return 'C'
-        else:
-            return 'D'
-    elif strategy == 'Axelrod First By Feld':
+        p_c = (t_c / 10)
+        return rnd_prob(max(0, p_c - 0.1))
+    elif strategy == 'First By Feld':
         if game_round > 0 and memory[-1][opp_index] == 'D':
             return 'D'
         else:
@@ -1455,11 +1662,11 @@ def think(strategy,opp_index,opp_name):
                 return 'C'
             else:
                 return 'D'
-    elif strategy == 'Axelrod Second By White':
+    elif strategy == 'Second By White':
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[83] += 1
-        if (game_round + 1) <= 11:
+        if (game_round) < 10:
             return 'C'
         if memory[-1][opp_index] == 'C':
             return 'C'
@@ -1469,13 +1676,13 @@ def think(strategy,opp_index,opp_name):
                 return 'D'
             else:
                 return 'C'
-    elif strategy == 'Axelrod Second By Black':
+    elif strategy == 'Second By Black':
         prob_coop = {0: 1.0, 1: 1.0, 2: 0.88, 3: 0.68, 4: 0.4, 5: 0.04}
-        if (game_round + 1) <= 5:
+        if (game_round) < 5:
             return 'C'
-        inp = [(memory[-1 - i][opp_index] == 'D') for i in range(5)]
-        return 'C' if rnd.random() <= prob_coop[sum(inp)] else 'D'
-    elif strategy == 'Axelrod Second By Tranquilizer':
+        inp = [(memory[-i][opp_index] == 'D') for i in range(5, 0, -1)]
+        return rnd_prob(prob_coop[sum(inp)])
+    elif strategy == 'Second By Tranquilizer':
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[89][1] += 1
@@ -1565,26 +1772,17 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Gradual':
         if not game_round:
             return 'C'
-        if think_memory[101][1] > 0:
-            think_memory[101][1] -= 1
+        if think_memory[101][2] > 0:
+            think_memory[101][2] -= 1
             return 'C'
-        if memory[-1][opp_index] == 'D' and think_memory[101][0] <= 0:
-            think_memory[101][0] = think_memory[101][2] + 1
-            think_memory[101][2] += 1
-        if think_memory[101][0] > 0:
+        if memory[-1][opp_index] == 'D' or think_memory[101][0] > 0:
+            if memory[-1][opp_index] == 'D':
+                think_memory[101][1] += 1
+                if think_memory[101][0] == 0:
+                    think_memory[101][0] = think_memory[101][1]
             think_memory[101][0] -= 1
             if think_memory[101][0] == 0:
-                think_memory[101][1] = 2
-            return 'D'
-        else:
-            return 'C'
-    elif strategy == 'Good Random':
-        if rnd.random() <= 0.8:
-            return 'C'
-        else:
-            return 'D'
-    elif strategy == 'Bad Random':
-        if rnd.random() <= 0.8:
+                think_memory[101][2] = 2
             return 'D'
         else:
             return 'C'
@@ -1602,7 +1800,7 @@ def think(strategy,opp_index,opp_name):
             return 'C'
         else:
             return 'D'
-    elif strategy == 'Axelrod Second By Weiner':
+    elif strategy == 'Second By Weiner':
         def try_return(to_return):
             if sum(think_memory[35][3]) >= 5:
                 return 'D'
@@ -1636,7 +1834,7 @@ def think(strategy,opp_index,opp_name):
                     think_memory[64] = 1
                 return 'C'
         return 'D'
-    elif strategy == 'Axelrod Second By Borufsen':
+    elif strategy == 'Second By Borufsen':
         def try_return(to_return):
             if to_return == 'C':
                 return 'C'
@@ -1644,7 +1842,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[121][4] = False
                 return 'C'
             return 'D'
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'C'
         if (game_round + 1) > 3:
             if memory[-1][opp_index] == 'C':
@@ -1698,10 +1896,10 @@ def think(strategy,opp_index,opp_name):
                 think_memory[121][3] = 0
                 think_memory[121][4] = True
             return try_return(memory[-1][opp_index])
-    elif strategy == 'Axelrod Second By Graaskamp & Katzen':
+    elif strategy == 'Second By Graaskamp & Katzen':
         if not game_round:
             return 'C'
-        if ((game_round) % 10) == 0:
+        if (game_round % 10) == 0:
             A = -10 + ((game_round + 1) * 3)
             if score[self_index] < A:
                 think_memory[122] = 1
@@ -1719,7 +1917,7 @@ def think(strategy,opp_index,opp_name):
             return 'C'
         else:
             return 'D'
-    elif strategy == 'Axelrod Second By Adams':
+    elif strategy == 'Second By Wiliam Adams':
         if not game_round:
             return 'C'
         if (game_round + 1) == 2:
@@ -1738,7 +1936,7 @@ def think(strategy,opp_index,opp_name):
                 if rnd.random() <= A:
                     return 'D'
             return 'C'
-    elif strategy == 'Axelrod Second By Yamachi':
+    elif strategy == 'Second By Yamachi':
         def try_return(to_return, opp_def):
             """
             Return `to_return`, unless the turn is greater than 40 AND
@@ -1775,7 +1973,7 @@ def think(strategy,opp_index,opp_name):
             return try_return('C', think_memory[125][2])
         return try_return('D', think_memory[125][2])
     elif strategy == 'Prober':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return ('D', 'C', 'C')[(game_round + 1)-1]
         if (memory[1][opp_index] + memory[2][opp_index]) == 'CC':
             return 'D'
@@ -1807,16 +2005,16 @@ def think(strategy,opp_index,opp_name):
             lookup_table = {('CC', 'CC', 'CC'): 'C', ('CC', 'CC', 'CD'): 'D', ('CC', 'CC', 'DC'): 'D', ('CC', 'CC', 'DD'): 'C', ('CC', 'CD', 'CC'): 'D', ('CC', 'CD', 'CD'): 'C', ('CC', 'CD', 'DC'): 'D', ('CC', 'CD', 'DD'): 'D', ('CC', 'DC', 'CC'): 'C', ('CC', 'DC', 'CD'): 'D', ('CC', 'DC', 'DC'): 'D', ('CC', 'DC', 'DD'): 'D', ('CC', 'DD', 'CC'): 'C', ('CC', 'DD', 'CD'): 'D', ('CC', 'DD', 'DC'): 'D', ('CC', 'DD', 'DD'): 'D', ('CD', 'CC', 'CC'): 'D', ('CD', 'CC', 'CD'): 'D', ('CD', 'CC', 'DC'): 'C', ('CD', 'CC', 'DD'): 'D', ('CD', 'CD', 'CC'): 'C', ('CD', 'CD', 'CD'): 'D', ('CD', 'CD', 'DC'): 'C', ('CD', 'CD', 'DD'): 'C', ('CD', 'DC', 'CC'): 'C', ('CD', 'DC', 'CD'): 'D', ('CD', 'DC', 'DC'): 'D', ('CD', 'DC', 'DD'): 'C', ('CD', 'DD', 'CC'): 'C', ('CD', 'DD', 'CD'): 'D', ('CD', 'DD', 'DC'): 'C', ('CD', 'DD', 'DD'): 'D', ('DC', 'CC', 'CC'): 'D', ('DC', 'CC', 'CD'): 'D', ('DC', 'CC', 'DC'): 'C', ('DC', 'CC', 'DD'): 'C', ('DC', 'CD', 'CC'): 'C', ('DC', 'CD', 'CD'): 'C', ('DC', 'CD', 'DC'): 'C', ('DC', 'CD', 'DD'): 'D', ('DC', 'DC', 'CC'): 'D', ('DC', 'DC', 'CD'): 'D', ('DC', 'DC', 'DC'): 'C', ('DC', 'DC', 'DD'): 'D', ('DC', 'DD', 'CC'): 'D', ('DC', 'DD', 'CD'): 'D', ('DC', 'DD', 'DC'): 'D', ('DC', 'DD', 'DD'): 'D', ('DD', 'CC', 'CC'): 'D', ('DD', 'CC', 'CD'): 'D', ('DD', 'CC', 'DC'): 'D', ('DD', 'CC', 'DD'): 'D', ('DD', 'CD', 'CC'): 'C', ('DD', 'CD', 'CD'): 'C', ('DD', 'CD', 'DC'): 'D', ('DD', 'CD', 'DD'): 'D', ('DD', 'DC', 'CC'): 'C', ('DD', 'DC', 'CD'): 'D', ('DD', 'DC', 'DC'): 'D', ('DD', 'DC', 'DD'): 'D', ('DD', 'DD', 'CC'): 'C', ('DD', 'DD', 'CD'): 'C', ('DD', 'DD', 'DC'): 'C', ('DD', 'DD', 'DD'): 'D'}
             return lookup_table[inp]
         return 'C'
-    elif strategy == 'Alternator':
-        if ((game_round + 1) % 2) == 0:
-            return 'D'
-        else:
+    elif strategy == 'Alternator / Second By Duisman':
+        if (game_round % 2) == 0:
             return 'C'
+        else:
+            return 'D'
     elif strategy == 'Suspicious Alternator':
-        if ((game_round + 1) % 2) == 0:
-            return 'C'
-        else:
+        if (game_round % 2) == 0:
             return 'D'
+        else:
+            return 'C'
     elif strategy == 'Sneaky Tit For Tat':
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
@@ -2096,7 +2294,7 @@ def think(strategy,opp_index,opp_name):
         def _has_played_enough_rounds_to_be_tricky():
             return (game_round) >= think_memory[145][0]
         def _opponents_has_cooperated_enough_to_be_tricky():
-            rounds_to_be_checked = [memory[-1 - i][opp_index] for i in range(min(-think_memory[145][0], default_memory_looked))]
+            rounds_to_be_checked = [memory[-i][opp_index] for i in range(1, min(-think_memory[145][0], default_memory_looked) + 1)] 
             return 'D' not in rounds_to_be_checked
         if (
             _has_played_enough_rounds_to_be_tricky()
@@ -2104,7 +2302,7 @@ def think(strategy,opp_index,opp_name):
         ):
             return 'D'
         return 'C'
-    elif strategy == 'Axelrod Second By Cave':
+    elif strategy == 'Second By Cave':
         if not game_round:
             return 'C'
         if memory[-1][opp_index] == 'D':
@@ -2126,7 +2324,7 @@ def think(strategy,opp_index,opp_name):
                 return rnd.choice(['C', 'D'])
         else:
             return 'C'
-    elif strategy == 'Axelrod Second By Kluepfel':
+    elif strategy == 'Second By Kluepfel':
         if not game_round:
             return 'C'
         if (game_round + 1) > 2:
@@ -2152,7 +2350,7 @@ def think(strategy,opp_index,opp_name):
             ):
                 return 'D'
         kluepfel_eyes = [('C', 'C') for _ in range(3)] + memory
-        inp = [kluepfel_eyes[-1 - i][opp_index] for i in range(3)]
+        inp = [kluepfel_eyes[-i][opp_index] for i in range(1, 3 + 1)] 
         if inp[0] == inp[1] and inp[1] == inp[2]:
             return inp[0]
         A = rnd.random()
@@ -2171,7 +2369,7 @@ def think(strategy,opp_index,opp_name):
                 return inp[0]
             else:
                 return 'C' if inp[0] == 'D' else 'D'
-    elif strategy == 'Axelrod Second By Getzler':
+    elif strategy == 'Second By Getzler':
         if not game_round: return 'C'
         if memory[-1][opp_index] == 'D':
             think_memory[150] += 1
@@ -2180,23 +2378,21 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         else:
             return 'C'
-    elif strategy == 'Axelrod Second By Leyvraz':
-        if (game_round + 1) <= 3:
-            return 'C'
-        else:
-            prob_coop = {
-                ('C', 'C', 'C'): 1.0,
-                ('C', 'C', 'D'): 0.5,  
-                ('C', 'D', 'C'): 0.0,  
-                ('C', 'D', 'D'): 0.25,  
-                ('D', 'C', 'C'): 1.0,  
-                ('D', 'C', 'D'): 1.0,  
-                ('D', 'D', 'C'): 1.0,  
-                ('D', 'D', 'D'): 0.25,  
-            }
-            inp = tuple([memory[-1 - i][opp_index] for i in range(3)])
-            return 'C' if rnd.random() <= prob_coop[inp] else 'D'
-    elif strategy == 'Axelrod Second By Eatherley':
+    elif strategy == 'Second By Leyvraz':
+        prob_coop = {
+            ('C', 'C', 'C'): 1.0,
+            ('C', 'C', 'D'): 0.5,  
+            ('C', 'D', 'C'): 0.0,  
+            ('C', 'D', 'D'): 0.25,  
+            ('D', 'C', 'C'): 1.0,  
+            ('D', 'C', 'D'): 1.0,  
+            ('D', 'D', 'C'): 1.0,  
+            ('D', 'D', 'D'): 0.25,  
+        }
+        B = min(3, game_round)
+        inp = tuple((['C'] * (3 - B)) + [memory[-i][opp_index] for i in range(B, 0, -1)])
+        return rnd_prob(prob_coop[inp])
+    elif strategy == 'Second By Eatherley':
         if not game_round:
             return 'C'
         if memory[-1][opp_index] == 'D':
@@ -2204,11 +2400,8 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'C'
         p_d = think_memory[151] / (game_round)
-        if rnd.random() <= p_d:
-            return 'D'
-        else:
-            return 'C'
-    elif strategy == 'Axelrod Second By Richard Hufford':
+        return rnd_prob(1 - p_d)
+    elif strategy == 'Second By Richard Hufford':
         turn = (game_round + 1)
         if turn == 1:
             return 'C'
@@ -2250,8 +2443,8 @@ def think(strategy,opp_index,opp_name):
         elif proportion_agree >= 0.625 and last_four_num >= 2:
             return memory[-1][opp_index]
         return 'D'
-    elif strategy == 'Axelrod Second By Colbert':
-        if (game_round + 1) <= 5:
+    elif strategy == 'Second By Colbert':
+        if (game_round) < 5:
             return 'C'
         elif (game_round + 1) == 6:
             return 'D'
@@ -2263,21 +2456,7 @@ def think(strategy,opp_index,opp_name):
             think_memory[152] = 3
             return 'D'
         return 'C'
-    elif strategy == 'Axelrod Second By Mauk':
-        if game_round > 0:
-            if memory[-1][opp_index] == 'C':
-                think_memory[153][0] += 1
-        if (game_round + 1) <= 10:
-            return 'C'
-        else:
-            p_c = think_memory[153][0] / (game_round + 1)
-            if p_c < 0.7:
-                think_memory[153][1] = 1
-            if think_memory[153][1] == 1:
-                return 'D'
-            else:
-                return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Mikkelson':
+    elif strategy == 'Second By Mikkelson':
         turn = (game_round + 1)
         if turn == 1:
             return 'C'
@@ -2300,7 +2479,7 @@ def think(strategy,opp_index,opp_name):
         if think_memory[154][1] / turn >= 0.15:
             return 'D'
         return 'C'
-    elif strategy == 'Axelrod Second By Rowsam':
+    elif strategy == 'Second By Rowsam':
         turn = (game_round + 1)
         if think_memory[155][0] == "Defect":
             return 'D'
@@ -2331,7 +2510,7 @@ def think(strategy,opp_index,opp_name):
         else:
             think_memory[155][0] = "Coop Def Cycle 1"
         return 'D'
-    elif strategy == 'Axelrod Second By Appold':
+    elif strategy == 'Second By Appold':
         turn = (game_round + 1)
         us_two_turns_ago = 'C' if turn <= 2 else memory[-2][self_index]
         if turn > 1:
@@ -2348,375 +2527,1086 @@ def think(strategy,opp_index,opp_name):
             / think_memory[156][1][us_two_turns_ago]
         )
         return 'C' if rnd.random() <= prob_coop else 'D'
-    elif strategy == 'Axelrod Second By Almy':
-        if (game_round + 1) <= 5:
-            return 'C'
-        else:
-            inp = [(memory[-i][opp_index] == 'D') for i in range(5, 0, -1)] 
-            t_d = sum(inp)
-            if t_d >= 3:
-                return 'D'
-            else:
-                return 'C'
-    elif strategy == 'Axelrod Second By Ambuelh & Hickey':
-        if not game_round:
-            think_memory[158] = 0
-            return 'C'
-        elif (game_round + 1) == 2:
-            return 'D' 
-        elif (game_round + 1) == 3:
-            return 'C'
-        elif (game_round + 1) == 4:
-            if memory[-1][opp_index] == 'C':
-                think_memory[158] = 1 
-            return memory[-1][opp_index]
-        else:
-            if think_memory[158] == 1:
-                return 'D' if ((game_round + 1) % 3 == 0) else 'C'
-            return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Pinkley':
-        if (game_round + 1) <= 3:
-            return 'C'
-        def pay_off_matrix(x,y):
-            if x == 'C':
-                if y == 'C':
-                    return RPST['R']
-                else:
-                    return RPST['T']
-            else:
-                if y == 'C':
-                    return RPST['S']
-                else:
-                    return RPST['P']
-        inp = [pay_off_matrix(memory[-i][opp_index],memory[-i][self_index]) for i in range(3, 0, -1)] 
-        A = sum(inp) / 3
-        if A < 2:
-            return 'D'
-        else:
-            return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Pebley':
-        if not game_round:
-            return 'C'
-        if think_memory[159] > 0:
-            think_memory[159] -= 1
-            return 'D'
-        else:
-            if memory[-1][opp_index] == 'D':
-                think_memory[159] = 1
-                return 'D'
-            else:
-                return 'C'
-    elif strategy == 'Axelrod Second By Falk & Lanqsted':
-        if not game_round:
-            return 'C'
-        else:
-            if think_memory[160][0] == 1:
-                return 'D'
-            else:
-                if (memory[-1][opp_index] == 'D') and (think_memory[160][1] == 0):
-                    think_memory[160][1] = (game_round + 1)
-                    return 'C'
-                if think_memory[160][1] > 0:
-                    if (((game_round + 1) - think_memory[160][1]) <= 3) and (memory[-1][opp_index] == 'D'):
-                        think_memory[160][0] = 1
-                        return 'D'
-                    if (((game_round + 1) - think_memory[160][1]) > 3):
-                        think_memory[160][1] = 0
-                return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Weiderman':
-        if not game_round:
-            return 'C'
-        else:
-            if memory[-1][opp_index] == 'D':
-                think_memory[161] = 1
-            if think_memory[161] == 1:
-                return 'D'
-            else:
-                return 'C'
-    elif strategy == 'Axelrod Second By Dawes & Batell':
-        if not game_round:
-            return 'C'
-        elif (game_round + 1) <= (tournament_avg_last_round - 1):
-            if memory[-1][opp_index] == 'D':
-                think_memory[162] = 1
-            if think_memory[162] == 1:
-                return 'D'
-            else:
-                return 'C'
-        else:
-            return 'D'
-    elif strategy == 'Axelrod Second By Lefevre':
-        if not game_round:
-            return 'C'
-        else:
-            if (memory[-1][self_index] == 'D') and (memory[-1][opp_index] == 'C'):
-                return 'C'
-            else:
-                return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Quayle':
-        if (game_round + 1) <= (0.5 * tournament_avg_last_round):
-            if not game_round:
-                return 'C'
-            return memory[-1][opp_index]
-        else:
-            if score[self_index] < ((game_round) * 2.5):
-                if rnd.random() <= 0.15:
-                    return 'D'
-                else:
-                    return memory[-1][opp_index]
-            else:
-                return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Anderson':
-        if (game_round + 1) <= (tournament_avg_last_round - 10):
-            if not game_round:
-                return 'C'
-            return memory[-1][opp_index]
-        else:
-            return 'D'
-    elif strategy == 'Axelrod Second By Zimmerman':
-        if (game_round + 1) <= (tournament_avg_last_round - 5):
-            if not game_round:
-                return 'C'
-            return memory[-1][opp_index]
-        else:
-            return 'D'
-    elif strategy == 'Axelrod Second By Newman':
-        if (game_round + 1) <= (tournament_avg_last_round - 10):
-            if not game_round:
-                return 'C'
-            if memory[-1][opp_index] == 'D':
-                think_memory[163][0] += 1
-            return memory[-1][opp_index]
-        else:
-            if (think_memory[163][0] / (tournament_avg_last_round - 10)) < 0.05:
-                return 'D'
-            return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Jones':
-        if not game_round:
-            return 'C'
-        if (think_memory[197]
-            and memory[-1] == ('D', 'D')
-            ):
-            think_memory[197] = False
-            return 'C'
-        think_memory[197] = False
-        if game_round >= 3:
-            inp = [memory[-i][opp_index] for i in range(3, 0, -1)]
-            if inp == ['C', 'C', 'C']:
-                think_memory[197] = True
-                return 'D'
-        return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Schurmann':
-        if (game_round + 1) <= 2:
-            return 'C'
-        else:
-            if memory[-1][opp_index] == 'C':
-                return 'C'
-            else:
-                if memory[-1-1][opp_index] == 'C':
-                    return 'C' if rnd.random() <= 0.3 else 'D'
-                else:
-                    return 'D'
-    elif strategy == 'Axelrod Second By Nussbacher':
+    elif strategy == 'Second By Almy':
+        k39r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if k39r + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 2:
+            think_memory[129]["bothd"] += 1
+        if k39r + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) < 2:
+            think_memory[129]["bothd"] = 0
+        think_memory[129]["count"] -= 1
+        k39r = 0
+        voldmv = think_memory[129]["oldmov"]
+        think_memory[129]["oldmov"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+            think_memory[129]["tatcnt"] += 1
+        if think_memory[129]["evil"] == 0 and ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+            think_memory[129]["evil"] = 1
+        while True:
+            step = think_memory[129]["step"]
+            substp = think_memory[129]["substp"]
+            if step == 1:
+                if substp == 1:
+                    think_memory[129]["count"] = 10
+                    think_memory[129]["tatcnt"] = 0
+                    think_memory[129]["titcnt"] = 0
+                    think_memory[129]["substp"] = 2
+                    continue
+                elif substp == 2:
+                    if voldmv + think_memory[129]["oldmov"] == 2:
+                        k39r = 1
+                    think_memory[129]["titcnt"] += k39r
+                    if think_memory[129]["count"] == 0:
+                        think_memory[129]["substp"] = 3
+                    return 'CD'[k39r]
+                elif substp == 3:
+                    oldstp = think_memory[129]["step"]
+                    think_memory[129]["ok"][think_memory[129]["step"]] = score[self_index] - think_memory[129]["totk"]
+                    think_memory[129]["totk"] = score[self_index]
+                    think_memory[129]["substp"] = 1
+                    if think_memory[129]["tatcnt"] > 0:
+                        think_memory[129]["step"] = 1
+                        for i1 in range(1, 3):
+                            for i2 in range(2, 4):
+                                if (
+                                    think_memory[129]["ok"][i1] == 0
+                                    or think_memory[129]["ok"][i2] == 0
+                                ):
+                                    continue
+                                if think_memory[129]["ok"][i1] >= think_memory[129]["ok"][i2]:
+                                    continue
+                                if think_memory[129]["step"] == i1:
+                                    think_memory[129]["step"] = i2
+                        if think_memory[129]["step"] != 3:
+                            if (
+                                think_memory[129]["ok"][think_memory[129]["step"] + 1] == 0
+                                and (think_memory[129]["tatcnt"] >= 4 or think_memory[129]["titcnt"] == 0)
+                            ):
+                                think_memory[129]["step"] += 1
+                        if think_memory[129]["step"] < oldstp and think_memory[129]["bothd"] > 0:
+                            think_memory[129]["step"] = 5
+                        continue
+                    else:
+                        think_memory[129]["step"] = 4
+                        if think_memory[129]["evil"] == 1:
+                            think_memory[129]["step"] = 1
+                        elif think_memory[129]["evil"] == 0:
+                            think_memory[129]["evil"] = -1
+                        continue
+            elif step == 2:
+                if substp == 1:
+                    think_memory[129]["count"] = 10
+                    think_memory[129]["tatcnt"] = 0
+                    think_memory[129]["titcnt"] = 0
+                    think_memory[129]["substp"] = 2
+                    continue
+                elif substp == 2:
+                    if think_memory[129]["oldmov"] == 1:
+                        k39r = 1
+                    think_memory[129]["titcnt"] += k39r
+                    if think_memory[129]["count"] == 0:
+                        think_memory[129]["substp"] = 3
+                    return 'CD'[k39r]
+                elif substp == 3:
+                    think_memory[129]["substp"] = 1
+                    think_memory[129]["step"] = 1
+                    continue
+            elif step == 3:
+                if substp == 1:
+                    think_memory[129]["count"] = 10
+                    think_memory[129]["tatcnt"] = 0
+                    think_memory[129]["titcnt"] = 0
+                    think_memory[129]["substp"] = 2
+                    continue
+                elif substp == 2:
+                    k39r = 1
+                    think_memory[129]["titcnt"] += 1
+                    if think_memory[129]["count"] == 0:
+                        think_memory[129]["substp"] = 3
+                    return 'CD'[k39r]
+                elif substp == 3:
+                    think_memory[129]["substp"] = 1
+                    think_memory[129]["step"] = 1
+                    continue
+            elif step == 4:
+                if substp == 1:
+                    think_memory[129]["substp"] = 2
+                    k39r = 1
+                    think_memory[129]["count"] = think_memory[129]["n"]
+                    think_memory[129]["tatcnt"] = 0
+                    return 'CD'[k39r]
+                elif substp == 2:
+                    if think_memory[129]["count"] == 0:
+                        think_memory[129]["substp"] = 3
+                    return 'CD'[k39r]
+                elif substp == 3:
+                    if think_memory[129]["tatcnt"] != 0:
+                        if think_memory[129]["f"] == 0:
+                            think_memory[129]["n"] += 1
+                            think_memory[129]["substp"] = 1
+                            think_memory[129]["step"] = 1
+                            continue
+                        else:
+                            think_memory[129]["substp"] = 4
+                            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                                think_memory[129]["n"] += 1
+                            think_memory[129]["tatcnt"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                            return 'CD'[k39r]
+                    else:
+                        think_memory[129]["f"] = 1
+                        think_memory[129]["substp"] = 1
+                        continue
+                elif substp == 4:
+                    if think_memory[129]["tatcnt"] <= 4:
+                        return 'CD'[k39r]
+                    think_memory[129]["substp"] = 1
+                    think_memory[129]["step"] = 1
+                    continue
+            elif step == 5:
+                if think_memory[129]["substp"] != 2:
+                    think_memory[129]["count"] = 5
+                    think_memory[129]["substp"] = 2
+                if think_memory[129]["count"] != 0:
+                    return 'CD'[k39r]
+                think_memory[129]["substp"] = 1
+                think_memory[129]["step"] = 1
+                continue
+    elif strategy == 'Second By Ambuehl & Hickey':
         if not game_round:
             return 'C'
-        else:
-            if memory[-1][self_index] == 'D':
-                if ((game_round + 1) >= 3) and ((memory[-1][opp_index] == 'C') and (memory[-1-1][opp_index] == 'C')):
-                    return 'C'
-                else:
-                    return 'D'
-            else:
-                return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Batell':
-        if (game_round + 1) <= 20:
-            if not game_round:
-                return 'C'
-            if memory[-1][opp_index] == 'D':
-                think_memory[164][0] += 1
+        if (game_round + 1) < 6:
             return memory[-1][opp_index]
-        elif (game_round + 1) == 21:
-            think_memory[164][1] = 'exploit' if think_memory[164][0] == 0 else 'tft'
-            return memory[-1][opp_index]
-        else:
-            if think_memory[164][1] == 'exploit':
-                return 'D' if ((game_round + 1) % 5 == 0) else 'C'
-            return memory[-1][opp_index]
-    elif strategy == 'Smith':
+        return choice_majority([memory[-i][opp_index] for i in range(5, 0, -1)], 'C', memory[-5][opp_index])
+    elif strategy == 'Second By Pinkley':
+        if (game_round + 1) == 1:
+            return 'C'
         if (game_round + 1) > 2:
-            if memory[-1-1][self_index] == 'C':
-                think_memory[165][0] += 1
-                if memory[-1][opp_index] == 'C':
-                    think_memory[165][1] += 1
-            else:
-                think_memory[165][2] += 1
-                if memory[-1][opp_index] == 'C':
-                    think_memory[165][3] += 1
-        if (game_round + 1) <= 10:
-            if not game_round:
-                return 'C'
-            return memory[-1][opp_index]
+            n_idx = think_memory[158]["n"]
+            if 0 <= n_idx < 4:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[158]["qc"][n_idx] += 1.0
+                think_memory[158]["qn"][n_idx] += 1.0
+            if n_idx == 0:
+                think_memory[158]["x"] = think_memory[158]["qc"][0] / think_memory[158]["qn"][0]
+                think_memory[158]["px"] = 1.0 - think_memory[158]["x"]
+            elif n_idx == 2:
+                think_memory[158]["y"] = think_memory[158]["qc"][2] / think_memory[158]["qn"][2]
+                think_memory[158]["py"] = 1.0 - think_memory[158]["y"]
+            elif n_idx == 1:
+                think_memory[158]["z"] = think_memory[158]["qc"][1] / think_memory[158]["qn"][1]
+                think_memory[158]["pz"] = 1.0 - think_memory[158]["z"]
+            elif n_idx == 3:
+                think_memory[158]["w"] = think_memory[158]["qc"][3] / think_memory[158]["qn"][3]
+                think_memory[158]["pw"] = 1.0 - think_memory[158]["w"]
+        x = think_memory[158]["x"]
+        px = think_memory[158]["px"]
+        y = think_memory[158]["y"]
+        py = think_memory[158]["py"]
+        z = think_memory[158]["z"]
+        pz = think_memory[158]["pz"]
+        w = think_memory[158]["w"]
+        pw = think_memory[158]["pw"]
+        e = [0.0] * 11
+        e[0] = (3.0 * z) / (z + px) if (z + px) != 0 else 0.0
+        e[1] = (3.0 * (y * z + w * pz) + 5.0 * z * px + px * pz) / (
+            y * z + w * pz + px + z * px + px * pz
+            if (y * z + w * pz + px + z * px + px * pz) != 0
+            else 1.0
+        )
+        e[2] = (3.0 * w * y + 5.0 * w * px + px * pz) / (
+            w * y + 2.0 * w * px + px * pz
+            if (w * y + 2.0 * w * px + px * pz) != 0
+            else 1.0
+        )
+        e[3] = (3.0 * w * py + 5.0 * z * px + px * py) / (
+            w * py + px * py + z * px + px * py
+            if (w * py + px * py + z * px + px * py) != 0
+            else 1.0
+        )
+        e[4] = (3.0 * z + 5.0 * x * z + z * px) / (
+            1.0 - x * y - w * px + 2.0 * z
+            if (1.0 - x * y - w * px + 2.0 * z) != 0
+            else 1.0
+        )
+        e[5] = (8.0 * w * z + z * px) / (
+            2.0 * w * z + w * py + z * px if (2.0 * w * z + w * py + z * px) != 0 else 1.0
+        )
+        e[6] = (3.0 * z * py + 5.0 * x * z + z * py) / (
+            2.0 * z * py + pw * py + x * z
+            if (2.0 * z * py + pw * py + x * z) != 0
+            else 1.0
+        )
+        e[7] = (3.0 * (y * z + w * pz) + 5.0 * (z * pw + w * x) + 1.0 - x * y - z * py) / (
+            y * z + w * pz + 2.0 - 2.0 * x * y - w * px + z * pw + w * x - z * py
+            if (
+                y * z + w * pz + 2.0 - 2.0 * x * y - w * px + z * pw + w * x - z * py
+            )
+            != 0
+            else 1.0
+        )
+        e[8] = (3.0 * w * y + 5.0 * w + 1.0 - x * y - z * py) / (
+            2.0 * w + 1.0 - x * y - z * py
+            if (2.0 * w + 1.0 - x * y - z * py) != 0
+            else 1.0
+        )
+        e[9] = (3.0 * w * py + 5.0 * (z * pw + w * x) + py) / (
+            py + z * pw + w * x + py if (py + z * pw + w * x + py) != 0 else 1.0
+        )
+        e[10] = (5.0 * w + py) / (w + py if (w + py) != 0 else 1.0)
+        ibest = 0
+        beste = e[0]
+        for i in range(1, 11):
+            if e[i] > beste:
+                ibest = i
+                beste = e[i]
+        think_memory[158]["n"] = (2 * think_memory[158]["iold"] + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)) % 4
+        k91r = think_memory[158]["ipol"][ibest][think_memory[158]["n"]]
+        think_memory[158]["iold"] = k91r
+        return 'CD'[k91r]
+    elif strategy == 'Second By Pebly':
+        r = rnd.random()
+        k70r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if think_memory[159]["jz"] == ((memory[-1][opp_index] == 'D') if game_round > 0 else 0):
+            k70r = think_memory[159]["jz"]
         else:
-            if memory[-1][self_index] == 'C':
-                A = think_memory[165][1] / (think_memory[165][0] + 1e-9)
+            k70r = 0
+            if r > 0.2:
+                k70r = 1
+        think_memory[159]["jz"] = k70r
+        return 'CD'[k70r]
+    elif strategy == 'Second By Falk & Langsted':
+        if (game_round + 1) == 1:
+            k85r = 0
+            think_memory[160]["f1"] = k85r
+            return 'CD'[k85r]
+        j5 = think_memory[160]["j0"] / 1e07
+        j3 = int(j5)
+        think_memory[160]["j8"] = (j5 - j3) * 1e07
+        f5 = think_memory[160]["f0"] / 1e07
+        f3 = int(f5)
+        think_memory[160]["f8"] = (f5 - f3) * 1e07
+        think_memory[160]["j0"] = think_memory[160]["j8"] * 10 + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        think_memory[160]["f0"] = think_memory[160]["f8"] * 10 + think_memory[160]["f1"]
+        if think_memory[160]["f1"] != 0:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                think_memory[160]["i1"] += 1
             else:
-                A = think_memory[165][3] / (think_memory[165][2] + 1e-9)
-            if A > 0.65:
-                return 'C'
+                think_memory[160]["i2"] += 1
+        else:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                think_memory[160]["i3"] += 1
             else:
+                think_memory[160]["i4"] += 1
+        if (game_round + 1) > 20:
+            i5_val = think_memory[160]["i1"] + 1e-6
+            i6_val = think_memory[160]["i2"] + 1e-6
+            x8_val = think_memory[160]["i3"] + 1e-6
+            i8_val = think_memory[160]["i4"] + 1e-6
+            a_val = i5_val / i6_val
+            b_val = x8_val / i8_val
+            if 0.5 <= a_val <= 1.5 and 0.5 <= b_val <= 1.5:
+                try:
+                    think_memory[160]["f1"] = k85r
+                except NameError:
+                    think_memory[160]["f1"] = 0
+                k85r = 1
+                think_memory[160]["d"] = 0
+                return 'CD'[k85r]
+        if think_memory[160]["t"] == 1:
+            k85r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            return 'CD'[k85r]
+        if int(think_memory[160]["j0"]) == 11111111:
+            think_memory[160]["t"] = 1
+            k85r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            return 'CD'[k85r]
+        if think_memory[160]["c"] == 1:
+            think_memory[160]["c"] = 0
+            think_memory[160]["f1"] = 1
+            k85r = 0
+            return 'CD'[k85r]
+        z1 = think_memory[160]["j0"] / 100.0
+        z2 = int(z1)
+        z3 = z1 - z2
+        think_memory[160]["j2"] = int(z3 * 100.0)
+        if (game_round) < 30 and think_memory[160]["j2"] == 11:
+            pass
+        else:
+            z4 = think_memory[160]["j0"] / 10000.0
+            z5 = int(z4)
+            z6 = z4 - z5
+            think_memory[160]["j4"] = int(z6 * 10000.0)
+            w8 = think_memory[160]["f0"] / 10000.0
+            z8 = int(w8)
+            z9 = w8 - z8
+            think_memory[160]["f4"] = int(z9 * 10000.0)
+            if think_memory[160]["j4"] == 1011 and think_memory[160]["f4"] == 111:
+                think_memory[160]["t"] = 1
+                k85r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                return 'CD'[k85r]
+        y1 = think_memory[160]["i2"] + think_memory[160]["i4"]
+        y2 = think_memory[160]["i1"] + think_memory[160]["i2"] + 3
+        if y1 >= y2:
+            think_memory[160]["f1"] = 0
+            k85r = 1
+            think_memory[160]["d"] = 0
+            return 'CD'[k85r]
+        if think_memory[160]["d"] == 1:
+            think_memory[160]["d"] = 0
+            think_memory[160]["f1"] = 1
+            k85r = 0
+            return 'CD'[k85r]
+        think_memory[160]["f1"] = 0
+        k85r = 0
+        return 'CD'[k85r]
+    elif strategy == 'Second By Weiderman':
+        k38r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if think_memory[161][1] == 1:
+            return 'D'
+        if think_memory[161][0] >= 4:
+            think_memory[161][0] -= 4
+        think_memory[161][0] = think_memory[161][0] * 2 + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        if think_memory[161][0] == 7:
+            think_memory[161][1] = 1
+        k38r = think_memory[161][1]
+        return 'CD'[k38r]
+    elif strategy == 'Second By Dawes & Batell':
+        if (game_round + 1) == 1:
+            return 'C'
+        if think_memory[162]["mode"] == 1:
+            return 'D'
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+            think_memory[162]["inod"] += 1
+            inoc = (game_round + 1) - think_memory[162]["inod"]
+            t1 = 1.6667 ** think_memory[162]["inod"]
+            t2 = 0.882 ** inoc
+            test_val = t1 * t2
+            if test_val >= 5.0:
+                think_memory[162]["mode"] = 1
                 return 'D'
-    elif strategy == 'Axelrod Second By Leyland':
-        if (game_round + 1) <= 2:
+        return 'C'
+    elif strategy == 'Second By Lefevre':
+        if game_round > 0 and memory[-1][opp_index] == 'D':
+            think_memory[26] += 1
+        k37r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if 5 * think_memory[26] > (game_round + 1):
+            k37r = 1
+        return 'CD'[k37r]
+    elif strategy == 'Second By Quayle':
+        k56r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if (game_round + 1) >= 3:
+            if think_memory[168]["past"] == 1:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[168]["nice2"] += 1
+                think_memory[168]["totdef"] += 1
+                think_memory[168]["bad"] = float(think_memory[168]["nice2"]) / float(think_memory[168]["totdef"])
+            else:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[168]["nice1"] += 1
+                think_memory[168]["totcop"] += 1
+                think_memory[168]["good"] = float(think_memory[168]["nice1"]) / float(think_memory[168]["totcop"])
+        think_memory[168]["past"] = k56r
+        good = think_memory[168]["good"]
+        bad = think_memory[168]["bad"]
+        c = 6.0 * good - 8.0 * bad - 2.0
+        alt = 4.0 * good - 5.0 * bad - 1.0
+        if c >= 0.0 and c >= alt:
+            k56r = 0
+        elif c >= 0.0 and c < alt:
+            k56r = 1 - k56r
+        elif alt >= 0.0:
+            k56r = 1 - k56r
+        else:
+            k56r = 1
+        think_memory[168]["past"] = k56r
+        return 'CD'[k56r]
+    elif strategy == 'Second By Anderson':
+        if (game_round + 1) == 1:
+            return 'CD'[think_memory[195]["iold1"]]
+        if (game_round + 1) >= 3:
+            if think_memory[195]["iold2"] == 1:
+                think_memory[195]["ndc"] += 1 - ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                think_memory[195]["ndd"] += 1 * ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            else:
+                think_memory[195]["ncc"] += 1 - ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                think_memory[195]["ncd"] += 1 * ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        think_memory[195]["iold2"] = think_memory[195]["iold1"]
+        if (game_round + 1) < 16:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                think_memory[195]["iold1"] = 0
+                return 'CD'[think_memory[195]["iold1"]]
+            if think_memory[195]["kount"] >= 3:
+                think_memory[195]["iold1"] = 0
+                return 'CD'[think_memory[195]["iold1"]]
+            think_memory[195]["kount"] += 1
+            think_memory[195]["iold1"] = 1
+            return 'CD'[think_memory[195]["iold1"]]
+        if (game_round + 1) == 17 and ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1 and think_memory[195]["ncd"] == 1 and think_memory[195]["ndd"] == 0:
+            think_memory[195]["mytwin"] = 1
+        if (think_memory[195]["ncd"] * 3) >= (think_memory[195]["ncc"] + think_memory[195]["ncd"]):
+            think_memory[195]["iold1"] = 1
+            return 'CD'[think_memory[195]["iold1"]]
+        if (game_round + 1) % 4 != 0:
+            think_memory[195]["iold1"] = 0
+            return 'CD'[think_memory[195]["iold1"]]
+        if think_memory[195]["mytwin"] == 1:
+            think_memory[195]["iold1"] = 0
+            return 'CD'[think_memory[195]["iold1"]]
+        if think_memory[195]["ndc"] >= ((game_round + 1) // 12) or think_memory[195]["ndd"] == 0:
+            think_memory[195]["iold1"] = 1
+            return 'CD'[think_memory[195]["iold1"]]
+        think_memory[195]["iold1"] = 0
+        return 'CD'[think_memory[195]["iold1"]]
+    elif strategy == 'Second By Zimmerman':
+        k73r = think_memory[388]["ipost"]
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) != think_memory[388]["itest"]:
+            return 'CD'[k73r]
+        if think_memory[388]["itest"] == 1:
+            think_memory[388]["idunu"] += 1
+        elif think_memory[388]["itest"] == 0:
+            think_memory[388]["idunb"] += 1
+        if think_memory[388]["idunu"] < think_memory[388]["iaggd"] and think_memory[388]["idunb"] < think_memory[388]["ipayb"]:
+            return 'CD'[k73r]
+        think_memory[388]["idunu"] = 0
+        think_memory[388]["idunb"] = 0
+        think_memory[388]["ipost"] = 1 if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1 else 0
+        k73r = think_memory[388]["ipost"]
+        think_memory[388]["itest"] = 1 if think_memory[388]["ipost"] == 0 else 0
+        if think_memory[388]["itest"] != 0:
+            rata_rata_skor = score[self_index] // (game_round + 1)
+            think_memory[388]["iaggd"] = think_memory[388]["iaggd"] - 3 + rata_rata_skor
+            if think_memory[388]["iaggd"] <= 0:
+                think_memory[388]["iaggd"] = 1
+        else:
+            think_memory[388]["ipayb"] = int(1.6667 * float(think_memory[388]["iaggd"] + 1))
+        return 'CD'[k73r]
+    elif strategy == 'Second By Newman':
+        k55r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if (game_round + 1) == 1:
+            k55r = 0
+            think_memory[163]["iold"] = k55r
+            return 'CD'[k55r]
+        if (game_round + 1) > 2:
+            if think_memory[163]["iold"] == 0:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[163]["qca"] += 1
+                think_memory[163]["qna"] += 1
+                if think_memory[163]["qna"] > 0:
+                    think_memory[163]["alpha"] = float(think_memory[163]["qca"]) / float(think_memory[163]["qna"])
+            else:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[163]["qcb"] += 1
+                think_memory[163]["qnb"] += 1
+                if think_memory[163]["qnb"] > 0:
+                    think_memory[163]["beta"] = float(think_memory[163]["qcb"]) / float(think_memory[163]["qnb"])
+        think_memory[163]["iold"] = k55r
+        alpha = think_memory[163]["alpha"]
+        beta = think_memory[163]["beta"]
+        polc = 6.0 * alpha - 9.0 * beta - 2.0
+        polalt = 4.0 * alpha - 6.0 * beta - 1.0
+        if polc >= 0:
+            if polc >= polalt:
+                k55r = 0
+                think_memory[163]["iold"] = k55r
+                return 'CD'[k55r]
+            else:
+                k55r = 1 - k55r
+                think_memory[163]["iold"] = k55r
+                return 'CD'[k55r]
+        else:
+            if polalt >= 0:
+                k55r = 1 - k55r
+                think_memory[163]["iold"] = k55r
+                return 'CD'[k55r]
+            else:
+                k55r = 1
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0 or think_memory[163]["iold"] == 0:
+                    think_memory[163]["mutdef"] = 0
+                else:
+                    think_memory[163]["mutdef"] += 1
+                    if think_memory[163]["mutdef"] > 3:
+                        k55r = 0
+                think_memory[163]["iold"] = k55r
+                return 'CD'[k55r]
+    elif strategy == 'Second By Jones':
+        def _jones_sub_evaluation(l4, k, l):
+            x = [0.0] * 8
+            d4 = think_memory[197]["t4"]
+            if d4 > 7:
+                d4 -= 8
+            a1 = l4[d4][0]
+            a2 = l4[d4][1]
+            if a2 == 0:
+                a2 = 1.0
+            a3 = a1 / a2
+            a = 3.0 * a3
+            b = a + a3 + 1.0
+            for c in range(4):
+                x[c] = a
+                x[c + 4] = b
+            t4_local = think_memory[197]["t4"]
+            if t4_local > 4:
+                t4_local -= 4
+            t4_local *= 2
+            for c in range(8):
+                d4_sub = t4_local
+                if c in [4, 5, 6, 7]:
+                    d4_sub += 1
+                if d4_sub == 9:
+                    d4_sub = 1
+                if d4_sub > 7:
+                    d4_sub -= 8
+                a1 = l4[d4_sub][0]
+                a2 = l4[d4_sub][1]
+                if a2 == 0:
+                    a2 = 1.0
+                a3 = a1 / a2
+                a_val = 3.0 * a3
+                b_val = a_val + a3 + 1.0
+                if c in [2, 3, 6, 7]:
+                    x[c] += b_val
+                else:
+                    x[c] += a_val
+            max_val = -999.0
+            s1 = 1
+            for c in range(8):
+                if x[c] > max_val:
+                    max_val = x[c]
+                    s1 = c + 1
+            think_memory[197]["s1"] = s1
+            if s1 < 5:
+                return 0
+            else:
+                return 1
+        l4 = think_memory[197]["l4"]
+        if (game_round + 1) == 81 and score[self_index] == score[opp_index] and score[self_index] == 237:
+            think_memory[197]["t0"] = 1
+        if (game_round + 1) == 1:
+            k81r = 0
+        else:
+            if (game_round + 1) == 2 and ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                think_memory[197]["t9"] = 9
+            if (game_round + 1) < think_memory[197]["t9"]:
+                k81r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            else:
+                if think_memory[197]["t5"] > 7:
+                    think_memory[197]["t5"] -= 8
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    l4[think_memory[197]["t5"]][0] += 1.0
+                if think_memory[197]["t9"] == 9 and think_memory[197]["t0"] == 1:
+                    if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                        think_memory[197]["t0"] = 0
+                        k81r = _jones_sub_evaluation(
+                            l4, score[self_index], score[opp_index]
+                        )
+                    else:
+                        t2 = 0
+                        k81r = 0
+                        temp_m = (game_round + 1)
+                        matched = False
+                        while temp_m >= 140 + t2:
+                            if (
+                                80 + t2 < (game_round + 1) < 140 + t2
+                            ):
+                                k81r = 1
+                                matched = True
+                                break
+                            elif (
+                                140 + t2 <= (game_round) < 180 + t2
+                            ):
+                                k81r = 0
+                                matched = True
+                                break
+                            t2 += 100
+                        if not matched:
+                            k81r = _jones_sub_evaluation(l4, score[self_index], score[opp_index])
+                else:
+                    if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                        think_memory[197]["t8"] += 1
+                        if 8 <= think_memory[197]["t8"] <= 9:
+                            k81r = 0
+                        else:
+                            if think_memory[197]["t8"] > 1:
+                                think_memory[197]["t8"] = 1
+                            k81r = _jones_sub_evaluation(l4, score[self_index], score[opp_index])
+                    else:
+                        if 0 <= think_memory[197]["t8"] < 6:
+                            think_memory[197]["t8"] = 0
+                            k81r = _jones_sub_evaluation(l4, score[self_index], score[opp_index])
+                        else:
+                            if think_memory[197]["t8"] > 0:
+                                think_memory[197]["t8"] = -200
+                            k81r = 0
+                            think_memory[197]["t8"] += 1
+        think_memory[197]["t5"] = think_memory[197]["t4"]
+        if (game_round + 1) % 10 == 0:
+            for c in range(8):
+                l4[c][0] *= 9.0
+            think_memory[197]["t6"] += 1
+        if think_memory[197]["t4"] > 7:
+            think_memory[197]["t4"] -= 8
+        if (game_round + 1) > 3:
+            l4[think_memory[197]["t4"]][1] += 1.0
+        if think_memory[197]["t4"] > 4:
+            think_memory[197]["t4"] -= 4
+        think_memory[197]["t4"] = (think_memory[197]["t4"] * 2) + k81r
+        return 'CD'[k81r]
+    elif strategy == 'Second By Schurmann':
+        r = rnd.random()
+        if (game_round + 1) == 1:
+            return 'C'
+        think_memory[153]["s"] = 2 * ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) + think_memory[153]["h"] + 1
+        if think_memory[153]["z"] == 1:
+            if think_memory[153]["s"] > 1:
+                if think_memory[153]["s"] == 4:
+                    think_memory[153]["q6"] = 0.74 * think_memory[153]["q6"] + 0.104
+                else:
+                    think_memory[153]["q6"] = 0.5 * think_memory[153]["q6"]
+            else:
+                think_memory[153]["q6"] = think_memory[153]["q6"] * 0.57 + 0.43
+            k87r = 1
+            think_memory[153]["h"] = 1
+            if r > think_memory[153]["q6"]:
+                return 'CD'[k87r]
+            else:
+                k87r = 0
+                think_memory[153]["h"] = 0
+                return 'CD'[k87r]
+        else:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                k87r = 0
+                think_memory[153]["h"] = 0
+                return 'CD'[k87r]
+            else:
+                think_memory[153]["z"] = 1
+                if think_memory[153]["s"] > 1:
+                    if think_memory[153]["s"] == 4:
+                        think_memory[153]["q6"] = 0.74 * think_memory[153]["q6"] + 0.104
+                    else:
+                        think_memory[153]["q6"] = 0.5 * think_memory[153]["q6"]
+                else:
+                    think_memory[153]["q6"] = think_memory[153]["q6"] * 0.57 + 0.43
+                k87r = 1
+                think_memory[153]["h"] = 1
+                if r > think_memory[153]["q6"]:
+                    return 'CD'[k87r]
+                else:
+                    k87r = 0
+                    think_memory[153]["h"] = 0
+                    return 'CD'[k87r]
+    elif strategy == 'Second By Nussbacher':
+        if (game_round) < 10:
+            return 'C'
+        r = rnd.random()
+        d = sum((memory[-i][opp_index] == 'D') for i in range(10, 0, -1))
+        if d > 8.9:
+            if r < 0.94:
+                return 'D'
+            return 'C'
+        elif d == 8 or d == 4 or d == 3:
+            if r < 0.915:
+                return 'D'
+            return 'C'
+        elif d == 7 or d == 6 or d == 5 or d == 2:
+            if r < 0.87:
+                return 'D'
+            return 'C'
+        elif d == 1:
+            if r < 0.23:
+                return 'D'
             return 'C'
         else:
-            if think_memory[166] > 0:
-                think_memory[166] -= 1
-                return 'D'
-            leyland_eyes = [('C', 'C') for _ in range(4)] + memory
-            inp = tuple([leyland_eyes[-i][opp_index] for i in range(4, 0, -1)]) 
-            if inp in (("C", "D", "C", "D"), ("D", "C", "D", "C")):
-                think_memory[166] = 1
-                return 'D'
-            else:
-                return leyland_eyes[-1][opp_index]
-    elif strategy == 'Axelrod Second By Mcgurrin':
-        if not game_round:
             return 'C'
-        else:
-            if memory[-1][opp_index] == 'C':
+    elif strategy == 'Second By Batell':
+        k65r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if (game_round + 1) == 1:
+            return 'C'
+        if think_memory[164]["totd"] >= 10:
+            return 'D'
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+            return 'C'
+        think_memory[164]["totd"] += 1
+        if think_memory[164]["totd"] >= 10:
+            return 'D'
+        if think_memory[164]["lastd"] == 0:
+            think_memory[164]["lastd"] = (game_round + 1)
+            return 'C'
+        think_memory[164]["diff"] = (game_round + 1) - think_memory[164]["lastd"]
+        if think_memory[164]["diff"] <= 4:
+            think_memory[164]["totd"] = 10
+            return 'D'
+        think_memory[164]["lastd"] = (game_round + 1)
+        return 'C'
+    elif strategy == 'Second By Smith':
+        r = rnd.random()
+        k52r = 0
+        think_memory[165]["d9"] += 1
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+            think_memory[165]["d9"] = 0
+        if think_memory[165]["d9"] >= 2:
+            k52r = 1
+            if think_memory[165]["d9"] < (5 + 3 * think_memory[165]["d8"]):
+                pass
+            else:
+                think_memory[165]["d9"] = 0
+                think_memory[165]["d8"] += 1
+        if r <= 0.05:
+            k52r = 1 - k52r
+        return 'CD'[k52r]
+    elif strategy == 'Second By Leyland':
+        r = rnd.random()
+        if (game_round + 1) == 1:
+            return 'C'
+        k82r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        think_memory[166]["i5"] += ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        think_memory[166]["d4"] += ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0 and think_memory[166]["i5"] > 1:
+            if think_memory[166]["i5"] > 5:
+                think_memory[166]["i5"] = 0
+                think_memory[166]["i1"] = 0
+                think_memory[166]["i3"] = 1 if think_memory[166]["i5"] <= 5 else 0
+                think_memory[166]["i5"] = 0
+                think_memory[166]["i1"] = 0
                 return 'C'
             else:
-                if score[self_index] > score[opp_index]:
+                think_memory[166]["i5"] = 0
+        if (game_round + 1) >= 30:
+            if think_memory[166]["i3"] != 0:
+                rasio_defeksi = think_memory[166]["d4"] / game_round
+                if abs(rasio_defeksi - 0.5) < 0.1:
+                    think_memory[166]["x"] -= 0.2
+                if think_memory[166]["i2"] == 1:
+                    if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                        think_memory[166]["x"] -= 0.05
+                        if think_memory[166]["x"] < 0.0:
+                            think_memory[166]["x"] = 0.0
+                        think_memory[166]["i2"] = 0
+                        if think_memory[166]["x"] < 0.3:
+                            if r > think_memory[166]["x"]:
+                                k82r = 1
+                                think_memory[166]["i1"] = 1
+                                return 'CD'[k82r]
+                            think_memory[166]["i2"] = think_memory[166]["i1"]
+                            return 'CD'[k82r]
+                        return 'CD'[k82r]
+                    else:
+                        think_memory[166]["x"] += 0.15
+                        if think_memory[166]["x"] > 1.0:
+                            think_memory[166]["x"] = 1.0
+                        think_memory[166]["i2"] = 0
+                        think_memory[166]["i3"] = 1
+                        if think_memory[166]["i5"] > 5:
+                            think_memory[166]["i3"] = 0
+                        think_memory[166]["i5"] = 0
+                        think_memory[166]["i1"] = 0
+                        return 'CD'[k82r]
+                else:
+                    if r > think_memory[166]["x"]:
+                        k82r = 1
+                        think_memory[166]["i1"] = 1
+                        return 'CD'[k82r]
+                    think_memory[166]["i2"] = think_memory[166]["i1"]
+        return 'CD'[k82r]
+    elif strategy == 'Second By Mcgurrin':
+        k45r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if (game_round + 1) == 1:
+            return 'D'
+        if (game_round + 1) == 2:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                think_memory[380]["d"] = 1
+            else:
+                think_memory[380]["d"] = 0
+            return 'C'
+        if (game_round + 1) == 3:
+            k45r = 0
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                if think_memory[380]["d"] == 1:
+                    think_memory[380]["c"] = 1
+            else:
+                if think_memory[380]["d"] != 1:
+                    think_memory[380]["a"] = 1
+            return 'CD'[k45r]
+        if think_memory[380]["c"] == 1:
+            k45r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            return 'CD'[k45r]
+        if think_memory[380]["b"] == 1:
+            k45r = 0
+            if think_memory[380]["jold"] == 1 and ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                k45r = 1
+            think_memory[380]["jold"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            return 'CD'[k45r]
+        if think_memory[380]["a"] == 1:
+            k45r = 1
+            think_memory[380]["e"] += 1
+            if think_memory[380]["e"] != 8:
+                if not (think_memory[380]["jold"] == 1 and ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1):
+                    k45r = 0
+            else:
+                think_memory[380]["e"] = 0
+            think_memory[380]["jold"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            return 'CD'[k45r]
+        if think_memory[380]["d"] == 1:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                k45r = 1
+                think_memory[380]["c"] = 1
+            else:
+                k45r = 0
+                think_memory[380]["b"] = 1
+            return 'CD'[k45r]
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+            k45r = 0
+            think_memory[380]["c"] = 1
+        else:
+            k45r = 0
+            think_memory[380]["b"] = 1
+        return 'CD'[k45r]
+    elif strategy == 'Second By Hollander':
+        r = rnd.random()
+        k62r = 0
+        if (game_round + 1) == think_memory[167]["iran"]:
+            k62r = 1
+            think_memory[167]["iran"] = int(23 * r + (game_round + 1) + 1)
+        else:
+            if think_memory[167]["jold"] == 1 and ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                k62r = 1
+        think_memory[167]["jold"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        return 'CD'[k62r]
+    elif strategy == 'Second By Smoody':
+        r = rnd.random()
+        k50r = 0
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0 and r >= 0.9:
+            k50r = 1
+        return 'CD'[k50r]
+    elif strategy == 'Second By Snodgrass':
+        sc = think_memory[169]["sc"]
+        sl = think_memory[169]["sl"]
+        st = think_memory[169]["st"]
+        gt = think_memory[169]["gt"]
+        tm = think_memory[169]["tm"]
+        while True:
+            code = think_memory[169]["cn"] // 10
+            if code * 10 == think_memory[169]["cn"] and 1 <= code <= 6:
+                if code - 1 < len(sc):
+                    sc[code - 1] = score[self_index]
+            if code - 1 < len(sl) and sl[code - 1] == 1:
+                think_memory[169]["cn"] += 1
+                tm[code - 1] += 1
+                if code == 1:
                     return 'C'
-                else:
+                elif code == 2:
                     return 'D'
-    elif strategy == 'Axelrod Second By Hollander':
-        if (game_round + 1) <= 10:
-            return 'C'
-        else:
-            if ((game_round + 1) % 10) == 1:
-                current_score = score[self_index]
-                score_diff = current_score - think_memory[167][0]
-                think_memory[167][0] = current_score
-                think_memory[167][1] = 1 if score_diff < 20 else 0
-            if think_memory[167][1] == 1:
-                return 'D' if rnd.random() < 0.4 else memory[-1][opp_index]
-            return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Smoody':
-        if (game_round + 1) <= 16:
-            if game_round > 0:
-                think_memory[168][0][(game_round + 1) - 2] = (memory[-1][opp_index] == 'D')
-            return 'C'
-        def smoody_set_new_memory():
-            if (game_round + 1) > 16:
-                for i in range(14):
-                    think_memory[168][0][i] = think_memory[168][0][i+1]
-                think_memory[168][0][14] = (memory[-1][opp_index] == 'D')
-        if think_memory[168][1] > 0:
-            think_memory[168][1] -= 1
-            smoody_set_new_memory()
-            return 'D'
-        A = sum(think_memory[168][0])
-        if A > 5:
-            think_memory[168][1] = 14
-            smoody_set_new_memory()
-            return 'D'
-        else:
-            smoody_set_new_memory()
-            return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Snodgrass':
-        if (game_round + 1) <= 11:
-            if game_round > 0:
-                think_memory[169][0][(game_round + 1) - 2] = (memory[-1][opp_index] == 'D')
-            return 'C'
-        def snodgrass_set_new_memory():
-            if (game_round + 1) > 11:
-                for i in range(9):
-                    think_memory[169][0][i] = think_memory[169][0][i+1]
-                think_memory[169][0][9] = (memory[-1][opp_index] == 'D')
-        if think_memory[169][1] > 0:
-            think_memory[169][1] -= 1
-            snodgrass_set_new_memory()
-            return 'D'
-        A = sum(think_memory[169][0])
-        if A > 3:
-            think_memory[169][1] = 9
-            snodgrass_set_new_memory()
-            return 'D'
-        else:
-            snodgrass_set_new_memory()
-            return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Duisman':
-        if not game_round:
-            return 'C'
-        else:
-            if memory[-1][opp_index] == 'C':
-                think_memory[170] += 1
+                elif code == 3:
+                    k89r_val = 1 - think_memory[169]["mylm"]
+                    think_memory[169]["mylm"] = k89r_val
+                    return 'CD'[k89r_val]
+                elif code == 4:
+                    return memory[-1][opp_index]
+                elif code == 5:
+                    k89r_val = (
+                        1 if (((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1 and think_memory[169]["hlm"] == 1) else 0
+                    )
+                    think_memory[169]["hlm"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                    return 'CD'[k89r_val]
+                elif code == 6:
+                    sgt = 0
+                    for i in range(5):
+                        st[i] = sc[i + 1] - sc[i]
+                        sgt += st[i]
+                        gt[i] += st[i]
+                    mean = sgt // think_memory[169]["csrc"] if think_memory[169]["csrc"] > 0 else 0
+                    amean = 9 * mean // 10
+                    think_memory[169]["csrc"] = 0
+                    for i in range(5):
+                        if sl[i] == 1:
+                            if st[i] < amean:
+                                sl[i] = 0
+                        else:
+                            if tm[i] > 0 and (10 * gt[i] // tm[i]) > amean:
+                                sl[i] = 1
+                        if sl[i] == 1:
+                            think_memory[169]["csrc"] += 1
+                    think_memory[169]["cn"] = 10
+                    continue
             else:
-                think_memory[170] -= 2
-            if think_memory[170] < 0:
-                return 'D'
+                think_memory[169]["cn"] += 10
+                if think_memory[169]["cn"] > 60:
+                    think_memory[169]["cn"] = 10
+                continue
+            break
+        return 'C'
+    elif strategy == 'Second By Robertson':
+        k54r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if (game_round + 1) == 1:
+            return 'C'
+        if (game_round + 1) == 20:
+            think_memory[171]["dl"] = 0.10
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+            think_memory[171]["stdef"] = 0
+            think_memory[171]["coops"] += 1
+            if float(think_memory[171]["opdef"]) > float((game_round + 1)) * think_memory[171]["dl"]:
+                pass
+            elif (game_round + 1) % think_memory[171]["nd"] == 0 and think_memory[171]["okdef"]:
+                k54r = 1
+                think_memory[171]["mydef"] = False
+                think_memory[171]["nodef"] += 1
+                if think_memory[171]["nodef"] % 6 == 0:
+                    think_memory[171]["nd"] -= 1
+                if think_memory[171]["nd"] < 1:
+                    think_memory[171]["nd"] = 1
+                return 'CD'[k54r]
             else:
+                think_memory[171]["mydef"] = False
                 return 'C'
-    elif strategy == 'Axelrod Second By Robertson':
-        if (game_round + 1) <= 41:
-            if game_round > 0:
-                think_memory[171][(game_round + 1) - 2] = (memory[-1][opp_index] == 'D')
-            return 'C'
-        def robertson_set_new_memory():
-            if (game_round + 1) > 41:
-                for i in range(39):
-                    think_memory[171][i] = think_memory[171][i+1]
-                think_memory[171][39] = (memory[-1][opp_index] == 'D')
-        A1 = sum(think_memory[171][i] for i in range(20))
-        A2 = sum(think_memory[171][i + 19] for i in range(20))
-        if memory[-1][opp_index] == 'C':
-            robertson_set_new_memory()
-            return 'C'
+        think_memory[171]["coops"] = 0
+        if (game_round) < 4:
+            k54r = 1
+            return 'CD'[k54r]
+        think_memory[171]["stdef"] += 1
+        think_memory[171]["opdef"] += 1
+        if think_memory[171]["mydef"]:
+            think_memory[171]["okdef"] = False
+        if float(think_memory[171]["opdef"]) > float((game_round + 1)) * think_memory[171]["dl"]:
+            pass
+        elif think_memory[171]["stdef"] > 2:
+            pass
         else:
-            if A1 > A2:
-                robertson_set_new_memory()
-                return 'D'
+            think_memory[171]["mydef"] = False
+            return 'C'
+        if 20 * think_memory[171]["opdef"] <= think_memory[171]["coops"] * (game_round + 1):
+            return 'C'
+        k54r = 1
+        think_memory[171]["mydef"] = False
+        return 'CD'[k54r]
+    elif strategy == 'Second By Rabbie':
+        m = game_round + 1
+        k33r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        j = (memory[-1][opp_index] == 'D') if game_round > 0 else 0.5
+        if m > 2:
+            index = 2 * ((memory[-2][self_index] == 'D') if game_round > 1 else 1) + ((memory[-1][self_index] == 'D') if game_round > 0 else 1) + 1
+            idx = index - 1
+            think_memory[23][0][idx] += float(1 - j)
+            think_memory[23][1][idx] += 1.0
+            if think_memory[23][1][idx] > 0:
+                think_memory[23][2][idx] = think_memory[23][0][idx] / think_memory[23][1][idx]
+        index = 2 * ((memory[-2][self_index] == 'D') if game_round > 1 else 1) + ((memory[-1][self_index] == 'D') if game_round > 0 else 1) + 1
+        idx = index - 1
+        if m > 1 and j != ((memory[-1][self_index] == 'D') if game_round > 0 else 1):
+            think_memory[23][3] = False
+        if m <= 22:
+            ipol = 4
+        elif think_memory[23][3]:
+            ipol = 1
+        else:
+            best = -1.0
+            ipol = 1
+            for ii in range(6):
+                suma = think_memory[23][4][ii]
+                for jj in range(4):
+                    suma += think_memory[23][5][ii][jj] * think_memory[23][2][jj]
+                if suma > best:
+                    best = suma
+                    ipol = ii + 1
+        decision_map = {
+            1: [0, 0, 0, 0],
+            2: [1, 0, 0, 0],
+            3: [1, 0, 1, 0],
+            4: [1, 1, 0, 0],
+            5: [1, 1, 1, 0],
+            6: [1, 1, 1, 1],
+        }
+        if think_memory[23][3] and m > 22:
+            k33r = 0
+        else:
+            k33r = decision_map[ipol][idx]
+        return 'CD'[k33r]
+    elif strategy == 'Second By Hall':
+        k71r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if (game_round + 1) == 1:
+            return 'C'
+        if (game_round + 1) == 2:
+            k71r = 1
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                k71r = 0
+            return 'CD'[k71r]
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+            think_memory[172]["ia"] += 1
+            if think_memory[172]["ia"] == 2:
+                think_memory[172]["ia"] = 0
+                k71r = 1
             else:
-                robertson_set_new_memory()
-                return 'D' if rnd.random() <= 0.75 else 'C'
-    elif strategy == 'Axelrod Second By Rabbie':
-        if not game_round: return 'C'
-        if memory[-1][opp_index] == 'C':
-            return 'C'
+                k71r = 0
         else:
-            return 'D' if rnd.random() <= 0.7 else 'C'
-    elif strategy == 'Axelrod Second By Hall':
-        if not game_round:
-            return 'C'
-        else:
-            if memory[-1][opp_index] == 'D':
-                if think_memory[172] > 0:
-                    think_memory[172] += 1
-                else:
-                    think_memory[172] += 2
-            if think_memory[172] > 0:
-                think_memory[172] -= 1
-                return 'D'
+            think_memory[172]["ib"] += 1
+            if think_memory[172]["ib"] == 2:
+                think_memory[172]["ib"] = 0
+                k71r = 1
             else:
-                return 'C'
-    elif strategy == 'Axelrod Second By Friedland':
-        if not game_round:
+                k71r = 0
+        return 'CD'[k71r]
+    elif strategy == 'Second By Friedland':
+        if (game_round + 1) == 1:
             return 'C'
-        else:
-            if (memory[-1][self_index] == 'D') and (memory[-1][opp_index] == 'C'):
-                return 'D'
+        if think_memory[389]["jr"] == 1:
+            think_memory[389]["k74r_val"] = 1
+            return 'D'
+        if (game_round + 1) > 2:
+            if think_memory[389]["iold"] == 0:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[389]["qca"] += 1.0
+                think_memory[389]["qna"] += 1.0
+                think_memory[389]["alpha"] = think_memory[389]["qca"] / think_memory[389]["qna"]
+                think_memory[389]["qca"] *= 0.8
+                think_memory[389]["qna"] *= 0.8
             else:
-                return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Hotz':
-        if (game_round + 1) <= 2:
-            return 'C'
-        else:
-            if memory[-1][opp_index] != memory[-1-1][opp_index]:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[389]["qcb"] += 1.0
+                think_memory[389]["qnb"] += 1.0
+                think_memory[389]["beta"] = think_memory[389]["qcb"] / think_memory[389]["qnb"]
+                think_memory[389]["qcb"] *= 0.8
+                think_memory[389]["qnb"] *= 0.8
+        think_memory[389]["iold"] = think_memory[389]["k74r_val"]
+        if (game_round + 1) == 37:
+            if not (
+                think_memory[389]["js4"] == 0
+                or think_memory[389]["js11"] == 1
+                or think_memory[389]["jt"] <= 10
+                or think_memory[389]["jt"] >= 26
+                or think_memory[389]["jsw"] >= 26
+            ):
+                think_memory[389]["jr"] = 1
+                think_memory[389]["k74r_val"] = 1
                 return 'D'
+        elif (game_round + 1) > 1:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == think_memory[389]["jl"]:
+                think_memory[389]["jsm"] += 1
+                if think_memory[389]["jsm"] >= 3:
+                    think_memory[389]["js4"] = 1
+                if think_memory[389]["jsm"] >= 11:
+                    think_memory[389]["js11"] = 1
             else:
-                return memory[-1][opp_index]
-    elif strategy == 'Axelrod Second By Grisell / Go By Majority / Soft Go By Majority':
+                think_memory[389]["jsw"] += 1
+                think_memory[389]["jsm"] = 1
+            think_memory[389]["jt"] += ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        think_memory[389]["jl"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        polc = 6.0 * think_memory[389]["alpha"] - 8.0 * think_memory[389]["beta"] - 2.0
+        polalt = 4.0 * think_memory[389]["alpha"] - 5.0 * think_memory[389]["beta"] - 1.0
+        if polc == 0.0:
+            k74r = 0 if polc >= polalt else 1
+        elif polalt >= 0.0:
+            k74r = 1 - think_memory[389]["k74r_val"]
+        else:
+            k74r = 1
+        think_memory[389]["k74r_val"] = k74r
+        return 'CD'[k74r]
+    elif strategy == 'Second By Hotz':
+        if 1 <= (game_round + 1) < 100:
+            probc = 0.1
+        elif 100 <= (game_round + 1) < 200:
+            probc = 0.05
+        elif 200 <= (game_round + 1) < 300:
+            probc = 0.15
+        else:
+            probc = 0.0
+        return rnd_prob(probc)
+    elif strategy == 'Go By Majority / Second By Grisell / Soft Go By Majority':
         if not game_round:
             return 'C'
         return choice_majority([memory[i][opp_index] for i in range(game_round)], 'C', 'C')
@@ -2734,7 +3624,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[176] = True
         return 'D'
     elif strategy == 'Loyal':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'C'
         else:
             return memory[-1][opp_index]
@@ -2753,7 +3643,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[192] += 1
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'D'
         if think_memory[192] == 0:
             return 'D'
@@ -2775,14 +3665,14 @@ def think(strategy,opp_index,opp_name):
                     think_memory[193] = 1
             return 'C'
     elif strategy == 'Mirror':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'C'
         return memory[-2][opp_index]
     elif strategy == 'Bayes Foomii Version':
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[194] += 1
-        if (game_round + 1) <= 12:
+        if (game_round) < 12:
             return 'C'
         p_d = think_memory[194] / (game_round)
         if p_d >= 0.55:
@@ -2811,7 +3701,7 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         return 'C'
     elif strategy == 'Manipulator':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return 'C'
         return 'D'
     elif strategy == 'Retaliate':
@@ -2864,7 +3754,7 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         return 'C'
     elif strategy == 'Alternator Hunter':
-        if (game_round + 1) <= 6:
+        if (game_round) < 6:
             return 'C'
         inp = tuple([memory[-i][opp_index] for i in range(6, 0, -1)]) 
         if inp not in (("C", "D", "C", "D", "C", "D"), ("D", "C", "D", "C", "D", "C")):
@@ -2892,7 +3782,7 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Better & Better':
         return 'C' if rnd.random() <= (game_round / 1000) else 'D'
     elif strategy == 'Handshake':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return ('C', 'D')[game_round]
         if (game_round + 1) == 3:
             think_memory[207] = [memory[-i][opp_index] for i in range(2, 0, -1)] 
@@ -2901,7 +3791,7 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'D'
     elif strategy == 'Fortress 3':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '1:D1|D2,2:D1|C3,3:C3|D1'
         def translating(x):
@@ -2920,7 +3810,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[208] = fortress_rule[1]
         return fortress_rule[0]
     elif strategy == 'Fortress 4':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '1:D1|D2,2:D1|D3,3:D1|C4,4:C4|D1'
         def translating(x):
@@ -2943,7 +3833,7 @@ def think(strategy,opp_index,opp_name):
             if memory[-1][opp_index] == 'C':
                 think_memory[210] = 1
         if (game_round + 1) > 3:
-            inp = tuple([memory[-1 - i][opp_index] for i in range(3)])
+            inp = tuple([memory[-i][opp_index] for i in range(1, 3 + 1)]) 
             if think_memory[210] == 1 and 'C' not in inp:
                 return 'C'
         return 'D'
@@ -2968,15 +3858,15 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         return 'C'
     elif strategy == 'Resurrection':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         if game_round >= 5:
-            inp = [memory[-1 - i][self_index] for i in range(5)]
+            inp = [memory[-i][self_index] for i in range(1, 5 + 1)] 
             if inp == ['D', 'D', 'D', 'D', 'D']:
                 return 'D'
         return memory[-1][opp_index]
     elif strategy == 'Detective':
-        if (game_round + 1) <= 4:
+        if (game_round) < 4:
             return ('C', 'D', 'C', 'C')[game_round]
         elif (game_round + 1) == 5:
             inp = tuple([(memory[-i][opp_index] == 'D') for i in range(4, 0, -1)]) 
@@ -2990,11 +3880,11 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'D'
     elif strategy == 'AON2':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'C'
         return 'C' if rnd.random() <= {('CC', 'CC'): 1, ('CC', 'CD'): 0, ('CC', 'DC'): 0, ('CC', 'DD'): 0, ('CD', 'CC'): 0, ('CD', 'CD'): 1, ('CD', 'DC'): 0, ('CD', 'DD'): 0, ('DC', 'CC'): 0, ('DC', 'CD'): 0, ('DC', 'DC'): 1, ('DC', 'DD'): 0, ('DD', 'CC'): 0, ('DD', 'CD'): 0, ('DD', 'DC'): 0, ('DD', 'DD'): 1}[(memory[-2][self_index] + memory[-1][self_index], memory[-2][opp_index] + memory[-1][opp_index])] else 'D'
     elif strategy == 'Delayed AON1':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'C'
         return 'C' if rnd.random() <= {('CC', 'CC'): 1, ('CC', 'CD'): 0, ('CC', 'DC'): 0, ('CC', 'DD'): 0, ('CD', 'CC'): 0, ('CD', 'CD'): 1, ('CD', 'DC'): 0, ('CD', 'DD'): 1, ('DC', 'CC'): 0, ('DC', 'CD'): 0, ('DC', 'DC'): 1, ('DC', 'DD'): 0, ('DD', 'CC'): 0, ('DD', 'CD'): 1, ('DD', 'DC'): 0, ('DD', 'DD'): 1}[(memory[-2][self_index] + memory[-1][self_index], memory[-2][opp_index] + memory[-1][opp_index])] else 'D'
     elif strategy == 'Meta Minority':
@@ -3028,8 +3918,8 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             think_memory[231][0][memory[-1][opp_index]] += score[self_index] - think_memory[231][1]
         think_memory[231][1] = score[self_index]
-        if (game_round + 1) <= 11:
-            return 'C' if (game_round + 1) <= 6 else 'D'
+        if (game_round) < 11:
+            return 'C' if (game_round) < 6 else 'D'
         if think_memory[231][0]['C'] > think_memory[231][0]['D']:
             return 'C'
         return 'D'
@@ -3064,11 +3954,11 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'D'
     elif strategy == 'Adaptive Pavlov 2006':
-        if (game_round + 1) <= 6:
+        if (game_round) < 6:
             if not game_round:
                 return 'C'
             return memory[-1][opp_index]
-        inp = [memory[-1 - i][opp_index] for i in range(6)]
+        inp = [memory[-i][opp_index] for i in range(1, 6 + 1)] 
         if (game_round) % 6 == 0:
             if inp == ['C'] * 6:
                 think_memory[235] = "Cooperative"
@@ -3095,11 +3985,11 @@ def think(strategy,opp_index,opp_name):
                 return 'D'
         return 'C'
     elif strategy == 'Adaptive Pavlov 2011':
-        if (game_round + 1) <= 6:
+        if (game_round) < 6:
             if not game_round:
                 return 'C'
             return memory[-1][opp_index]
-        inp = [memory[-1 - i][opp_index] for i in range(6)]
+        inp = [memory[-i][opp_index] for i in range(1, 6 + 1)] 
         if (game_round) % 6 == 0:
             if inp == ['C'] * 6:
                 think_memory[236] = "Cooperative"
@@ -3127,19 +4017,19 @@ def think(strategy,opp_index,opp_name):
             think_memory[237] += 1
         p_c = think_memory[237] / (game_round)
         return 'C' if rnd.random() <= p_c else 'D'
-    elif strategy == 'Axelrod Second By Grofman':
-        if (game_round + 1) <= 2:
+    elif strategy == 'Second By Grofman':
+        if (game_round) < 2:
             return 'C'
-        elif 2 < (game_round + 1) <= 7:
+        elif 2 < (game_round) < 7:
             return memory[-1][opp_index]
         else:
-            t_d = sum([(memory[-1 - i][opp_index] == 'D') for i in range(1, min(game_round, 8))])
+            t_d = sum([(memory[-i][opp_index] == 'D') for i in range(2, min(game_round, 8) + 1)]) 
             if memory[-1][opp_index] == 'C' and t_d <= 2:
                 return 'C'
             if memory[-1][opp_index] == 'D' and t_d <= 1:
                 return 'C'
             return 'D'
-    elif strategy == 'Axelrod Second By Tideman & Chieruzzi':
+    elif strategy == 'Second By Tideman & Chieruzzi':
         def _fresh_start():
             """Give the opponent a fresh start by forgetting the past"""
             score[self_index] = 0
@@ -3187,7 +4077,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[240][0] += 1
-                if (game_round + 1) <= 7:
+                if (game_round) < 7:
                     think_memory[240][1] = 1
         if (think_memory[240][1] == 0) and (7 < (game_round + 1) < 180):
             return 'D' if (memory[-2][opp_index], memory[-1][opp_index]) == ('D', 'D') else 'C'
@@ -3238,7 +4128,7 @@ def think(strategy,opp_index,opp_name):
             think_memory[241][0] / (think_memory[241][0] + think_memory[241][1])
         ) else 'D'
     elif strategy == 'Calculator':
-        if (game_round + 1) <= 21:
+        if (game_round) < 21:
             if game_round > 0:
                 think_memory[242][0][(game_round + 1) - 2] = memory[-1][opp_index]
             if (game_round + 1) < 21:
@@ -3261,7 +4151,7 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         return memory[-1][opp_index]
     elif strategy == 'Anti Cycler':
-        if (game_round + 1) <= len(think_memory[243][2]):
+        if (game_round) < len(think_memory[243][2]):
             return think_memory[243][2].pop(0)
         if think_memory[243][1] < think_memory[243][0]:
             think_memory[243][1] += 1
@@ -3399,7 +4289,7 @@ def think(strategy,opp_index,opp_name):
                     return 'D'
         return 'C'
     elif strategy == 'Predator':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:D0|D1,1:D2|D3,2:C4|D3,3:D5|C4,4:C2|D6,5:D7|D3,6:C7|D7,7:D8|D7,8:D8|D6'
         def translating(x):
@@ -3418,7 +4308,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[247] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Pun 1':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '1:C2|C2,2:C1|D1'
         def translating(x):
@@ -3437,7 +4327,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[248] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Raider':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '0:D2|D2,1:C1|D1,2:D0|C3,3:D0|C1'
         def translating(x):
@@ -3456,7 +4346,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[249] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Ripoff':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '1:C2|C3,2:D1|C3,3:C3|D3'
         def translating(x):
@@ -3475,7 +4365,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[250] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Usually Cooperates':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '1:C1|C2,2:D1|C1'
         def translating(x):
@@ -3494,7 +4384,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[251] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Usually Defects':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '1:D2|D1,2:D1|C1'
         def translating(x):
@@ -3513,7 +4403,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[252] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Solution B1':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '1:D2|D1,2:C2|C3,3:C3|C3'
         def translating(x):
@@ -3532,7 +4422,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[253] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Solution B5':
-        if game_round == 0:
+        if not game_round:
             return 'D'
         instruction_string = '1:C2|D6,2:C2|D3,3:C6|D1,4:C3|D6,5:D5|D4,6:C3|D5'
         def translating(x):
@@ -3551,7 +4441,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[254] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Thumper':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '1:C1|D2,2:D1|D1'
         def translating(x):
@@ -3570,7 +4460,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[255] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Evolved FSM 4':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:C0|D2,1:D3|C0,2:D2|C1,3:D3|D1'
         def translating(x):
@@ -3589,7 +4479,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[256] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Evolved FSM 16':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:C0|D12,1:D3|C6,2:D2|D14,3:D3|D3,5:D12|D10,6:C5|D12,7:D3|C1,8:C5|C5,10:D11|C8,11:D15|D5,12:C8|D11,13:D13|D7,14:D13|D13,15:D15|C2'
         def translating(x):
@@ -3608,7 +4498,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[257] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Evolved FSM 16 Noise 05':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:C8|D3,1:C13|D15,2:C12|D3,3:C10|D3,4:D5|D4,5:D4|D10,6:C8|D6,8:C2|D4,10:D4|D1,11:D14|C13,12:C13|C2,13:C13|C6,14:D3|D13,15:D5|C11'
         def translating(x):
@@ -3627,7 +4517,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[258] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'TF 1':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:C7|C1,1:D11|D11,2:D8|C8,3:C3|D12,4:C6|C3,5:C11|D8,6:D13|C14,7:D4|D2,8:D14|D8,9:C0|D10,10:C8|C15,11:D6|D5,12:D6|D9,13:D9|D8,14:D8|D13,15:C4|C5'
         def translating(x):
@@ -3646,7 +4536,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[259] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'TF 2':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:D13|D12,1:D3|D4,2:D14|D9,3:C0|D1,4:D1|D2,7:D12|D2,8:D7|D9,9:D8|D0,10:C2|C15,11:D7|D13,12:C3|D8,13:C7|D10,14:D10|D7,15:C15|D11'
         def translating(x):
@@ -3665,7 +4555,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[260] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'TF 3':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:C0|C3,1:D5|C0,2:C3|D2,3:D4|D6,4:C3|D1,5:C6|D3,6:D6|D6,7:D7|C5'
         def translating(x):
@@ -3684,7 +4574,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[261] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Evolved FSM 6':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '2:D2|D7,3:D6|C4,4:C4|D6,5:D2|D7,6:C3|D5,7:C2|D3'
         def translating(x):
@@ -3707,7 +4597,7 @@ def think(strategy,opp_index,opp_name):
             if memory[-1][opp_index] == 'D':
                 think_memory[263] += 1
         t_d = think_memory[263]
-        if t_d > ((game_round + 1) / 10):
+        if t_d > (game_round / 10):
             return 'D'
         return 'C'
     elif strategy == 'Forgiving Tit For Tat':
@@ -3715,7 +4605,7 @@ def think(strategy,opp_index,opp_name):
             if memory[-1][opp_index] == 'D':
                 think_memory[264] += 1
         t_d = think_memory[264]
-        if t_d > ((game_round + 1) / 10):
+        if t_d > (game_round / 10):
             return memory[-1][opp_index]
         return 'C'
     elif strategy == 'Frequency Analyzer':
@@ -3784,7 +4674,7 @@ def think(strategy,opp_index,opp_name):
             think_memory[268] = memory[-2][opp_index] + memory[-1][opp_index]
         A = {('CC', 'CC', 'CC'): 1.0, ('CC', 'CC', 'CD'): 1.0, ('CC', 'CC', 'DC'): 0.0, ('CC', 'CC', 'DD'): 0.0, ('CC', 'CD', 'CC'): 0.0, ('CC', 'CD', 'CD'): 1.0, ('CC', 'CD', 'DC'): 0.98603825, ('CC', 'CD', 'DD'): 1.0, ('CC', 'DC', 'CC'): 1.0, ('CC', 'DC', 'CD'): 0.0, ('CC', 'DC', 'DC'): 0.0, ('CC', 'DC', 'DD'): 0.16240799, ('CC', 'DD', 'CC'): 0.63548102, ('CC', 'DD', 'CD'): 0.0, ('CC', 'DD', 'DC'): 0.0, ('CC', 'DD', 'DD'): 0.0, ('CD', 'CC', 'CC'): 1.0, ('CD', 'CC', 'CD'): 0.0, ('CD', 'CC', 'DC'): 1.0, ('CD', 'CC', 'DD'): 0.0, ('CD', 'CD', 'CC'): 1.0, ('CD', 'CD', 'CD'): 0.13863175, ('CD', 'CD', 'DC'): 0.06434619, ('CD', 'CD', 'DD'): 1.0, ('CD', 'DC', 'CC'): 1.0, ('CD', 'DC', 'CD'): 1.0, ('CD', 'DC', 'DC'): 1.0, ('CD', 'DC', 'DD'): 1.0, ('CD', 'DD', 'CC'): 0.0, ('CD', 'DD', 'CD'): 0.7724137, ('CD', 'DD', 'DC'): 1.0, ('CD', 'DD', 'DD'): 0.0, ('DC', 'CC', 'CC'): 0.0, ('DC', 'CC', 'CD'): 0.0, ('DC', 'CC', 'DC'): 1.0, ('DC', 'CC', 'DD'): 0.0, ('DC', 'CD', 'CC'): 1.0, ('DC', 'CD', 'CD'): 1.0, ('DC', 'CD', 'DC'): 0.50999729, ('DC', 'CD', 'DD'): 1.0, ('DC', 'DC', 'CC'): 0.0, ('DC', 'DC', 'CD'): 0.0, ('DC', 'DC', 'DC'): 0.00524508, ('DC', 'DC', 'DD'): 0.87463905, ('DC', 'DD', 'CC'): 0.0, ('DC', 'DD', 'CD'): 0.07127653, ('DC', 'DD', 'DC'): 1.0, ('DC', 'DD', 'DD'): 0.0, ('DD', 'CC', 'CC'): 1.0, ('DD', 'CC', 'CD'): 0.0, ('DD', 'CC', 'DC'): 1.0, ('DD', 'CC', 'DD'): 0.0, ('DD', 'CD', 'CC'): 0.0, ('DD', 'CD', 'CD'): 1.0, ('DD', 'CD', 'DC'): 1.0, ('DD', 'CD', 'DD'): 1.0, ('DD', 'DC', 'CC'): 0.0, ('DD', 'DC', 'CD'): 0.28124022, ('DD', 'DC', 'DC'): 1.0, ('DD', 'DC', 'DD'): 0.0, ('DD', 'DD', 'CC'): 0.0, ('DD', 'DD', 'CD'): 0.0, ('DD', 'DD', 'DC'): 1.0, ('DD', 'DD', 'DD'): 0.0}[(memory[-2][self_index] + memory[-1][self_index], memory[-2][opp_index] + memory[-1][opp_index], think_memory[268])]
         return 'C' if rnd.random() <= A else 'D'
-    elif strategy == 'Zero Determinant Memory 2 / ZD-M2':
+    elif strategy == 'ZD-M2 / Zero Determinant Memory 2':
         if (game_round + 1) < 3:
             return 'C'
         A = {('CC', 'CC'): 0.9166666666666666, ('CC', 'CD'): 0.36363636363636365, ('CC', 'DC'): 0.7777777777777778, ('CC', 'DD'): 0.1, ('CD', 'CC'): 0.8333333333333334, ('CD', 'CD'): 0.2727272727272727, ('CD', 'DC'): 0.7777777777777778, ('CD', 'DD'): 0.1, ('DC', 'CC'): 0.6666666666666666, ('DC', 'CD'): 0.09090909090909091, ('DC', 'DC'): 0.7777777777777778, ('DC', 'DD'): 0.1, ('DD', 'CC'): 0.75, ('DD', 'CD'): 0.18181818181818182, ('DD', 'DC'): 0.7777777777777778, ('DD', 'DD'): 0.1}[(memory[-2][self_index] + memory[-1][self_index], memory[-2][opp_index] + memory[-1][opp_index])]
@@ -3793,7 +4683,7 @@ def think(strategy,opp_index,opp_name):
         if not game_round: return 'C'
         return choice_majority([memory[i][opp_index] for i in range(game_round)], 'C', 'D')
     elif strategy == 'Gradual Killer':
-        if (game_round + 1) <= 5:
+        if (game_round) < 5:
             return 'D'
         elif ((game_round + 1) - 5) <= 2:
             return 'C'
@@ -3825,7 +4715,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[273] = True
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return 'D'
         if think_memory[273]:
             return 'D'
@@ -3854,7 +4744,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[276] = True
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'C'
         if think_memory[276]:
             return 'D'
@@ -3989,7 +4879,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[282] = True
-        if (game_round + 1) <= 10:
+        if (game_round) < 10:
             return 'C'
         if (game_round) % 10 == 0 and think_memory[282]:
             if cycle_detec(opp_index, min_ = 3, offset = 10):
@@ -4168,7 +5058,7 @@ def think(strategy,opp_index,opp_name):
                 return 'C'
             return memory[-1][opp_index]
         elif think_memory[290][0] == 'TFTT':
-            if (game_round + 1) <= 2:
+            if (game_round) < 2:
                 return 'C'
             return 'D' if (memory[-2][opp_index], memory[-1][opp_index]) == ('D', 'D') else 'C'
         else:
@@ -4344,20 +5234,20 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'CS / Collective Strategy':
         if game_round > 0 and memory[-1][opp_index] == 'D':
             think_memory[297] += 1
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return ('D', 'C')[game_round]
         if (memory[0][opp_index] + memory[1][opp_index]) == 'CD':
             return 'C'
         return 'D'
     elif strategy == 'Prober 2':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return ('D', 'C', 'C')[(game_round + 1)-1]
         if (memory[1][opp_index] + memory[2][opp_index]) == 'DC':
             return 'C'
         else:
             return memory[-1][opp_index]
     elif strategy == 'Prober 3':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return ('D', 'C')[(game_round + 1)-1]
         if memory[1][opp_index] == 'C':
             return 'D'
@@ -4385,7 +5275,7 @@ def think(strategy,opp_index,opp_name):
                 return 'C'
             return 'D' if memory[-1][opp_index] == 'D' else 'C'
     elif strategy == 'Hard Prober':
-        if (game_round + 1) <= 4:
+        if (game_round) < 4:
             return ('D', 'D', 'C', 'C')[(game_round + 1)-1]
         if (memory[1][opp_index] + memory[2][opp_index]) == 'CC':
             return 'D'
@@ -4437,10 +5327,10 @@ def think(strategy,opp_index,opp_name):
                 return 'D'
         return 'C'
     elif strategy == 'Double Resurrection':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         if game_round >= 5:
-            inp = [memory[-1 - i][self_index] for i in range(5)]
+            inp = [memory[-i][self_index] for i in range(1, 5 + 1)] 
             if inp == ['C', 'C', 'C', 'C', 'C']:
                 return 'D'
             if inp == ['D', 'D', 'D', 'D', 'D']:
@@ -4516,7 +5406,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[304][1] = 0
                 think_memory[304][0] = False
         return 'C'
-    elif strategy == 'Axelrod Second By Downing':
+    elif strategy == 'First By Downing, But Get Revised By Axelrod':
         round_number = game_round + 1
         if round_number == 1:
             return 'C'
@@ -4536,7 +5426,7 @@ def think(strategy,opp_index,opp_name):
         if c >= 0 and c >= alt:
             move = 'C'
         elif (0 <= c < alt) or (alt >= 0):
-            move = 'C' if memory[-1][self_index] == 'D' else 'D'
+            move = flip(memory[-1][self_index])
         else:
             move = 'D'
         return move
@@ -4569,7 +5459,7 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Short Mem':
         if game_round <= 10:
             return 'C'
-        array = [memory[-1 - i][opp_index] for i in range(10)]
+        array = [memory[-i][opp_index] for i in range(1, 10 + 1)] 
         C_counts = array.count('C')
         D_counts = array.count('D')
         if C_counts - D_counts >= 3:
@@ -4583,7 +5473,7 @@ def think(strategy,opp_index,opp_name):
         very_bad_score = RPST['P']
         wish_score = (RPST['R'] + RPST['P']) / 2
         """Actual strategy definition that determines player's action."""
-        if game_round == 0:
+        if not game_round:
             return 'C'
         current_average_score = score[self_index] / game_round
         if current_average_score > very_good_score:
@@ -4602,24 +5492,24 @@ def think(strategy,opp_index,opp_name):
         if not game_round:
             return 'C'
         think_memory[306] += (memory[-1][opp_index] == 'C')
-        inp = [memory[-1 - i][opp_index] for i in range(min(2, game_round))]
+        inp = [memory[-i][opp_index] for i in range(1, min(2, game_round) + 1)] 
         if 'D' in inp:
             return 'C'  if rnd.random() <= (
                 think_memory[306] / game_round
             ) else 'D'
         else:
             return 'C'
-    elif strategy == 'Hard Tit For Tat / 3 Tits For Tat':
+    elif strategy == '3 Tits For Tat / Hard Tit For Tat':
         if not game_round:
             return 'C'
-        inp = [memory[-1 - i][opp_index] for i in range(min(3, game_round))]
+        inp = [memory[-i][opp_index] for i in range(1, min(3, game_round) + 1)] 
         if 'D' in inp:
             return 'D'
         return 'C'
-    elif strategy == 'Hard Tit For 2 Tats / 2 Tits For 2 Tats':
+    elif strategy == '2 Tits For 2 Tats / Hard Tit For 2 Tats':
         if not game_round:
             return 'C'
-        inp = [memory[-1 - i][opp_index] for i in range(min(3, game_round))]
+        inp = [memory[-i][opp_index] for i in range(1, min(3, game_round) + 1)] 
         if 'DD' in "".join(inp):
             return 'D'
         return 'C'
@@ -4656,21 +5546,22 @@ def think(strategy,opp_index,opp_name):
         if not game_round:
             return 'C'
         if memory[-1][opp_index] == 'D':
-            think_memory[281][2] += 1
-        if think_memory[281][1] > 0:
-            think_memory[281][1] -= 1
+            think_memory[281][1] += 1
+        if think_memory[281][2] > 0:
+            think_memory[281][2] -= 1
             return 'C'
         if memory[-1][opp_index] == 'D' or think_memory[281][0] > 0:
             if memory[-1][opp_index] == 'D':
-                think_memory[281][0] = think_memory[281][2]
+                if think_memory[281][0] == 0:
+                    think_memory[281][0] = think_memory[281][1]
             think_memory[281][0] -= 1
             if think_memory[281][0] == 0:
-                think_memory[281][1] = 2
+                think_memory[281][2] = 2
             return 'D'
         else:
             return 'C'
     elif strategy == 'Spiteful Tit For Tat':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         if game_round >= 2:
             if ((memory[-2][opp_index], memory[-1][opp_index]) == ('D', 'D')) or think_memory[308]:
@@ -4685,7 +5576,7 @@ def think(strategy,opp_index,opp_name):
             return memory[-1][opp_index]
         return memory[-1][self_index]
     elif strategy == 'Alexei / End Game Cheater':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         if game_round >= (tournament_avg_last_round):
             return 'D'
@@ -4701,7 +5592,7 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'N Tits For M Tats':
         if game_round <= (think_memory[310][0] - 1):
             return  'C'
-        inp = sum([(memory[-1 - i][opp_index] == 'D') for i in range(think_memory[310][0])])
+        inp = sum([(memory[-i][opp_index] == 'D') for i in range(1, think_memory[310][0] + 1)]) 
         if inp == think_memory[310][0]:
             think_memory[310][2] = think_memory[310][1]
         if think_memory[310][2] > 0:
@@ -4729,7 +5620,7 @@ def think(strategy,opp_index,opp_name):
         if game_round % 2 == 0:
             return memory[-1][opp_index] if game_round > 0 else 'C'
         return 'C' if rnd.random() <= Peta else 'D'
-    elif strategy == 'Burn Both Ends / BBE':
+    elif strategy == 'BBE / Burn Both Ends':
         if not game_round:
             return 'C'
         if memory[-1][opp_index] == 'C':
@@ -4761,7 +5652,7 @@ def think(strategy,opp_index,opp_name):
         else:
             probability = 20 / current_round
             return 'C' if rnd.random() <= probability else 'D'
-    elif strategy == 'Zero Determinant Extortion / ZD-X':
+    elif strategy == 'ZD-X / Zero Determinant Extortion':
         phi = 0.2
         s = 0.1
         l = 1.0
@@ -4774,7 +5665,7 @@ def think(strategy,opp_index,opp_name):
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
         return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
-    elif strategy == 'Zero Determinant Generous / ZD-G':
+    elif strategy == 'ZD-G / Zero Determinant Generous':
         phi = 1/8
         s = 0.5
         l = 3.0
@@ -4787,7 +5678,7 @@ def think(strategy,opp_index,opp_name):
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
         return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
-    elif strategy == 'Zero Determinant Generous Tit For Tat / ZD-GTFT':
+    elif strategy == 'ZD-GTFT / Zero Determinant Generous Tit For Tat':
         phi = 0.25
         s = 0.5
         l = 3.0
@@ -4800,7 +5691,7 @@ def think(strategy,opp_index,opp_name):
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
         return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
-    elif strategy == 'Zero Determinant Mischief / ZD-MS':
+    elif strategy == 'ZD-MS / Zero Determinant Mischief':
         phi = 0.1
         s = 0.0
         l = 1.0
@@ -4813,7 +5704,7 @@ def think(strategy,opp_index,opp_name):
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
         return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
-    elif strategy == 'Zero Determinant Set / ZD-S':
+    elif strategy == 'ZD-S / Zero Determinant Set':
         phi = 1/4
         s = 0.0
         l = 2.0
@@ -4826,7 +5717,7 @@ def think(strategy,opp_index,opp_name):
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
         return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
-    elif strategy == 'Zero Determinant Equalizer / ZD-Q':
+    elif strategy == 'ZD-Q / Zero Determinant Equalizer':
         phi = 0.125
         s = 0.0
         l = 2.0
@@ -4909,16 +5800,16 @@ def think(strategy,opp_index,opp_name):
             return 'D'
     elif strategy == 'Free Rider':
         if game_round > 0 and memory[-1][opp_index] == 'D':
-            return '[SKIP]'
+            return '[OUT]'
         return 'D'
     elif strategy == 'Rover':
         threshold = 2.0
         if game_round > 0 and (score[self_index] - think_memory[318]) < threshold:
-            return '[SKIP]'
+            return '[OUT]'
         think_memory[318] = score[self_index]
         return 'D'
     elif strategy == 'Vengeful':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = "1:C1|D2,2:D3|D3,3:C1|D2"
         def translating(x):
@@ -4937,7 +5828,7 @@ def think(strategy,opp_index,opp_name):
         think_memory[319] = finite_state_rule[1]
         return finite_state_rule[0]
     elif strategy == 'Deadlock Breaker':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = "1:C1|D2,2:C1|D3,3:C1|C1"
         def translating(x):
@@ -4955,8 +5846,8 @@ def think(strategy,opp_index,opp_name):
         finite_state_rule = instruction[think_memory[320]][(memory[-1][opp_index] == 'D')]
         think_memory[320] = finite_state_rule[1]
         return finite_state_rule[0]
-    elif strategy == 'Treasure Hunt / Sugar Strategy':
-        if game_round == 0:
+    elif strategy == 'Sugar Strategy / Treasure Hunt':
+        if not game_round:
             return 'C'
         instruction_string = "1:C2|D4,2:D3|D4,3:C3|D4,4:D4|D4"
         def translating(x):
@@ -4997,7 +5888,7 @@ def think(strategy,opp_index,opp_name):
         E_sh = (pc_given_c * RPST['R']) + ((1 - pc_given_c) * RPST['S'])
         E_st = (pc_given_d * RPST['T']) + ((1 - pc_given_d) * RPST['P'])
         return 'C' if E_sh > E_st else 'D'
-    elif strategy == 'Look Up / Look Ahead':
+    elif strategy == 'Look Ahead / Look Up':
         depth = 5
         PAYOFFS = {
             ('C', 'C'): (RPST['R'], RPST['R']),
@@ -5040,14 +5931,14 @@ def think(strategy,opp_index,opp_name):
                 return 'D'
         return 'C'
     elif strategy == 'Lenient Grim 2':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         if game_round >= 2:
             if (memory[-2][opp_index], memory[-1][opp_index]) == ('D', 'D'):
                 return 'D'
         return memory[-1][self_index]
     elif strategy == 'Lenient Grim 3':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         if game_round >= 3:
             if (memory[-3][opp_index], memory[-2][opp_index], memory[-1][opp_index]) == ('D', 'D', 'D'):
@@ -5059,7 +5950,7 @@ def think(strategy,opp_index,opp_name):
                 return 'D'
         return 'C' if rnd.random() > 0.1 else 'D'
     elif strategy == 'Exploratory Lenient Grim 2':
-        if game_round == 0:
+        if not game_round:
             return 'C' if rnd.random() > 0.1 else 'D'
         if game_round >= 2:
             if (memory[-2][opp_index], memory[-1][opp_index]) == ('D', 'D'):
@@ -5108,7 +5999,7 @@ def think(strategy,opp_index,opp_name):
         if think_memory[327] > 0:
             think_memory[327] -= 1
             return 'D'
-        recent_opp = [memory[-1 - i][opp_index] for i in range(min(3, game_round))]
+        recent_opp = [memory[-i][opp_index] for i in range(1, min(3, game_round) + 1)] 
         if recent_opp.count('D') >= anger_threshold:
             think_memory[327] = punishment_length - 1
             return 'D'
@@ -5116,7 +6007,7 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Observant':
         if game_round < 5:
             return 'C'
-        inp = [memory[-1 - i][opp_index] for i in range(game_round)]
+        inp = [memory[-i][opp_index] for i in range(1, game_round + 1)] 
         d_ratio = inp.count('D') / game_round
         if d_ratio > 0.5:
             return 'D'
@@ -5124,7 +6015,7 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Mensa':
         if game_round < 3:
             return 'C'
-        inp = [memory[-1 - i][opp_index] for i in range(game_round)]
+        inp = [memory[-i][opp_index] for i in range(1, game_round + 1)] 
         c_ratio = inp.count('C') / game_round
         if c_ratio > 0.8:
             return 'D'
@@ -5132,7 +6023,7 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Killer':
         if game_round < 4:
             return 'D' if game_round % 2 == 1 else 'C'
-        inp = [memory[-1 - i][opp_index] for i in range(game_round)]
+        inp = [memory[-i][opp_index] for i in range(1, game_round + 1)] 
         if inp.count('D') == 0:
             return 'D'
         return memory[-1][opp_index]
@@ -5146,15 +6037,6 @@ def think(strategy,opp_index,opp_name):
         if similarity >= threshold:
             return 'C'
         return memory[-1][opp_index]
-    elif strategy == 'TOM Level 1 / Theory Of Mind Level 1':
-        if not game_round:
-            return 'C'
-        my_history = [memory[-1 - i][self_index] for i in range(game_round)]
-        my_c_ratio = my_history.count('C') / game_round
-        predicted_opp_move = 'D' if my_c_ratio > 0.7 or memory[-1][opp_index] == 'D' else 'C'
-        if predicted_opp_move == 'D':
-            return 'D'
-        return 'C'
     elif strategy == 'Bandit UCB':
         payoff_map = {
             ('C', 'C'): RPST['R'], ('C', 'D'): RPST['S'],
@@ -5361,7 +6243,7 @@ def think(strategy,opp_index,opp_name):
             if think_memory[332][2] > 0:
                 return 'C'
             return 'C' if 'D' not in (memory[-2][opp_index], memory[-3][opp_index]) else memory[-1][opp_index]
-        if (game_round + 1) <= 35:
+        if (game_round) < 35:
             if (game_round + 1) in (22, 35):
                 think_memory[332][2] = 2
                 return 'D'
@@ -5482,7 +6364,7 @@ def think(strategy,opp_index,opp_name):
         if game_round < 5:
             return 'D'
         inp1 = [memory[i][opp_index] for i in range(5)]
-        inp2 = [memory[-1 - i][opp_index] for i in range(5)]
+        inp2 = [memory[-i][opp_index] for i in range(1, 5 + 1)] 
         if 'C' in inp1 or ('C' not in inp2 if game_round > 5 else False):
             return 'D'
         elif game_round == 5:
@@ -6221,19 +7103,9 @@ def think(strategy,opp_index,opp_name):
             return 'C' if c_ratio >= threshold else 'D'
         return 'C'
     elif strategy == 'Defect Once':
-        return 'D' if game_round == 0 else 'C'
+        return 'D' if not game_round else 'C'
     elif strategy == 'Cooperate Once':
-        return 'C' if game_round == 0 else 'D'
-    elif strategy == 'Forgiving Bot':
-        threshold = 0.1
-        if not game_round:
-            return 'C'
-        if memory[-1][opp_index] == 'D':
-            think_memory[380] += 1
-        p_d = think_memory[380] / game_round
-        if p_d >= threshold:
-            return 'D'
-        return 'C'
+        return 'C' if not game_round else 'D'
     elif strategy == 'Forgetful Majority Bot':
         M = 10
         if not game_round:
@@ -6246,16 +7118,6 @@ def think(strategy,opp_index,opp_name):
         if 'D' in inp:
             return memory[-1][opp_index]
         return 'D'
-    elif strategy == 'Forgiving Tit For Tat':
-        threshold = 0.1
-        if not game_round:
-            return 'C'
-        if memory[-1][opp_index] == 'D':
-            think_memory[381] += 1
-        p_d = think_memory[381] / game_round
-        if p_d >= threshold:
-            return memory[-1][opp_index]
-        return 'C'
     elif strategy == 'Jester':
         return rnd_prob(0.9)
     elif strategy == 'MSAgent':
@@ -6266,11 +7128,19 @@ def think(strategy,opp_index,opp_name):
             'DD':RPST['P'] * -0.2,
         }
         if game_round > 0:
-            reward = payoff[memory[-1][self_index] + memory[-1][opp_index]]
-            immortal_memory[0]['Trust'] = immortal_memory[0]['Trust'] + ((1 - immortal_memory[0]['Trust']) * reward)
+            reward1 = payoff[memory[-1][self_index] + memory[-1][opp_index]]
+            reward2 = (memory[-1][self_index] == 'C')
+            if reward1 >= 0:
+                immortal_memory[0]['Trust'] = immortal_memory[0]['Trust'] + ((1 - immortal_memory[0]['Trust']) * reward1)
+            else:
+                immortal_memory[0]['Trust'] = immortal_memory[0]['Trust'] + (immortal_memory[0]['Trust'] * reward1)
+            if reward2 >= 0:
+                immortal_memory[0]['Trustworthiness'] = immortal_memory[0]['Trustworthiness'] + ((1 - immortal_memory[0]['Trustworthiness']) * reward2)
+            else:
+                immortal_memory[0]['Trustworthiness'] = immortal_memory[0]['Trustworthiness'] + (immortal_memory[0]['Trustworthiness'] * reward2)
         if rnd.random() < immortal_memory[0]['Trust']:
             return rnd_prob(immortal_memory[0]['Trustworthiness'])
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Statistical Strategy':
         payoff = {
             'CC':RPST['R'],
@@ -6331,8 +7201,818 @@ def think(strategy,opp_index,opp_name):
             if payoff[memory[-1][self_index] + memory[-1][opp_index]] < RPST['R']:
                 immortal_memory[2][game_round - 2] = flip(immortal_memory[2][game_round - 2])
         return immortal_memory[2][game_round - 1]
+    elif strategy == 'WHAgent':
+        payoff = {
+            'CC':(RPST['R'] / 3) * 0.7,
+            'CD':(RPST['S'] - RPST['P']) * 0.5,
+            'DC':RPST['T'] / 5,
+            'DD':RPST['P'] * -0.2,
+        }
+        if game_round > 0:
+            reward1 = payoff[memory[-1][self_index] + memory[-1][opp_index]]
+            reward2 = (memory[-1][self_index] != 'C')
+            if reward1 >= 0:
+                immortal_memory[5]['Trust'] = immortal_memory[5]['Trust'] + ((1 - immortal_memory[5]['Trust']) * reward1)
+            else:
+                immortal_memory[5]['Trust'] = immortal_memory[5]['Trust'] + (immortal_memory[5]['Trust'] * reward1)
+            if reward2 >= 0:
+                immortal_memory[5]['Trustworthiness'] = immortal_memory[5]['Trustworthiness'] + ((1 - immortal_memory[5]['Trustworthiness']) * reward2)
+            else:
+                immortal_memory[5]['Trustworthiness'] = immortal_memory[5]['Trustworthiness'] + (immortal_memory[5]['Trustworthiness'] * reward2)
+            if rnd.random() < immortal_memory[5]['Trust']:
+                p_c = sum((memory[i][opp_index] == 'C') for i in range(game_round)) / game_round
+                A = 0.5 + abs(p_c - 0.5)
+                if rnd.random() < A:
+                    E = memory[-1][opp_index]
+                else:
+                    E = flip(memory[-1][opp_index])
+                if A == 'D':
+                    return '[OUT]'
+            else:
+                if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
+                    return '[OUT]'
+        return rnd_prob(immortal_memory[5]['Trustworthiness'])
+    elif strategy == 'RLAgent':
+        payoff = {
+            'CC':(RPST['R'] / 3) * 0.7,
+            'CD':(RPST['S'] - RPST['P']) * 0.5,
+            'DC':RPST['T'] / 5,
+            'DD':RPST['P'] * -0.2,
+        }
+        relative_reward = True
+        if game_round > 0:
+            gamma = 0.3
+            learning_rate = 0.1
+            reward1 = payoff[memory[-1][self_index] + memory[-1][opp_index]]
+            reward2 = (memory[-1][self_index] != 'C')
+            think_memory[382][0] = reward1 + (gamma * think_memory[382][0])
+            think_memory[382][1] = 1 + (gamma * think_memory[382][1])
+            think_memory[382][2] = reward2 + (gamma * think_memory[382][2])
+            think_memory[382][3] = 1 + (gamma * think_memory[382][3])
+            if relative_reward and think_memory[382][1] > 0:
+                reward1 = reward1 - (think_memory[382][0] / think_memory[382][1])
+                if reward1 >= 0:
+                    immortal_memory[6]['Trust'] = immortal_memory[6]['Trust'] + (learning_rate * ((1 - immortal_memory[6]['Trust']) * reward1))
+                else:
+                    immortal_memory[6]['Trust'] = immortal_memory[6]['Trust'] + (learning_rate * (immortal_memory[6]['Trust'] * reward1))
+            if relative_reward and think_memory[382][3] > 0:
+                reward2 = reward2 - (think_memory[382][2] / think_memory[382][3])
+                if reward2 >= 0:
+                    immortal_memory[6]['Trustworthiness'] = immortal_memory[6]['Trustworthiness'] + (learning_rate * ((1 - immortal_memory[6]['Trustworthiness']) * reward2))
+                else:
+                    immortal_memory[6]['Trustworthiness'] = immortal_memory[6]['Trustworthiness'] + (learning_rate * (immortal_memory[6]['Trustworthiness'] * reward2))
+            if rnd.random() < immortal_memory[6]['Trust']:
+                p_c = sum((memory[i][opp_index] == 'C') for i in range(game_round)) / game_round
+                A = 0.5 + abs(p_c - 0.5)
+                if rnd.random() < A:
+                    E = memory[-1][opp_index]
+                else:
+                    E = flip(memory[-1][opp_index])
+                if A == 'D':
+                    return '[OUT]'
+            else:
+                if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
+                    return '[OUT]'
+        return rnd_prob(immortal_memory[6]['Trustworthiness'])
+    elif strategy == 'GossipAgent':
+        payoff = {
+            'CC':(RPST['R'] / 3) * 0.7,
+            'CD':(RPST['S'] - RPST['P']) * 0.5,
+            'DC':RPST['T'] / 5,
+            'DD':RPST['P'] * -0.2,
+        }
+        if game_round > 0:
+            reward1 = payoff[memory[-1][self_index] + memory[-1][opp_index]]
+            reward2 = (memory[-1][self_index] != 'C')
+            if reward1 >= 0:
+                immortal_memory[7]['Trust'] = immortal_memory[7]['Trust'] + ((1 - immortal_memory[7]['Trust']) * reward1)
+            else:
+                immortal_memory[7]['Trust'] = immortal_memory[7]['Trust'] + (immortal_memory[7]['Trust'] * reward1)
+            if reward2 >= 0:
+                immortal_memory[7]['Trustworthiness'] = immortal_memory[7]['Trustworthiness'] + ((1 - immortal_memory[7]['Trustworthiness']) * reward2)
+            else:
+                immortal_memory[7]['Trustworthiness'] = immortal_memory[7]['Trustworthiness'] + (immortal_memory[7]['Trustworthiness'] * reward2)
+            if reward1 > 0:
+                immortal_memory[7]['Memory'][opp_name] = 'GOOD'
+            else:
+                immortal_memory[7]['Memory'][opp_name] = 'BAD'
+            if rnd.random() < immortal_memory[7]['Trust']:
+                p_c = sum((memory[i][opp_index] == 'C') for i in range(game_round)) / game_round
+                A = 0.5 + abs(p_c - 0.5)
+                if rnd.random() < A:
+                    E = memory[-1][opp_index]
+                else:
+                    E = flip(memory[-1][opp_index])
+                if A == 'D':
+                    return '[OUT]'
+            else:
+                if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
+                    return '[OUT]'
+        if immortal_memory[7]['Memory'].get(opp_name) == 'BAD':
+            return '[OUT]'
+        return rnd_prob(immortal_memory[7]['Trustworthiness'])
+    elif strategy == 'RLGossipAgent':
+        payoff = {
+            'CC':(RPST['R'] / 3) * 0.7,
+            'CD':(RPST['S'] - RPST['P']) * 0.5,
+            'DC':RPST['T'] / 5,
+            'DD':RPST['P'] * -0.2,
+        }
+        relative_reward = True
+        if game_round > 0:
+            gamma = 0.3
+            learning_rate = 0.1
+            reward1 = payoff[memory[-1][self_index] + memory[-1][opp_index]]
+            reward2 = (memory[-1][self_index] != 'C')
+            think_memory[383][0] = reward1 + (gamma * think_memory[383][0])
+            think_memory[383][1] = 1 + (gamma * think_memory[383][1])
+            think_memory[383][2] = reward2 + (gamma * think_memory[383][2])
+            think_memory[383][3] = 1 + (gamma * think_memory[383][3])
+            if relative_reward and think_memory[383][1] > 0:
+                reward1 = reward1 - (think_memory[383][0] / think_memory[383][1])
+                if reward1 >= 0:
+                    immortal_memory[8]['Trust'] = immortal_memory[8]['Trust'] + (learning_rate * ((1 - immortal_memory[8]['Trust']) * reward1))
+                else:
+                    immortal_memory[8]['Trust'] = immortal_memory[8]['Trust'] + (learning_rate * (immortal_memory[8]['Trust'] * reward1))
+            if relative_reward and think_memory[383][3] > 0:
+                reward2 = reward2 - (think_memory[383][2] / think_memory[383][3])
+                if reward2 >= 0:
+                    immortal_memory[8]['Trustworthiness'] = immortal_memory[8]['Trustworthiness'] + (learning_rate * ((1 - immortal_memory[8]['Trustworthiness']) * reward2))
+                else:
+                    immortal_memory[8]['Trustworthiness'] = immortal_memory[8]['Trustworthiness'] + (learning_rate * (immortal_memory[8]['Trustworthiness'] * reward2))
+            if reward1 > 0:
+                immortal_memory[8]['Memory'][opp_name] = 'GOOD'
+            else:
+                immortal_memory[8]['Memory'][opp_name] = 'BAD'
+            if rnd.random() < immortal_memory[7]['Trust']:
+                p_c = sum((memory[i][opp_index] == 'C') for i in range(game_round)) / game_round
+                A = 0.5 + abs(p_c - 0.5)
+                if rnd.random() < A:
+                    E = memory[-1][opp_index]
+                else:
+                    E = flip(memory[-1][opp_index])
+                if A == 'D':
+                    return '[OUT]'
+            else:
+                if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
+                    return '[OUT]'
+        if immortal_memory[8]['Memory'].get(opp_name) == 'BAD':
+            return '[OUT]'
+        return rnd_prob(immortal_memory[8]['Trustworthiness'])
+    elif strategy == 'Second By Robert Adams':
+        k40r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        think_memory[135]["s"] += 1
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+            think_memory[135]["w"] += 1
+            think_memory[135]["q"] /= 2.0
+        if (game_round + 1) < 3:
+            return 'C'
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+            w = think_memory[135]["w"]
+            if w > 2 and ((w // 3 == w / 3) or ((w - 1) // 3 == (w - 1) / 3)):
+                think_memory[135]["s"] = 1
+                think_memory[135]["q"] /= 2.0
+                return 'D'
+            if rnd.random() >= think_memory[135]["q"]:
+                k40r = 0
+                think_memory[135]["q"] /= 2.0
+                return 'CD'[k40r]
+            else:
+                think_memory[135]["q"] /= 2.0
+                return 'D'
+        else:
+            if think_memory[135]["s"] == 1 or think_memory[135]["s"] == 2:
+                return 'D'
+            w = think_memory[135]["w"]
+            if w > 2 and ((w // 3 == w / 3) or ((w - 1) // 3 == (w - 1) / 3)):
+                think_memory[135]["s"] = 1
+                think_memory[135]["q"] /= 2.0
+                return 'D'
+            return 'C'
+    elif strategy == 'Second By George Hufford':
+        think_memory[381]
+        k48r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        iarray = think_memory[381]["iarray"]
+        ipo2 = think_memory[381]["ipo2"]
+        if (game_round + 1) == 1:
+            think_memory[381]["kold"] = 0
+            think_memory[381]["k5"] = 0
+            think_memory[381]["klast"] = 0
+            for i in range(5):
+                iarray[i] = 0
+            think_memory[381]["ichan"] = 1
+            think_memory[381]["ipo1"] = 1
+        if (game_round) < 5:
+            idx = ipo2[think_memory[381]["ipo1"] - 1] - 1
+            iarray[idx] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            think_memory[381]["ipo1"] += ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            k48r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            return 'CD'[k48r]
+        mm = (game_round % 5) + 1
+        k48r = iarray[mm - 1]
+        if mm != 1:
+            return 'CD'[k48r]
+        think_memory[381]["kold"] = think_memory[381]["k5"]
+        think_memory[381]["k5"] = score[self_index] - think_memory[381]["klast"]
+        think_memory[381]["klast"] = score[self_index]
+        if think_memory[381]["kold"] > think_memory[381]["k5"]:
+            think_memory[381]["ichan"] = -think_memory[381]["ichan"]
+            think_memory[381]["ipo1"] += think_memory[381]["ichan"]
+        if think_memory[381]["ipo1"] < 1:
+            think_memory[381]["ipo1"] = 0
+        if think_memory[381]["ipo1"] > 5:
+            think_memory[381]["ipo1"] = 6
+        if think_memory[381]["ipo1"] < 1 or think_memory[381]["ipo1"] > 5:
+            return 'CD'[k48r]
+        target_idx1 = ipo2[think_memory[381]["ipo1"] - 1] - 1
+        iarray[target_idx1] += think_memory[381]["ichan"]
+        think_memory[381]["ipo1"] += think_memory[381]["ichan"]
+        k48r = iarray[mm - 1]
+        return 'CD'[k48r]
+    elif strategy == 'Second By Nydegger':
+        k57r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        n = 4 * (think_memory[387]["n"] % 16) + 2 * k57r + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        think_memory[387]["n"] = n
+        if (game_round) < 3:
+            k57r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+            if (game_round + 1) == 3 and n == 6:
+                k57r = 1
+            return 'CD'[k57r]
+        coop_states = {
+            0, 27, 28, 32,
+            40, 41, 42, 43, 44,
+            46, 47, 48,
+            56, 57,
+            59, 60,
+            62, 63
+        }
+        if n in coop_states:
+            k57r = 0
+        else:
+            k57r = 1
+        return 'CD'[k57r]
+    elif strategy == 'Second By Joss':
+        r = rnd.random()
+        k69r = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if (game_round + 1) == 1:
+            return 'C'
+        if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+            think_memory[170]["c"] += 1
+        s = think_memory[170]["s"]
+        while True:
+            if s == 1:
+                if r < 0.1:
+                    s = 5
+                    k69r = 1
+                    break
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[170]["d"] = 0
+                else:
+                    think_memory[170]["d"] += 1
+                if think_memory[170]["d"] > 20:
+                    s = 3
+                    k69r = 0
+                    think_memory[170]["d"] = 0
+                    break
+                if think_memory[170]["c"] < 0.7 * ((game_round + 1) - 3):
+                    s = 2
+                    if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                        think_memory[170]["d"] = 0
+                    else:
+                        think_memory[170]["d"] += 1
+                    if think_memory[170]["d"] > 10:
+                        s = 3
+                        k69r = 1
+                        break
+                    k69r = 1
+                    break
+                k69r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                break
+            elif s == 2:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[170]["d"] = 0
+                else:
+                    think_memory[170]["d"] += 1
+                if think_memory[170]["d"] > 10:
+                    s = 3
+                    k69r = 1
+                    break
+                k69r = 1
+                break
+            elif s == 3:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[170]["d"] = 0
+                else:
+                    think_memory[170]["d"] += 1
+                if think_memory[170]["d"] > 20:
+                    s = 3
+                    k69r = 0
+                    think_memory[170]["d"] = 0
+                    break
+                k69r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                break
+            elif s == 4:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 1:
+                    think_memory[170]["f"] += 1
+                    if think_memory[170]["f"] > 3:
+                        s = 3
+                        k69r = 0
+                        think_memory[170]["d"] = 0
+                        break
+                s = 1
+                k69r = 0
+                break
+            elif s == 5:
+                s = 4
+                if r < 0.1:
+                    s = 5
+                    k69r = 1
+                    break
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[170]["d"] = 0
+                else:
+                    think_memory[170]["d"] += 1
+                if think_memory[170]["d"] > 20:
+                    s = 3
+                    k69r = 0
+                    think_memory[170]["d"] = 0
+                    break
+                k69r = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                break
+            break
+        think_memory[170]["s"] = s
+        return 'CD'[k69r]
+    elif strategy == 'Second By Friedland, But Get Revised By Axelrod':
+        if (game_round + 1) == 1:
+            return 'C'
+        if think_memory[390]["jr"] == 1:
+            think_memory[390]["k74dummy"] = 1
+            return 'D'
+        if (game_round + 1) > 2:
+            if think_memory[390]["iold"] == 0:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[390]["qca"] += 1.0
+                think_memory[390]["qna"] += 1.0
+                think_memory[390]["alpha"] = think_memory[390]["qca"] / think_memory[390]["qna"]
+                think_memory[390]["qca"] *= 0.8
+                think_memory[390]["qna"] *= 0.8
+            else:
+                if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == 0:
+                    think_memory[390]["qcb"] += 1.0
+                think_memory[390]["qnb"] += 1.0
+                think_memory[390]["beta"] = think_memory[390]["qcb"] / think_memory[390]["qnb"]
+                think_memory[390]["qcb"] *= 0.8
+                think_memory[390]["qnb"] *= 0.8
+        think_memory[390]["iold"] = think_memory[390]["k74dummy"]
+        if (game_round + 1) == 37:
+            if not (
+                think_memory[390]["js4"] == 0
+                or think_memory[390]["js11"] == 1
+                or think_memory[390]["jt"] <= 10
+                or think_memory[390]["jt"] >= 26
+                or think_memory[390]["jsw"] >= 26
+            ):
+                think_memory[390]["jr"] = 1
+                think_memory[390]["k74dummy"] = 1
+                return 'D'
+        elif (game_round + 1) > 1:
+            if ((memory[-1][opp_index] == 'D') if game_round > 0 else 0) == think_memory[390]["jl"]:
+                think_memory[390]["jsm"] += 1
+                if think_memory[390]["jsm"] >= 3:
+                    think_memory[390]["js4"] = 1
+                if think_memory[390]["jsm"] >= 11:
+                    think_memory[390]["js11"] = 1
+            else:
+                think_memory[390]["jsw"] += 1
+                think_memory[390]["jsm"] = 1
+            think_memory[390]["jt"] += ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        think_memory[390]["jl"] = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+        polc = 6.0 * think_memory[390]["alpha"] - 8.0 * think_memory[390]["beta"] - 2.0
+        polalt = 4.0 * think_memory[390]["alpha"] - 5.0 * think_memory[390]["beta"] - 1.0
+        if polc == 0.0:
+            k74rxx = 0 if polc >= polalt else 1
+        elif polalt >= 0.0:
+            k74rxx = 1 - think_memory[390]["k74dummy"]
+        else:
+            k74rxx = 1
+        think_memory[390]["k74dummy"] = k74rxx
+        return 'CD'[k74rxx]
+    elif strategy == 'Second By Feld':
+        feld_enemy_action = (memory[-1][opp_index] == 'D') if game_round > 0 else 0
+        if think_memory[391]["ktry"] >= 20:
+            idx = think_memory[391]["jstr"] - 1
+            think_memory[391]["kexp"][idx] = score[self_index] - think_memory[391]["ki"]
+            if think_memory[391]["jstr"] < 5 and think_memory[391]["kexp"][idx + 1] > think_memory[391]["kexp"][idx]:
+                think_memory[391]["jstr"] += 1
+            elif think_memory[391]["jstr"] > 1 and think_memory[391]["kexp"][idx - 1] > think_memory[391]["kexp"][idx]:
+                think_memory[391]["jstr"] -= 1
+                feld_enemy_action = 0
+            think_memory[391]["ki"] = score[self_index]
+            think_memory[391]["ktry"] = 0
+        think_memory[391]["ktry"] += 1
+        jstr = think_memory[391]["jstr"]
+        if jstr == 1:
+            return 'C'
+        elif jstr == 2:
+            if feld_enemy_action == 0:
+                return 'C'
+            return rnd_prob(1 - 0.75)
+        elif jstr == 3:
+            return 'CD'[feld_enemy_action]
+        elif jstr == 4:
+            if feld_enemy_action == 1:
+                return 'D'
+            return rnd_prob(0.75)
+        elif jstr == 5:
+            return 'D'
+        return 'C'
+    elif strategy == 'S2':
+        if not game_round:
+            return 'D'
+        instruction_string = '1:D1|C2,2:D1|D1'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[392]][(memory[-1][opp_index] == 'D')]
+        think_memory[392] = rule[1]
+        return rule[0]
+    elif strategy == 'S6':
+        if not game_round:
+            return 'D'
+        instruction_string = '1:C2|D1,2:D1|D1'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[393]][(memory[-1][opp_index] == 'D')]
+        think_memory[393] = rule[1]
+        return rule[0]
+    elif strategy == 'S7':
+        if not game_round:
+            return 'D'
+        instruction_string = '1:C2|D1,2:D1|C2'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[394]][(memory[-1][opp_index] == 'D')]
+        think_memory[394] = rule[1]
+        return rule[0]
+    elif strategy == 'Grateful / S9':
+        if not game_round:
+            return 'D'
+        instruction_string = '1:C2|D1,2:C2|C2'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[395]][(memory[-1][opp_index] == 'D')]
+        think_memory[395] = rule[1]
+        return rule[0]
+    elif strategy == 'S11':
+        if not game_round:
+            return 'D'
+        instruction_string = '1:C2|C2,2:D1|C2'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[396]][(memory[-1][opp_index] == 'D')]
+        think_memory[396] = rule[1]
+        return rule[0]
+    elif strategy == 'S12 / Suspicious Forgiver':
+        if not game_round:
+            return 'D'
+        instruction_string = '1:C2|C2,2:C2|D1'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[397]][(memory[-1][opp_index] == 'D')]
+        think_memory[397] = rule[1]
+        return rule[0]
+    elif strategy == 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14':
+        if not game_round:
+            return 'C'
+        instruction_string = '1:C1|D2,2:C1|C1'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[398]][(memory[-1][opp_index] == 'D')]
+        think_memory[398] = rule[1]
+        return rule[0]
+    elif strategy == 'S18':
+        if not game_round:
+            return 'C'
+        instruction_string = '1:D2|C1,2:C1|C1'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[399]][(memory[-1][opp_index] == 'D')]
+        think_memory[399] = rule[1]
+        return rule[0]
+    elif strategy == 'S19':
+        if not game_round:
+            return 'C'
+        instruction_string = '1:D2|C1,2:C1|D2'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[400]][(memory[-1][opp_index] == 'D')]
+        think_memory[400] = rule[1]
+        return rule[0]
+    elif strategy == 'S23':
+        if not game_round:
+            return 'C'
+        instruction_string = '1:D2|D2,2:C1|D2'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[401]][(memory[-1][opp_index] == 'D')]
+        think_memory[401] = rule[1]
+        return rule[0]
+    elif strategy == 'S24':
+        if not game_round:
+            return 'C'
+        instruction_string = '1:D2|D2,2:D2|C1'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[402]][(memory[-1][opp_index] == 'D')]
+        think_memory[402] = rule[1]
+        return rule[0]
+    elif strategy == 'Paradoxic Grim / S21':
+        if not game_round:
+            return 'C'
+        instruction_string = '1:D2|C1,2:D2|D2'
+        def translating(x):
+            rule = {}
+            semua_mode = x.strip().rstrip(',').split(',')
+            for item in semua_mode:
+                if not item: continue
+                nomor_mode, isi_aksi = item.split(':')
+                aksi_0_str, aksi_1_str = isi_aksi.split('|')
+                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
+                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
+                rule[nomor_mode] = [aksi_0, aksi_1]
+            return rule
+        instruction = translating(instruction_string)
+        rule = instruction[think_memory[403]][(memory[-1][opp_index] == 'D')]
+        think_memory[403] = rule[1]
+        return rule[0]
+    elif strategy == 'Pattern Reader':
+        if game_round < 3:
+            if game_round < 2:
+                return 'C'
+            return 'D' if (memory[0][opp_index] == 'D' and memory[1][opp_index] == 'D') else 'C'
+        sc = (
+            (4 if memory[game_round-1][opp_index] == 'D' else 0) + 
+            (2 if memory[game_round-1][self_index] == 'D' else 0) + 
+            (2 if memory[game_round-2][opp_index] == 'D' else 0) + 
+            (1 if memory[game_round-2][self_index] == 'D' else 0)
+            )
+        return 'D' if sc >= 3 else 'C'
+    elif strategy == 'Forgiving Grudger':
+        if not game_round:
+            return 'C'
+        if memory[-1] == ('D', 'D'):
+            return 'C' if rnd.random() < 2/7 else 'D'
+        return memory[-1][opp_index]
+    elif strategy == 'Scorched Earth':
+        if not game_round:
+            return 'C'
+        if memory[-1][opp_index] == 'D' or think_memory[405][0] > 0:
+            if ((memory[-2][opp_index] if game_round > 1 else 'C'), memory[-1][opp_index]) == ('C', 'D'):
+                think_memory[405][1] += 1
+                think_memory[405][0] = think_memory[405][1]
+            think_memory[405][0] -= 1
+            return 'D'
+        else:
+            return 'C'
+    elif strategy == 'Bookend Cooperator':
+        if game_round < 4:
+            return 'C'
+        if game_round == tournament_avg_last_round - 1:
+            return 'D'
+        if game_round == tournament_avg_last_round:
+            return 'C'
+        return memory[-1][opp_index]
+    elif strategy == 'Patient Cooperator':
+        if game_round < 10:
+            return 'C'
+        return memory[-1][opp_index]
+    elif strategy == 'Probe & Exploit':
+        if not game_round:
+            return 'C'
+        if game_round % 50 == 0:
+            return 'D'
+        return memory[-1][opp_index]
+    elif strategy == 'Strategist':
+        if not game_round:
+            return 'C'
+        if memory[-1][self_index] == 'C':
+            think_memory[406][0] += 1
+            if memory[-1][opp_index] == 'C':
+                think_memory[406][1] += 1
+        else:
+            think_memory[406][2] += 1
+            if memory[-1][opp_index] == 'C':
+                think_memory[406][3] += 1
+        pc = (think_memory[406][1] + 1) / (think_memory[406][0] + 2)
+        pd = (think_memory[406][3] + 1) / (think_memory[406][2] + 2)
+        E_sh = (pc * RPST['R']) + ((1 - pc) * RPST['S'])
+        E_st = (pd * RPST['T']) + ((1 - pd) * RPST['P'])
+        return 'D' if E_st > E_sh else 'C'
+    elif strategy == 'Second By Named Withheld':
+        turn = game_round + 1
+        r = rnd.random()
+        grasr = (memory[-1][self_index] == 'D') if game_round > 0 else 0
+        if turn < 1:
+            grasr = 0
+            return 'CD'[grasr]
+        elif turn == 1:
+            grasr = 0
+            return 'CD'[grasr]
+        else:
+            if turn < 51:
+                grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                return 'CD'[grasr]
+            elif turn == 51:
+                grasr = 1
+                return 'CD'[grasr]
+            else:
+                if turn < 57:
+                    if turn > 52:
+                        think_memory[407]["riwayat_gerakan"][turn - 52 - 1] = think_memory[407]["gerakan_terakhir"] + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                    grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                    if grasr - 1 < 0:
+                        think_memory[407]["gerakan_terakhir"] = 2
+                    else:
+                        think_memory[407]["gerakan_terakhir"] = 4
+                    return 'CD'[grasr]
+                elif turn == 57:
+                    if score[opp_index] <= 135:
+                        think_memory[407]["status_game"] = 3
+                        grasr = 1
+                        return 'CD'[grasr]
+                    else:
+                        j = think_memory[407]["riwayat_gerakan"][1]
+                        if j == 3:
+                            if think_memory[407]["riwayat_gerakan"][0] == 2:
+                                if think_memory[407]["riwayat_gerakan"][2] == 4:
+                                    if think_memory[407]["riwayat_gerakan"][3] == 2:
+                                        think_memory[407]["status_game"] = 4
+                                        grasr = 0
+                                        if turn >= 118:
+                                            think_memory[407]["status_game"] = 2
+                                        return 'CD'[grasr]
+                            think_memory[407]["status_game"] = 1
+                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            grasr = 0
+                            return 'CD'[grasr]
+                        elif j == 4:
+                            if think_memory[407]["riwayat_gerakan"][0] == 3:
+                                if think_memory[407]["riwayat_gerakan"][2] == 3:
+                                    think_memory[407]["status_game"] = 2
+                                    grasr = 0
+                                    return 'CD'[grasr]
+                            think_memory[407]["status_game"] = 1
+                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            grasr = 0
+                            return 'CD'[grasr]
+                        elif j == 5:
+                            if think_memory[407]["riwayat_gerakan"][0] == 5:
+                                if think_memory[407]["riwayat_gerakan"][2] == 5:
+                                    think_memory[407]["status_game"] = 2
+                                    grasr = 0
+                                    return 'CD'[grasr]
+                            think_memory[407]["status_game"] = 1
+                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            grasr = 0
+                            return 'CD'[grasr]
+                        else:
+                            think_memory[407]["status_game"] = 1
+                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            grasr = 0
+                            return 'CD'[grasr]
+                else:
+                    if think_memory[407]["status_game"] == 1:
+                        if think_memory[407]["counter_acak"] <= 0:
+                            grasr = 1
+                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            return 'CD'[grasr]
+                        else:
+                            grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                            think_memory[407]["counter_acak"] = think_memory[407]["counter_acak"] - 1
+                            return 'CD'[grasr]
+                    elif think_memory[407]["status_game"] == 2:
+                        grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                        return 'CD'[grasr]
+                    elif think_memory[407]["status_game"] == 3:
+                        grasr = 1
+                        return 'CD'[grasr]
+                    elif think_memory[407]["status_game"] == 4:
+                        grasr = 0
+                        return 'CD'[grasr]
+                    else:
+                        grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                        return 'CD'[grasr]
         
-    # New Strategies
+    # Strategies That From This Tournament
     elif strategy == 'Pavlov Tester':
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
@@ -6461,7 +8141,7 @@ def think(strategy,opp_index,opp_name):
                     return 'D'
                 else:
                     return 'C'
-    elif strategy == 'Adaptive Tit For Tat Attar Version':
+    elif strategy == 'Adaptive Tit For Tat Attariq Version':
         if (memory[-1][opp_index] == 'C') if game_round > 0 else True:
             think_memory[13][1] += 1
         elif rnd.random() < (0.25 * (think_memory[13][1] / (game_round + 1))):
@@ -6540,7 +8220,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'C':
                 think_memory[20][2] += 1
-        if (game_round + 1) <= key_len:
+        if (game_round) < key_len:
             if game_round > 0:
                 think_memory[20][1][(game_round + 1)-1] = (memory[-1][opp_index] == 'D')
             key = think_memory[20][0][(game_round + 1)-1]
@@ -6562,7 +8242,7 @@ def think(strategy,opp_index,opp_name):
                     return 'C'
             else:
                 return 'C'
-    elif strategy == 'Game Theory Explorer / GT-E':
+    elif strategy == 'GT-E / Game Theory Explorer':
         if (memory[-1][opp_index] == 'C') if game_round > 0 else True:
             if (memory[-1][self_index] == 'C') if game_round > 0 else True:
                 C = 0
@@ -6576,7 +8256,7 @@ def think(strategy,opp_index,opp_name):
             if memory[-1][self_index] == 'C':
                 C = 2
                 S = 0
-                learn = -3 * abs(RPST['S'] - RPST['P'])
+                learn = -3 * (RPST['P'] - RPST['S'])
             else:
                 C = 3
                 S = 1
@@ -6710,7 +8390,7 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'D'
     elif strategy == 'Alan':
-        if game_round == 0:
+        if not game_round:
             return 'C'
         instruction_string = '0:C0|C1,1:C0|D2,2:C1|D3,3:C2|D4,4:D3|D4'
         def translating(x):
@@ -6758,7 +8438,7 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'D'
     elif strategy == 'Line':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             if not game_round:
                 return 'C'
             return memory[-1][opp_index]
@@ -7075,7 +8755,7 @@ def think(strategy,opp_index,opp_name):
                     brain[another_variable[1]][1] += RPST['T']
             else:
                 if sumo_eyes[-1][self_index] == 'C':
-                    brain[another_variable[1]][1] -= 4 * abs(RPST['S'] - RPST['P'])
+                    brain[another_variable[1]][1] -= 4 * (RPST['P'] - RPST['S'])
                 else:
                     brain[another_variable[1]][1] += RPST['P']
             if brain[another_variable[1]][1] <= 0 and another_variable[0] <= 0:
@@ -7138,7 +8818,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 if smart_snake_eyes[-1][self_index] == 'C':
                     for learn in range(5):
-                        brain[0][learn] = max(min((brain[0][learn] - (0.4 * abs(RPST['S'] - RPST['P']) * dis[learn])),1),-1)
+                        brain[0][learn] = max(min((brain[0][learn] - (0.4 * (RPST['P'] - RPST['S']) * dis[learn])),1),-1)
                 else:
                     for learn in range(5):
                         brain[1][learn] = max(min((brain[1][learn] + (0.1 * (RPST['P']) * dis[learn])),1),-1)
@@ -7179,7 +8859,7 @@ def think(strategy,opp_index,opp_name):
                     brain[another_factor[0]] = max(min(brain[another_factor[0]] - (0.5 * (RPST['T'] / 5) * another_factor[1]),1),0)
             else:
                 if theseus_eyes[-1][self_index] == 'C':
-                    brain[another_factor[0]] = max(min(brain[another_factor[0]] - (0.4 * abs(RPST['S'] - RPST['P']) * another_factor[1]),1),0)
+                    brain[another_factor[0]] = max(min(brain[another_factor[0]] - (0.4 * (RPST['P'] - RPST['S']) * another_factor[1]),1),0)
                 else:
                     brain[another_factor[0]] = max(min(brain[another_factor[0]] - (0.1 * RPST['P'] * another_factor[1]),1),0)
         inp = tuple(["".join([theseus_eyes[-i][opp_index] for i in range(5, 0, -1)]),"".join([theseus_eyes[-j][self_index] for j in range(5, 0, -1)])]) 
@@ -7443,7 +9123,7 @@ def think(strategy,opp_index,opp_name):
             return 'C'
         else:
             return 'D'
-    elif strategy == 'Bayes Attar Version':
+    elif strategy == 'Bayes Attariq Version':
         tm = think_memory[45]
         self = memory[-1][self_index] if game_round > 0 else 'C'
         opp = memory[-1][opp_index] if game_round > 0 else 'C'
@@ -7516,7 +9196,7 @@ def think(strategy,opp_index,opp_name):
             another_factor[0] = [inp, 1]
             return 'D'
     elif strategy == 'Stupidiot':
-        if (game_round + 1) <= ((50 / 200) * tournament_avg_last_round):
+        if (game_round) < ((50 / 200) * tournament_avg_last_round):
             if game_round > 0:
                 if memory[-1][opp_index] == 'D':
                     return 'D'
@@ -7526,7 +9206,7 @@ def think(strategy,opp_index,opp_name):
                             return 'C'
             return 'D'
             return rnd.choice(['C','D'])
-        elif (game_round + 1) <= ((100 / 200) * tournament_avg_last_round):
+        elif (game_round) < ((100 / 200) * tournament_avg_last_round):
             return 'D'
         else:
             if rnd.random() <= 0.1:
@@ -7536,7 +9216,7 @@ def think(strategy,opp_index,opp_name):
             if think_memory[47] == 1:
                 return 'D'
             else:
-                return 'C' #
+                return 'C'
     elif strategy == 'Smart-Clever':
         if (memory[-1][opp_index] == 'C') if game_round > 0 else True:
             win_or_lose = 'win'
@@ -7571,52 +9251,6 @@ def think(strategy,opp_index,opp_name):
             return 'C'
         else:
             return 'D'
-    elif strategy == 'Gateman':
-        def not_gate(x):
-            return (1 - x)
-        def and_gate(x,y):
-            return min(x,y)
-        def or_gate(x,y):
-            return max(x,y)
-        def random_boolean(x,y):
-            if rnd.random() <= x:
-                return (y % 2)
-            else:
-                return 1 - (y % 2)
-        def save_to_prog(x):
-            nonlocal gate_prog
-            gate_prog.append(x)
-        def gateman_input(x,y):
-            opp_or_self = opp_index if (y % 2) == 0 else self_index
-            gateman_memory_index = x % 8
-            return (memory[-1-gateman_memory_index][opp_or_self] == 'D') if (game_round) > gateman_memory_index else 0
-        gate_prog = []
-        save_to_prog(
-            or_gate(
-                or_gate(
-                    and_gate(
-                        gateman_input(0,0),
-                        random_boolean(0.1, 0)
-                    ),
-                    and_gate(
-                        gateman_input(0,0),
-                        gateman_input(1,0)
-                    )
-                ),
-                and_gate(
-                    and_gate(
-                        gateman_input(1,0),
-                        not_gate(gateman_input(1,1))
-                    ),
-                    random_boolean(0.1, 1)
-                )
-            )
-        )
-        gate_output = gate_prog[0]
-        if gate_output == 0:
-            return 'C'
-        else:
-            return 'D'
     elif strategy == 'TF2T & 2TFT':
         think_memory[51][0] = rnd.randint(0,1)
         if think_memory[51][0] == 1:
@@ -7645,7 +9279,7 @@ def think(strategy,opp_index,opp_name):
                     return 'D'
             else:
                 return 'C'
-    elif strategy == 'Psycho Attar Version':
+    elif strategy == 'Psycho Attariq Version':
         if not game_round:
             return 'C'
         if think_memory[52] == 0:
@@ -7723,7 +9357,7 @@ def think(strategy,opp_index,opp_name):
                     (0,0,1,0,1):'bishop',
                     (0,1,0,0,1):'citizen',
                     }
-        if ((game_round + 1) <= 6) and (game_round > 0):
+        if ((game_round) < 6) and (game_round > 0):
             if memory[-1][opp_index] == 'C':
                 think_memory[57][(game_round + 1) - 2] = 0
             else:
@@ -7734,7 +9368,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
         else:
-            if (game_round + 1) <= 7:
+            if (game_round) < 7:
                 return 'C'
             others_pattern = others_key.get(tuple(think_memory[57]))
             if others_pattern == None:
@@ -7754,7 +9388,7 @@ def think(strategy,opp_index,opp_name):
                     (0,0,1,0,1):'bishop',
                     (0,1,0,0,1):'citizen',
                     }
-        if ((game_round + 1) <= 6) and (game_round > 0):
+        if ((game_round) < 6) and (game_round > 0):
             if memory[-1][opp_index] == 'C':
                 think_memory[58][(game_round + 1) - 2] = 0
             else:
@@ -7765,7 +9399,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
         else:
-            if (game_round + 1) <= 7:
+            if (game_round) < 7:
                 return 'C'
             others_pattern = others_key.get(tuple(think_memory[58]))
             if others_pattern == None:
@@ -7785,7 +9419,7 @@ def think(strategy,opp_index,opp_name):
                     (0,0,1,0,1):'bishop',
                     (0,1,0,0,1):'citizen',
                     }
-        if ((game_round + 1) <= 6) and (game_round > 0):
+        if ((game_round) < 6) and (game_round > 0):
             if memory[-1][opp_index] == 'C':
                 think_memory[59][(game_round + 1) - 2] = 0
             else:
@@ -7796,7 +9430,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
         else:
-            if (game_round + 1) <= 7:
+            if (game_round) < 7:
                 return 'C'
             others_pattern = others_key.get(tuple(think_memory[59]))
             if others_pattern == None:
@@ -7816,7 +9450,7 @@ def think(strategy,opp_index,opp_name):
                     (0,0,1,0,1):'bishop',
                     (0,1,0,0,1):'citizen',
                     }
-        if ((game_round + 1) <= 6) and (game_round > 0):
+        if ((game_round) < 6) and (game_round > 0):
             if memory[-1][opp_index] == 'C':
                 think_memory[60][(game_round + 1) - 2] = 0
             else:
@@ -7835,7 +9469,7 @@ def think(strategy,opp_index,opp_name):
                     (0,0,1,0,1):'bishop',
                     (0,1,0,0,1):'citizen',
                     }
-        if ((game_round + 1) <= 6) and (game_round > 0):
+        if ((game_round) < 6) and (game_round > 0):
             if memory[-1][opp_index] == 'C':
                 think_memory[61][(game_round + 1) - 2] = 0
             else:
@@ -7846,7 +9480,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
         else:
-            if (game_round + 1) <= 7:
+            if (game_round) < 7:
                 return 'C'
             others_pattern = others_key.get(tuple(think_memory[61]))
             if others_pattern == None:
@@ -7860,7 +9494,7 @@ def think(strategy,opp_index,opp_name):
                     (0,0,1,0,1):'bishop',
                     (0,1,0,0,1):'citizen',
                     }
-        if ((game_round + 1) <= 6) and (game_round > 0):
+        if ((game_round) < 6) and (game_round > 0):
             if memory[-1][opp_index] == 'C':
                 think_memory[62][(game_round + 1) - 2] = 0
             else:
@@ -7871,7 +9505,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
         else:
-            if (game_round + 1) <= 7:
+            if (game_round) < 7:
                 return 'C'
             others_pattern = others_key.get(tuple(think_memory[62]))
             if others_pattern == None:
@@ -7989,7 +9623,7 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'D'
     elif strategy == 'Racister':
-        if (game_round + 1) <= (tournament_avg_last_round / 2):
+        if (game_round) < (tournament_avg_last_round / 2):
             if game_round > 0:
                 if memory[-1][opp_index] == 'D':
                     think_memory[67] = 1
@@ -8016,14 +9650,14 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
     elif strategy == 'Male / Man':
-        if (game_round + 1) <= ((50 / 200) * tournament_avg_last_round): 
+        if (game_round) < ((50 / 200) * tournament_avg_last_round): 
             if (think_memory[69] == 1) or ((memory[-1][opp_index] == 'D') if game_round > 0 else False):
                 if think_memory[69] == 0:
                     think_memory[69] = 1
                 return 'D'
             else:
                 return 'C'
-        elif (game_round + 1) <= ((100 / 200) * tournament_avg_last_round): 
+        elif (game_round) < ((100 / 200) * tournament_avg_last_round): 
             if (think_memory[69] == 1) or (memory[-1][opp_index] == 'D'):
                 if think_memory[69] == 0:
                     think_memory[69] = 1
@@ -8033,7 +9667,7 @@ def think(strategy,opp_index,opp_name):
                 return 'D'
             else:
                 return 'C'
-        elif (game_round + 1) <= ((150 / 200) * tournament_avg_last_round): 
+        elif (game_round) < ((150 / 200) * tournament_avg_last_round): 
             return memory[-1][opp_index]
         else: 
             if rnd.random() < 0.1:
@@ -8041,17 +9675,17 @@ def think(strategy,opp_index,opp_name):
             else:
                 return memory[-1][opp_index]
     elif strategy == 'Female / Woman':
-        if (game_round + 1) <= ((50 / 200) * tournament_avg_last_round): 
+        if (game_round) < ((50 / 200) * tournament_avg_last_round): 
             if ((memory[-1][opp_index] == 'C') if game_round > 0 else True):
                 return 'C'
             else:
                 return rnd.choice(['C','D'])
-        elif (game_round + 1) <= ((100 / 200) * tournament_avg_last_round): 
+        elif (game_round) < ((100 / 200) * tournament_avg_last_round): 
             if rnd.random() < 0.1:
                 return 'D'
             else:
                 return memory[-1][opp_index]
-        elif (game_round + 1) <= ((150 / 200) * tournament_avg_last_round): 
+        elif (game_round) < ((150 / 200) * tournament_avg_last_round): 
             if rnd.random() < 0.1:
                 return 'C'
             else:
@@ -8105,7 +9739,7 @@ def think(strategy,opp_index,opp_name):
             return 'D'
     elif strategy == 'Majapahit':
         R = 5
-        if (game_round + 1) <= R:
+        if (game_round) < R:
             if game_round > 0:
                 if memory[-1][opp_index] == 'D':
                     think_memory[72][0] = 1
@@ -8148,7 +9782,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'C':
                 think_memory[73][0] += 1
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return 'C'
         A = think_memory[73][0] / (game_round + 1)
         if A >= 0.7:
@@ -8198,7 +9832,7 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         else:
             return 'C'
-    elif strategy == 'AMERICA! / USA / Freedoom':
+    elif strategy == 'AMERICA! / Freedoom / USA':
         tm = think_memory[77]
         opp = memory[-1][opp_index] if game_round > 0 else 'C'
         tm[0] += 0.1
@@ -8214,7 +9848,7 @@ def think(strategy,opp_index,opp_name):
                 return 'C'
         else:
             return 'D'
-    elif strategy == 'SOVIET UNION! / USSR / Inequality':
+    elif strategy == 'Inequality / SOVIET UNION! / USSR':
         tm = think_memory[78]
         opp = memory[-1][opp_index] if game_round > 0 else 'C'
         if opp == 'C':
@@ -8239,7 +9873,7 @@ def think(strategy,opp_index,opp_name):
             return 'C'
         else:
             return 'D'
-    elif strategy == 'Second Chance Attar Version':
+    elif strategy == 'Second Chance Attariq Version':
         if not game_round:
             return 'C'
         if memory[-1][opp_index] == 'D':
@@ -8262,7 +9896,7 @@ def think(strategy,opp_index,opp_name):
                 return 'D'
             else:
                 return 'C'
-    elif strategy == 'Crabby Attar Version':
+    elif strategy == 'Crabby Attariq Version':
         if not game_round:
             return 'D'
         elif (game_round + 1) == 2:
@@ -8376,10 +10010,10 @@ def think(strategy,opp_index,opp_name):
                 return 'C'
         else:
             return 'C'
-    elif strategy == 'Ethanol / Alcohol':
+    elif strategy == 'Alcohol / Ethanol':
         if not game_round:
             return 'D'
-        elif (game_round + 1) <= (tournament_avg_last_round / 2):
+        elif (game_round) < (tournament_avg_last_round / 2):
             if memory[-1][opp_index] == 'D':
                 think_memory[90] += 1
             return 'C'
@@ -8392,7 +10026,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'C'
     elif strategy == 'Simple Exploiter':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             return ('D', 'C')[game_round]
         elif (game_round + 1) == 3:
             if memory[-1][opp_index] == 'D':
@@ -8407,7 +10041,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
     elif strategy == 'Smart Go By Majority':
-        if (game_round + 1) <= 8:
+        if (game_round) < 8:
             if game_round > 0:
                 think_memory[93][(game_round + 1) - 2] = (memory[-1][opp_index] == 'D')
             return 'C'
@@ -8424,7 +10058,7 @@ def think(strategy,opp_index,opp_name):
             st_set_new_memory()
             return 'D'
     elif strategy == 'Mafia A':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return ('D', 'C', 'D')[game_round]
         elif (game_round + 1) == 4:
             inp = tuple(["D" if memory[-i][opp_index] == 'D' else "C" for i in range(3, 0, -1)]) 
@@ -8458,7 +10092,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
     elif strategy == 'Bluff':
-        if (game_round + 1) <= 4:
+        if (game_round) < 4:
             return ('C', 'D', 'C', 'C')[(game_round + 1)-1]
         else:
             if memory[-1][opp_index] == 'D':
@@ -8469,7 +10103,7 @@ def think(strategy,opp_index,opp_name):
                 else:
                     return 'C'
     elif strategy == 'Mafia B':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return ('D', 'C', 'D')[game_round]
         elif (game_round + 1) == 4:
             inp = tuple(["D" if memory[-i][opp_index] == 'D' else "C" for i in range(3, 0, -1)]) 
@@ -8506,7 +10140,7 @@ def think(strategy,opp_index,opp_name):
                 else:
                     return memory[-1][opp_index]
     elif strategy == 'Mafia C':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return ('D', 'C', 'D')[game_round]
         elif (game_round + 1) == 4:
             inp = tuple(["D" if memory[-i][opp_index] == 'D' else "C" for i in range(3, 0, -1)]) 
@@ -8549,7 +10183,7 @@ def think(strategy,opp_index,opp_name):
                     else:
                         return rnd.choice(['D','C'])
     elif strategy == 'Mafia D':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return ('D', 'C', 'D')[game_round]
         elif (game_round + 1) == 4:
             inp = tuple(["D" if memory[-i][opp_index] == 'D' else "C" for i in range(3, 0, -1)]) 
@@ -8640,7 +10274,7 @@ def think(strategy,opp_index,opp_name):
                     brain[another_variable[1]][1] += RPST['T']
             else:
                 if laws_eyes[-1][self_index] == 'C':
-                    brain[another_variable[1]][1] -= 4 * abs(RPST['S'] - RPST['P'])
+                    brain[another_variable[1]][1] -= 4 * (RPST['P'] - RPST['S'])
                 else:
                     brain[another_variable[1]][1] += RPST['P']
             if brain[another_variable[1]][1] <= 0 and another_variable[0] <= 0:
@@ -8696,7 +10330,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'D'
     elif strategy == 'Matcher':
-        if (game_round + 1) <= 10:
+        if (game_round) < 10:
             if not game_round:
                 return 'C'
             return memory[-1][opp_index]
@@ -8906,7 +10540,7 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Patterned Adaptive Fortress':
         confidence = (think_memory[114][0] * 0.95) + (0.05 * ((memory[-1][opp_index] == 'C') if game_round > 0 else True))
         think_memory[114][0] = confidence
-        if (game_round + 1) <= 5:
+        if (game_round) < 5:
             return 'C'
         else:
             if game_round >= (tournament_avg_last_round):
@@ -8943,16 +10577,16 @@ def think(strategy,opp_index,opp_name):
         else:
             return memory[-1][opp_index]
     elif strategy == 'Praedator':
-        if (game_round + 1) <= 5:
+        if (game_round) < 5:
             if (game_round + 1) == 5:
                 if memory[-1][opp_index] == 'D':
                     think_memory[116][0] = 1
             return memory[-1][opp_index] if game_round > 0 else 'C'
-        elif (game_round + 1) <= 25:
+        elif (game_round) < 25:
             if memory[-1][opp_index] == 'D':
                 think_memory[116][1] = 1
             return 'C'
-        elif (game_round + 1) <= 30:
+        elif (game_round) < 30:
             if (game_round + 1) > 25:
                 if memory[-1][opp_index] == 'D':
                     think_memory[116][2] = 1
@@ -9001,25 +10635,27 @@ def think(strategy,opp_index,opp_name):
         else:
             return 'D'
     elif strategy == 'Forgetable Gradual':
-        crow_eyes = [('C', 'C') for _ in range(5)] + memory
-        if think_memory[118][1] > 0:
-            think_memory[118][1] -= 1
+        if not game_round:
             return 'C'
-        if crow_eyes[-1][opp_index] == 'D' or think_memory[118][0] > 0:
-            if crow_eyes[-1][opp_index] == 'D':
-                think_memory[118][0] = think_memory[118][2] + 1
-                think_memory[118][2] += 1
+        if think_memory[118][2] > 0:
+            think_memory[118][2] -= 1
+            return 'C'
+        if memory[-1][opp_index] == 'D' or think_memory[118][0] > 0:
+            if memory[-1][opp_index] == 'D':
+                think_memory[118][1] += 1
+                if think_memory[118][0] == 0:
+                    think_memory[118][0] = think_memory[118][1]
             think_memory[118][0] -= 1
             if think_memory[118][0] == 0:
-                think_memory[118][1] = 2
+                think_memory[118][2] = 2
             return 'D'
         else:
-            inp = tuple([crow_eyes[-i][opp_index] for i in range(5, 0, -1)]) 
+            inp = tuple([memory[-i][opp_index] for i in range(min(5, game_round), 0, -1)])
             if inp == ("C", "C", "C", "C", "C"):
-                think_memory[118][2] -= 1
-                think_memory[118][2] = max(think_memory[118][2],0)
+                think_memory[118][1] -= 1
+                think_memory[118][1] = max(think_memory[118][1],0)
             return 'C'
-    elif strategy == 'MENACE / HER':
+    elif strategy == 'HER / MENACE':
         if game_round > 0:
             rev = "C" if think_memory[119][1] == "D" else "D"
             if memory[-1][opp_index] == 'C':
@@ -9031,8 +10667,8 @@ def think(strategy,opp_index,opp_name):
                     think_memory[119][0][rev][0] -= RPST['T'] / 2
             else:
                 if memory[-1][self_index] == 'C':
-                    think_memory[119][0][think_memory[119][1]][0] -= 4 * abs(RPST['S'] - RPST['P'])
-                    think_memory[119][0][rev][1] += 2 * abs(RPST['S'] - RPST['P'])
+                    think_memory[119][0][think_memory[119][1]][0] -= 4 * (RPST['P'] - RPST['S'])
+                    think_memory[119][0][rev][1] += 2 * (RPST['P'] - RPST['S'])
                 else:
                     think_memory[119][0][think_memory[119][1]][1] += RPST['P']
                     think_memory[119][0][rev][0] -= RPST['P'] / 2
@@ -9149,7 +10785,7 @@ def think(strategy,opp_index,opp_name):
         'law 44: Disarm and Infuriate with the Mirror Effect'
         return memory[-1][opp_index] if rnd.random() <= 0.1 else 'C'
     elif strategy == 'Pavolovo':
-        if (game_round + 1) <= 2:
+        if (game_round) < 2:
             if not game_round:
                 think_memory[127][0] += 1
                 think_memory[127][2] = 1
@@ -9209,7 +10845,7 @@ def think(strategy,opp_index,opp_name):
                 return 'C'
     elif strategy == 'Eric':
         eric_eyes = [('C', 'C')] + memory
-        if (game_round + 1) <= 5:
+        if (game_round) < 5:
             return eric_eyes[-1][opp_index]
         if think_memory[130] == 1:
             return eric_eyes[-1][opp_index]
@@ -9415,18 +11051,18 @@ def think(strategy,opp_index,opp_name):
                 return 'C'
             return 'D'
     elif strategy == 'Man In The Middle':
-        if (game_round + 1) <= ((190 / 200) * tournament_avg_last_round):
+        if (game_round) < ((190 / 200) * tournament_avg_last_round):
             if not game_round:
                 return 'C'
             return 'C' if rnd.random() <= 0.1 else memory[-1][opp_index]
         else:
             return 'D'
     elif strategy == 'DDoS':
-        if (game_round + 1) <= (tournament_avg_last_round / 2):
+        if (game_round) < (tournament_avg_last_round / 2):
             if not game_round:
                 return 'C'
             return 'C' if rnd.random() <= 0.1 else memory[-1][opp_index]
-        inp = [memory[-1 - i][opp_index] for i in range(10)]
+        inp = [memory[-i][opp_index] for i in range(1, 10 + 1)] 
         if "D" in inp:
             for i in range(5):
                 DDoS_n = (i + 1)
@@ -9443,7 +11079,7 @@ def think(strategy,opp_index,opp_name):
                         return rnd.choice(['C', 'D'])
         return 'C' if rnd.random() <= 0.1 else memory[-1][opp_index]
     elif strategy == 'Social Engineering':
-        if (game_round + 1) <= 5:
+        if (game_round) < 5:
             return ('D', 'C', 'D', 'D', 'C')[game_round]
         elif (game_round + 1) == 6:
             inp = [memory[-i][opp_index] for i in range(5, 0, -1)] 
@@ -9457,11 +11093,11 @@ def think(strategy,opp_index,opp_name):
                 return memory[-1][opp_index]
     elif strategy == 'Zero Day':
         A = 1
-        if (game_round + 1) <= (A + 1):
+        if (game_round) < (A + 1):
             if not game_round:
                 return 'C'
             return memory[-1][opp_index]
-        elif (game_round + 1) <= ((190 / 200) * tournament_avg_last_round):
+        elif (game_round) < ((190 / 200) * tournament_avg_last_round):
             inp = ''
             for i in range(A):
                 if memory[-1 - (A - i)][opp_index] == 'C': 
@@ -9566,7 +11202,7 @@ def think(strategy,opp_index,opp_name):
         if think_memory[178][1] == 1:
             return 'C'
         elif think_memory[178][1] == 2:
-            cyclic_inp = [verity_eyes[-1 - i][opp_index] for i in range(10)]
+            cyclic_inp = [verity_eyes[-i][opp_index] for i in range(1, 10 + 1)] 
             is_cycle = False
             if "D" in cyclic_inp:
                 if cycle_detec(opp_index, min_ = 1, max_ = 5, offset = (game_round - (game_round % 10))):
@@ -9758,7 +11394,7 @@ def think(strategy,opp_index,opp_name):
         if think_memory[182][1] == 1:
             return 'C'
         elif think_memory[182][1] == 2:
-            cyclic_inp = [cruelity_eyes[-1 - i][opp_index] for i in range(10)]
+            cyclic_inp = [cruelity_eyes[-i][opp_index] for i in range(1, 10 + 1)] 
             is_cycle = False
             if "D" in cyclic_inp:
                 if cycle_detec(opp_index, min_ = 1, max_ = 5, offset = (game_round - (game_round % 10))):
@@ -9877,18 +11513,6 @@ def think(strategy,opp_index,opp_name):
                     0.5,
                     0.5,
                     0.5
-                ],
-                [ 
-                    0.8,
-                    0.8,
-                    0.8,
-                    0.8
-                ],
-                [ 
-                    0.2,
-                    0.2,
-                    0.2,
-                    0.2
                 ]
             ]
             curiosity_enemy_differents = [0 for _ in range(len(curiosity_category))]
@@ -9900,7 +11524,7 @@ def think(strategy,opp_index,opp_name):
                     abs(mutual_defect_prob - curiosity_category[i][3])
                 ) / 4
             if min(curiosity_enemy_differents) <= 0.25:
-                most_similar = [['Tit For Tat', 'Pavlov', 'Alternator', 'reverse tit for tat', 'Random', 'Good Random', 'Bad Random'][j] for j in range(len(curiosity_enemy_differents)) if curiosity_enemy_differents[j] == min(curiosity_enemy_differents)]
+                most_similar = [['Tit For Tat', 'Pavlov', 'Alternator', 'reverse tit for tat', 'Random'][j] for j in range(len(curiosity_enemy_differents)) if curiosity_enemy_differents[j] == min(curiosity_enemy_differents)]
                 enemy_category = rnd.choice(most_similar)
                 if enemy_category == 'Tit For Tat':
                     return 'C'
@@ -9910,7 +11534,7 @@ def think(strategy,opp_index,opp_name):
                     return 'D' if curiosity_eyes[-1][opp_index] == 'C' else rnd.choice(['C', 'D'])
                 elif enemy_category == 'reverse tit for tat':
                     return 'D'
-                elif 'Random' in enemy_category:
+                elif enemy_category == 'Random':
                     return 'D'
             A = clamp(((think_memory[183][5][curiosity_cond][0] + 1) / (think_memory[183][5][curiosity_cond][1] + 2)) - 0.25)
             if rnd.random() <= A:
@@ -9952,7 +11576,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'C'
         elif think_memory[184][1] == 2:
-            cyclic_inp = [manipulity_eyes[-1 - i][opp_index] for i in range(10)]
+            cyclic_inp = [manipulity_eyes[-i][opp_index] for i in range(1, 10 + 1)] 
             is_cycle = False
             if "D" in cyclic_inp:
                 if cycle_detec(opp_index, min_ = 1, max_ = 5, offset = (game_round - (game_round % 10))):
@@ -9993,18 +11617,6 @@ def think(strategy,opp_index,opp_name):
                     0.5,
                     0.5,
                     0.5
-                ],
-                [ 
-                    0.8,
-                    0.8,
-                    0.8,
-                    0.8
-                ],
-                [ 
-                    0.2,
-                    0.2,
-                    0.2,
-                    0.2
                 ]
             ]
             manipulity_enemy_differents = [0 for _ in range(len(manipulity_category))]
@@ -10016,7 +11628,7 @@ def think(strategy,opp_index,opp_name):
                     abs(mutual_defect_prob - manipulity_category[i][3])
                 ) / 4
             if min(manipulity_enemy_differents) <= 0.25:
-                most_similar = [['Tit For Tat', 'Pavlov', 'Alternator', 'reverse tit for tat', 'Random', 'Good Random', 'Bad Random'][j] for j in range(len(manipulity_enemy_differents)) if manipulity_enemy_differents[j] == min(manipulity_enemy_differents)]
+                most_similar = [['Tit For Tat', 'Pavlov', 'Alternator', 'reverse tit for tat', 'Random'][j] for j in range(len(manipulity_enemy_differents)) if manipulity_enemy_differents[j] == min(manipulity_enemy_differents)]
                 enemy_category = rnd.choice(most_similar)
                 if enemy_category == 'Tit For Tat':
                     return 'C'
@@ -10026,7 +11638,7 @@ def think(strategy,opp_index,opp_name):
                     return 'D' if manipulity_eyes[-1][opp_index] == 'C' else rnd.choice(['C', 'D'])
                 elif enemy_category == 'reverse tit for tat':
                     return 'D'
-                elif 'Random' in enemy_category:
+                elif enemy_category == 'Random':
                     return 'D'
             A = ((think_memory[184][5][manipulity_cond][0] + 1) / (think_memory[184][5][manipulity_cond][1] + 2))
             if rnd.random() <= A:
@@ -10302,7 +11914,7 @@ def think(strategy,opp_index,opp_name):
             return 'D'
         return 'C'
     elif strategy == 'Monkey See, Monkey Do':
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             if not game_round:
                 return 'D'
             else:
@@ -10350,7 +11962,7 @@ def think(strategy,opp_index,opp_name):
         p_d = think_memory[215] / (game_round)
         if abs(p_d - 0.5) <= 0.1: return 'D'
         return memory[-1][opp_index]
-    elif strategy == 'Gambler Attar Version':
+    elif strategy == 'Gambler Attariq Version':
         if score[self_index] >= 15:
             if rnd.random() <= ((game_round + 1) / tournament_avg_last_round):
                 lose_gambling = (rnd.random() > 0.1)
@@ -10382,7 +11994,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'D':
                 think_memory[76] += 1
-        if (game_round + 1) <= 4:
+        if (game_round) < 4:
             return 'C'
         p_d = think_memory[76] / (game_round)
         if p_d > 0.25:
@@ -10398,7 +12010,7 @@ def think(strategy,opp_index,opp_name):
             else:
                 return 'C'
     elif strategy == 'Sweet Heart':
-        if (game_round + 1) <= 4:
+        if (game_round) < 4:
             return 'C'
         if (game_round + 1) == 11:
             return 'D'
@@ -10454,7 +12066,7 @@ def think(strategy,opp_index,opp_name):
         state = think_memory[217]
         alpha_base = 0.08
         lawan = memory[-1][opp_index] if game_round > 0 else 'C'
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             state["last_my_action"] = 'C'
             return 'C'
         b = 1.0 if lawan == 'C' else 0.0
@@ -10521,7 +12133,7 @@ def think(strategy,opp_index,opp_name):
                     R_or_P = RPST['T']
             else:
                 if memory[-1][self_index] == 'C':
-                    R_or_P = -4 * abs(RPST['S'] - RPST['P'])
+                    R_or_P = -4 * (RPST['P'] - RPST['S'])
                 else:
                     R_or_P = -max(abs(RPST['P']), 1)
             learning_rate = 0.5
@@ -10584,8 +12196,8 @@ def think(strategy,opp_index,opp_name):
     elif strategy == 'Whale':
         state = think_memory[220]
         lawan = memory[-1][opp_index] if game_round > 0 else 'C'
-        if (game_round + 1) <= 7:
-            if (game_round + 1) <= 5:
+        if (game_round) < 7:
+            if (game_round) < 5:
                 state["history"].append(lawan)
                 if state["history"].count('D') >= 3:
                     return 'D'
@@ -10806,7 +12418,7 @@ def think(strategy,opp_index,opp_name):
         if game_round > 0:
             if memory[-1][opp_index] == 'C':
                 think_memory[226][0] += 1
-        if (game_round + 1) <= 5:
+        if (game_round) < 5:
             return 'C'
         A1 = think_memory[226][0] / (game_round)
         A2 = sum((i[opp_index] == 'C') for i in memory[-5:]) / 5
@@ -10893,7 +12505,7 @@ def think(strategy,opp_index,opp_name):
             brain["Total poin opp D"] += score[self_index] - brain["Old score"]
             brain["B"][0] += score[self_index] - brain["Old score"]
             brain["B"][1] = 1
-        if (game_round + 1) <= 3:
+        if (game_round) < 3:
             return 'C'
         if brain["Lose round total"] >= brain["Tolerant"]:
             brain["ALLD"] = True
@@ -10909,7 +12521,7 @@ def think(strategy,opp_index,opp_name):
             brain["Lowest score ever get"] = avg_RPST
             if drawdown > 0.25 or profit_factor < 1 or expectation < 1:
                 return 'D'
-        inp = [(trader_eyes[-1 - i][opp_index] == 'C') for i in range(3)]
+        inp = [(trader_eyes[-i][opp_index] == 'C') for i in range(1, 3 + 1)] 
         SMA = sum(inp) / 3
         pivot_point = (1 + 0 + (trader_eyes[-1][opp_index] == 'C')) / 3
         if SMA < 0.66 or pivot_point < 0.5:
@@ -10923,7 +12535,7 @@ def think(strategy,opp_index,opp_name):
         if ((score[opp_index] - score[self_index]) >= (RPST['T'] * 10)):
             think_memory[232] = 10
         return 'C'
-    elif strategy == 'Evolvable Cycler Attar Version':
+    elif strategy == 'Evolvable Cycler Attariq Version':
         min_length_gene = 1
         max_length_gene = 7
         def breeding_and_mutating(x, y):
@@ -10971,7 +12583,7 @@ def think(strategy,opp_index,opp_name):
         if game_round <= 2:
             return ('D', 'C', 'C')[game_round]
         return 'D' if [memory[1][opp_index], memory[2][opp_index]] == ['D', 'C'] else 'C'
-    elif strategy == 'Zero Determinant 2026 / ZD-2026':
+    elif strategy == 'ZD-2026 / Zero Determinant 2026':
         # == BASES == 
         phi = 1.0
         s = 0.0
@@ -11000,7 +12612,7 @@ def think(strategy,opp_index,opp_name):
         # == OUTPUT ==
         four_vector = [p1, p2, p3, p4]
         return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
-    elif strategy == 'Zero Determinant Psychological War 2026 / ZD-PsyWar2026':
+    elif strategy == 'ZD-PW2026 / Zero Determinant Psychological War 2026':
         # == BASES == 
         phi = 0.8
         s = 0.15
@@ -11043,22 +12655,22 @@ def think(strategy,opp_index,opp_name):
         if game_round % 25 == 0 and game_round > 0:
             new_dict = {}
             total = {}
-            for i in range(24):
-                if new_dict.get(memory[-1 - (23 - i)][self_index] + memory[-1 - (23 - i)][opp_index]) == None: 
-                    new_dict[memory[-1 - (23 - i)][self_index] + memory[-1 - (23 - i)][opp_index]] = 0 
-                    total[memory[-1 - (23 - i)][self_index] + memory[-1 - (23 - i)][opp_index]] = 0 
-                new_dict[memory[-1 - (23 - i)][self_index] + memory[-1 - (23 - i)][opp_index]] += (memory[-1 - (24 - i)][opp_index] == 'C') 
-                total[memory[-1 - (23 - i)][self_index] + memory[-1 - (23 - i)][opp_index]] += 1 
+            for i in range(24, 0, -1):
+                if new_dict.get(memory[-(i + 1)][self_index] + memory[-(i + 1)][opp_index]) == None: 
+                    new_dict[memory[-(i + 1)][self_index] + memory[-(i + 1)][opp_index]] = 0 
+                    total[memory[-(i + 1)][self_index] + memory[-(i + 1)][opp_index]] = 0 
+                new_dict[memory[-(i + 1)][self_index] + memory[-(i + 1)][opp_index]] += (memory[-i][opp_index] == 'C') 
+                total[memory[-(i + 1)][self_index] + memory[-(i + 1)][opp_index]] += 1 
             think_memory[337][0] = {i: ((new_dict[i] / total[i]) if i in new_dict else ((think_memory[337][0][i] * (1 - decay_rate)) + (rnd.random() * decay_rate))) for i in ['CC', 'CD', 'DC', 'DD']}
             think_memory[337][1] = {i: think_memory[337][0][i] for i in think_memory[337][0]}
         think_memory[337][1] = {i: ((think_memory[337][1][i] * (1 - decay_rate)) + (rnd.random() * decay_rate)) for i in think_memory[337][1]}
         return 'C' if rnd.random() <= think_memory[337][1][(memory[-1][self_index] + memory[-1][opp_index]) if game_round > 0 else 'CC'] else 'D'
-    elif strategy == 'Always Skip / Skiptor':
-        return '[SKIP]'
+    elif strategy == 'Always Out / Outtor':
+        return '[OUT]'
     elif strategy == 'Out For Tat':
         if not game_round:
             return 'C'
-        return '[SKIP]' if memory[-1][opp_index] == 'D' else 'C'
+        return '[OUT]' if memory[-1][opp_index] == 'D' else 'C'
     elif strategy == 'Bandit':
         learning_rate = 0.1
         epsilon = 0.1
@@ -11306,7 +12918,7 @@ def think(strategy,opp_index,opp_name):
             return 'C'
         else:
             return 'D'
-    elif strategy == 'A-Actor&Critic / A-A&C':
+    elif strategy == 'A-A&C / A-Actor&Critic':
         brain = think_memory[346]
         if game_round > 0:
             learning_rate = 0.5
@@ -11338,7 +12950,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[348] = True
         if think_memory[348]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 2':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11348,7 +12960,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[349] = True
         if think_memory[349]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 3':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11358,7 +12970,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[350] = True
         if think_memory[350]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 4':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11368,7 +12980,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[351] = True
         if think_memory[351]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 5':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11378,7 +12990,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[352] = True
         if think_memory[352]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 6':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11388,7 +13000,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[353] = True
         if think_memory[353]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 7':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11398,7 +13010,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[354] = True
         if think_memory[354]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 8':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11408,7 +13020,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[355] = True
         if think_memory[355]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 9':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11418,7 +13030,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[356] = True
         if think_memory[356]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Japan Empire Soldier 10':
         if not game_round:
             next_chat[0] = '私はあなたの兵士だ!'
@@ -11428,7 +13040,7 @@ def think(strategy,opp_index,opp_name):
                 think_memory[357] = True
         if think_memory[357]:
             return 'C'
-        return '[SKIP]'
+        return '[OUT]'
     elif strategy == 'Prabowo':
         if not game_round:
             return 'C'
@@ -11518,7 +13130,7 @@ def think(strategy,opp_index,opp_name):
             think_memory[269][2] = think_memory[269][1]
         think_memory[269][2] -= 1
         return think_memory[269][0]
-    elif strategy == 'Ὀδυσσεύς / Odysseus':
+    elif strategy == 'Odysseus / Ὀδυσσεύς':
         if not game_round:
             return 'C'
         if (score[self_index] - score[opp_index]) >= (2 * RPST['T']):
@@ -11531,6 +13143,156 @@ def think(strategy,opp_index,opp_name):
         if None not in (A, immortal_memory[4].get(opp_name)):
             return rnd_prob(max(min(1 - (A * (1 + (immortal_memory[4][opp_name] * 0.05))), 1), 0))
         return 'C'
+    elif strategy == 'Newton':
+        if game_round > 0:
+            if memory[-1][opp_index] == 'D':
+                think_memory[384] += 1
+        m = (think_memory[384] / game_round) if game_round > 0 else 0.5
+        a = (min(game_round, 10) / ((min(game_round, 10) * 0.5) * (min(game_round, 10) * 0.5))) if game_round > 0 else 1
+        f = m * a
+        return rnd_prob(1 - (min(max(f, 0), 1)))
+    elif strategy == 'Coin':
+        if not game_round:
+            return rnd_prob(0.5)
+        return memory[-1][self_index] if rnd.random() <= 0.51 else flip(memory[-1][self_index])
+    elif strategy == 'LCG':
+        think_memory[385][3] = ((think_memory[385][0] * think_memory[385][3]) + think_memory[385][1]) % think_memory[385][2]
+        return 'DC'[(think_memory[385][3] >= (think_memory[385][2] / 2))]
+    elif strategy == 'Your Choice Or My Choice':
+        if not game_round:
+            return 'C'
+        return rnd.choice(memory[-1])
+    elif strategy == 'L-BODOR / Learning Based On Derivative Of Reward':
+        if game_round > 0:
+            learning_rate = 0.25
+            diff = 0.75
+            reward = (score[self_index] - (think_memory[386][0] + avg_RPST)) / diff
+            think_memory[386][0] = score[self_index]
+            A1 = think_memory[386][1][(memory[-2][self_index] + memory[-2][opp_index]) if game_round > 1 else 'CC'][(memory[-1][self_index] == 'D')]
+            think_memory[386][1][(memory[-2][self_index] + memory[-2][opp_index]) if game_round > 1 else 'CC'][(memory[-1][self_index] == 'D')] = ((1 - learning_rate) * A1) + (learning_rate * reward)
+        A2 = think_memory[386][1][(memory[-1][self_index] + memory[-1][opp_index]) if game_round > 0 else 'CC']
+        return 'CD'[A2.index(max(A2))]
+    elif strategy == 'TOM Level 1 / Theory Of Mind Level 1':
+        models = {
+            'ALLC': lambda my_h, opp_h: 'C',
+            'ALLD': lambda my_h, opp_h: 'D',
+            'TFT':  lambda my_h, opp_h: my_h[-1] if my_h else 'C',
+            'GRIM': lambda my_h, opp_h: 'D' if 'D' in my_h else 'C'
+        }
+        if not game_round:
+            think_memory[404] = {m: 0 for m in models}
+            return 'C'
+        my_history = [m[self_index] for m in memory]
+        opp_history = [m[opp_index] for m in memory]
+        last_opp_move = opp_history[-1]
+        prev_my_h = my_history[:-1]
+        prev_opp_h = opp_history[:-1]
+        if prev_my_h:
+            for name, model_func in models.items():
+                predicted = model_func(prev_my_h, prev_opp_h)
+                if predicted == last_opp_move:
+                    think_memory[404][name] += 1
+        best_model_name = max(think_memory[404], key=think_memory[404].get)
+        predicted_next_opp_move = models[best_model_name](my_history, opp_history)
+        if best_model_name == 'ALLC':
+            return 'D'
+        elif predicted_next_opp_move == 'D':
+            return 'D'
+        else:
+            return 'C'
+    elif strategy == 'TOM Level 2 / Theory Of Mind Level 2':
+        if game_round < 2:
+            return 'C'
+        my_history = [m[self_index] for m in memory]
+        opp_history = [m[opp_index] for m in memory]
+        my_c_ratio = my_history.count('C') / game_round
+        predicted_opp_level1_think = 'D' if (my_c_ratio > 0.7 or opp_history[-1] == 'D') else 'C'
+        if predicted_opp_level1_think == 'D':
+            return 'D'
+        else:
+            return 'C'
+    elif strategy == 'TOM Level 3 / Theory Of Mind Level 3':
+        if game_round < 3:
+            return 'C'
+        my_history = [m[self_index] for m in memory]
+        opp_history = [m[opp_index] for m in memory]
+        my_c_ratio = my_history.count('C') / game_round
+        opp_last_move = opp_history[-1]
+        opp_prev_move = opp_history[-2]
+        is_opp_trapping = (opp_prev_move == 'C' and opp_last_move == 'D' and my_history[-1] == 'C')
+        if is_opp_trapping:
+            return 'D'
+        if 0.65 <= my_c_ratio <= 0.75 and my_history[-1] == 'C':
+            return 'D'
+        return 'C' if opp_last_move == 'C' else 'D'
+    elif strategy == 'TPMS / Tree Predictive Matrix Strategy':
+        if not game_round:
+            return 'C'
+        if game_round == 1:
+            return memory[-1][opp_index]
+        level = 5
+        totals = [
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('C', 'C')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('C', 'D')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('D', 'C')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('D', 'D')) for i in range(min(25, game_round), 1, -1)]),
+        ]
+        c_responses = [
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('C', 'C', 'C')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('C', 'D', 'C')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('D', 'C', 'C')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('D', 'D', 'C')) for i in range(min(25, game_round), 1, -1)]),
+        ]
+        p_cc = (c_responses[0] / totals[0]) if totals[0] > 0 else 0.5
+        p_cd = (c_responses[1] / totals[1]) if totals[1] > 0 else 0.5
+        p_dc = (c_responses[2] / totals[2]) if totals[2] > 0 else 0.5
+        p_dd = (c_responses[3] / totals[3]) if totals[3] > 0 else 0.5
+        payoff_map = {
+            ('C', 'C'): RPST['R'], ('C', 'D'): RPST['S'],
+            ('D', 'C'): RPST['T'], ('D', 'D'): RPST['P']
+        }
+        prob = {
+            ('C', 'C'): p_cc, ('C', 'D'): p_cd,
+            ('D', 'C'): p_dc, ('D', 'D'): p_dd
+        }
+        def TPM(self_action, opp_action, depth):
+            if depth == 0:
+                return [prob[(self_action, opp_action)], payoff_map[(self_action, opp_action)]]
+            TPM_val = [TPM('C', 'C', depth - 1), TPM('C', 'D', depth - 1), TPM('D', 'C', depth - 1), TPM('D', 'D', depth - 1)]
+            max_val = [RPST['S'], -1]
+            for i in TPM_val:
+                if (i[0] * i[1]) > max_val[0]:
+                    max_val[0] = (i[0] * i[1])
+                    max_val[1] += 1
+            return [prob[(self_action, opp_action)] * TPM_val[max_val[1]][0], payoff_map[(self_action, opp_action)] + TPM_val[max_val[1]][1]]
+        A = [TPM('C', 'C', level), TPM('C', 'D', level), TPM('D', 'C', level), TPM('D', 'D', level)]
+        E_sh = max(A[0][0] * A[0][1], A[1][0] * A[1][1])
+        E_st = max(A[2][0] * A[2][1], A[3][0] * A[3][1])
+        if E_sh == E_st:
+            return 'D' if 'D' in memory[-1] else 'C'
+        if E_sh > E_st:
+            return 'C'
+        return 'D'
+    elif strategy == 'Mystical Logic':
+        if not game_round:
+            return 'C'
+        if think_memory[408] > 1 and (memory[-2][opp_index], memory[-1][opp_index]) == ('C', 'C'):
+            think_memory[408] = 0
+        if think_memory[408] == 3 and memory[-1][opp_index] == 'D':
+            next_chat[0] = rnd.choice(['YOU ATHEIST!😡', 'YOU ROBBER!😡', 'YOU JEALOUS!😡'])
+        if think_memory[408] == 2 and memory[-1][opp_index] == 'D':
+            next_chat[0] = 'HEY! DON\'T YOU DARE TAKE MY GIFT FROM THE SUPERNATURAL WORLD!😡'
+            think_memory[408] = 3
+        if think_memory[408] == 1 and memory[-1][opp_index] == 'C':
+            next_chat[0] = 'This is a gift from the supernatural world😏'
+            think_memory[408] = 2
+        if think_memory[408] == 0 and memory[-1][opp_index] == 'D':
+            next_chat[0] = rnd.choice(['YOU ROBBER!😡', 'YOU JEALOUS!😡'])
+            return 'D'
+        if rnd.random() <= 0.1:
+            think_memory[408] = max(1, think_memory[408])
+            return 'D'
+        return memory[-1][opp_index]
     else:
         print(f'ERROR NAME: {strategy}')
         return None
@@ -11548,21 +13310,21 @@ def run_match(args):
     local_round = tournament_avg_round + rnd.randint(-tournament_round_randomness, tournament_round_randomness)
     while game_round < local_round:
         strategy_next_chat = [[''], ['']]
-        c1 = think(strategies[i], 1, strategies[j])
-        c2 = think(strategies[j], 0, strategies[i])
+        c1 = call_strategy(strategies[i], 1, strategies[j])
+        c2 = call_strategy(strategies[j], 0, strategies[i])
         if with_noise_flag:
             if rnd.random() <= noise_prob_local:
                 c1 = rnd.choice(['C', 'D'])
             if rnd.random() <= noise_prob_local:
                 c2 = rnd.choice(['C', 'D'])
-        if (c1 not in ('C', 'D', '[SKIP]')) or (c2 not in ('C', 'D', '[SKIP]')):
+        if (c1 not in ('C', 'D', '[OUT]')) or (c2 not in ('C', 'D', '[OUT]')):
             ERROR = []
-            if c1 not in ('C', 'D', '[SKIP]'):
+            if c1 not in ('C', 'D', '[OUT]'):
                 ERROR.append(strategies[i])
-            if c2 not in ('C', 'D', '[SKIP]'):
+            if c2 not in ('C', 'D', '[OUT]'):
                 ERROR.append(strategies[j])
             raise NameError(f'ERROR {ERROR}')
-        if '[SKIP]' in (c1, c2):
+        if '[OUT]' in (c1, c2):
             break
         memory.append((c1, c2))
         if c1 == c2:
@@ -11574,9 +13336,9 @@ def run_match(args):
         game_round += 1
     return (i, j, score[0], score[1])
 
-strategies = ['2 Tits For 2 Tats Eckhart Arnold Version', '2 Tits For Tat', '3 Seconds Mirror', '3-Tree Of Prediction', 'A-Actor&Critic / A-A&C', 'ALLC OR ALLD', 'AMERICA! / USA / Freedoom', 'AON2', 'AQUA', 'Absurdistan 1', 'Acquaintance & Trust', 'Adaptive', 'Adaptive Hhhpraise Version', 'Adaptive Pavlov 2006', 'Adaptive Pavlov 2011', 'Adaptive Tit For Tat', 'Adaptive Tit For Tat Attar Version', 'Adaptor Brief', 'Adaptor Long', 'Aggravater', 'Alan', 'Alexei / End Game Cheater', 'Alternator', 'Alternator Hunter', 'Always Cooperate / Cooperator / Saint / Dove', 'Always Defect / Defector / Shark / Hawk', 'Always Skip / Skiptor', 'Amazon / Piraha', 'Analogy', 'Anatol', 'Angry Tit For Tat', 'Anti Cycler', 'Anti Noise Tit For Tat', 'Anti Tit For Tat / Psycho', 'Appeaser', 'Arrogant Q-Learner', 'Average Copier', 'Axelrod First By Davis', 'Axelrod First By Downing', 'Axelrod First By Feld', 'Axelrod First By Graaskamp', 'Axelrod First By Grofman', 'Axelrod First By Grudger / Grim trigger', 'Axelrod First By Joss / Naive Prober', 'Axelrod First By Named Withheld', 'Axelrod First By Nydegger', 'Axelrod First By Shubik', 'Axelrod First By Stein & Rapoport', 'Axelrod First By Tideman & Chieruzzi', 'Axelrod First By Tit For Tat', 'Axelrod First By Tullock', 'Axelrod Second By Adams', 'Axelrod Second By Almy', 'Axelrod Second By Ambuelh & Hickey', 'Axelrod Second By Anderson', 'Axelrod Second By Appold', 'Axelrod Second By Batell', 'Axelrod Second By Black', 'Axelrod Second By Borufsen', 'Axelrod Second By Cave', 'Axelrod Second By Champion', 'Axelrod Second By Colbert', 'Axelrod Second By Dawes & Batell', 'Axelrod Second By Downing', 'Axelrod Second By Duisman', 'Axelrod Second By Eatherley', 'Axelrod Second By Falk & Lanqsted', 'Axelrod Second By Friedland', 'Axelrod Second By Getzler', 'Axelrod Second By Gladstein / Tester', 'Axelrod Second By Graaskamp & Katzen', 'Axelrod Second By Grisell / Go By Majority / Soft Go By Majority', 'Axelrod Second By Grofman', 'Axelrod Second By Hall', 'Axelrod Second By Harrington', 'Axelrod Second By Hollander', 'Axelrod Second By Hotz', 'Axelrod Second By Jones', 'Axelrod Second By Kluepfel', 'Axelrod Second By Lefevre', 'Axelrod Second By Leyland', 'Axelrod Second By Leyvraz', 'Axelrod Second By Mauk', 'Axelrod Second By Mcgurrin', 'Axelrod Second By Mikkelson', 'Axelrod Second By Newman', 'Axelrod Second By Nussbacher', 'Axelrod Second By Pebley', 'Axelrod Second By Pinkley', 'Axelrod Second By Quayle', 'Axelrod Second By Rabbie', 'Axelrod Second By Richard Hufford', 'Axelrod Second By Robertson', 'Axelrod Second By Rowsam', 'Axelrod Second By Schurmann', 'Axelrod Second By Smoody', 'Axelrod Second By Snodgrass', 'Axelrod Second By Tideman & Chieruzzi', 'Axelrod Second By Tranquilizer', 'Axelrod Second By Weiderman', 'Axelrod Second By Weiner', 'Axelrod Second By White', 'Axelrod Second By Yamachi', 'Axelrod Second By Zimmerman', 'Back Stabber', 'Backrooms', 'Bad Random', 'Bahlil', 'Bandit', 'Bandit UCB', 'Bayes Attar Version', 'Bayes Foomii Version', 'Benjo', 'Beta Tester', 'Better & Better', 'Bluff', 'Bluff Master', 'Boltzmann Brain', 'Boxer', 'Bros Mind', 'Bully / Reverse Tit For Tat', 'Burn Both Ends / BBE', 'Burn The Bridge Strategy', 'Bush Mosteller', 'Buzzer', 'CS / Collective Strategy', 'Caerbannog', 'Calamity', 'Calculator', 'Calculator The Nerd Of AI Version', 'Capitalist', 'Capri', 'Cautious Q-Learner', 'Caveman', 'Cerebrum', 'Charity', 'Chatter', 'Clement Coldridge', 'Collatz', 'Communalist', 'Continuous Q-Learner Avg', 'Continuous Q-Learner Max', 'Contrite Grudger', 'Contrite Tit For Tat', 'Control 1', 'Control 10', 'Control 11', 'Control 2', 'Control 3', 'Control 4', 'Control 5', 'Control 6', 'Control 7', 'Control 8', 'Control 9', 'Cooperate Once', 'Cooperator Hunter', 'Crabby', 'Crabby Attar Version', 'Cruelity', 'Cult Bishop A', 'Cult Bishop B', 'Cult Citizen A', 'Cult Citizen B', 'Cult Citizen C', 'Cult Leader', 'Curiosity', 'Cycle Hunter', 'Cycler CCCCCD', 'Cycler CCCD', 'Cycler CCCDCD', 'Cycler CCD', 'Cycler DC', 'Cycler DCCCC', 'Cycler DDC', 'DBS / Derived Belief Strategy', 'DDoS', 'Darwin', 'Deadlock Breaker', 'Decay Given', 'Defect Once', 'Defector Hunter', 'Delayed AON1', 'Desire', 'Desprate', 'Detective', 'Devil Staircase', 'Diplomat', 'Dont Bite The Hand That Feeds You', 'Double Crosser', 'Double Q-Learner', 'Double Resurrection', 'Doubler', 'Downing Benjjo Version', 'Downing Eckhart Arnold Version', 'Dumpty 10', 'Dyna Q-Learner', 'Dynamic 2 Tits For Tat', 'Dynocat', 'EGOist', 'Easy Go / Reverse Grudger', 'Echo Adaptive', 'Echo Fisher', 'Egoist A-Learner', 'Eliza / Therapist', 'Entropy Sentinel', 'Envy', 'Eric', 'Ethanol / Alcohol', 'Eugine Nier', 'Euler', 'Eventual Cycle Hunter', 'Evil Alliance', 'Evolvable Cycler Attar Version', 'Evolved FSM 16', 'Evolved FSM 16 Noise 05', 'Evolved FSM 4', 'Evolved FSM 6', 'Evolved HMM 5', 'Evolved Looker Up 1_1_1', 'Evolved Looker Up 2_2_2', 'Exploratory Lenient Grim 2', 'Exploratory Tit For 3 Tats', 'FAWS', 'False Cooperator', 'Falsity', 'Female / Woman', 'Fibonacci', 'Finger Print', 'Firm But Fair / Firm For Tat', 'Fixed Pattern', 'Fool Me Once', 'Forest-RND', 'Forest-XG', 'Forgetable Gradual', 'Forgetful Fool Me Once', 'Forgetful Grudger', 'Forgetful Majority Bot', 'Forgiver', 'Forgiving', 'Forgiving Bot', 'Forgiving Fate', 'Forgiving Tit For Tat', 'Forgiving Tit For Tat', 'Fortress 3', 'Fortress 4', 'Frankl', 'Free Rider', 'Frequency Analyzer', 'Freud', 'Friendly Human', 'Gambler Attar Version', 'Game Theory Explorer / GT-E', 'Gaslighter', 'Gateman', 'Gen 1_64_200_30_0.3_A', 'Gen 2_64_200_30_0.3_A', 'Gen 3_64_200_30_0.3_A', 'Gen 4_64_200_30_0.3_A', 'Gen 5_64_200_30_0.3_A', 'Generic Downing', 'Generic Downing Friendly', 'Generous Tit For Tat', 'Generous Tit For Tat Axelrod Project Contributor Team Version', 'Generous Tit For Tat Benjjo Version', 'Generous Tit For Tat Eckhart Arnold Version 1', 'Generous Tit For Tat Eckhart Arnold Version 2', 'Generous Tit For Tat Less Wrong Version', 'Genetic Algo 1', 'Genetic Algo 2', 'George', 'Go By Minority', 'Gold Digger', 'Golden Mean', 'Good', 'Good Random', 'Graaskamp Benjjo Version', 'Gradual', 'Gradual Cristal Version', 'Gradual Killer', 'Grudger Alternator', 'Grumpy', 'HMM Player', 'Half Sin Square', 'Handshake', 'Hard Go By Majority', 'Hard Prober', 'Hard Tit For 2 Tats / 2 Tits For 2 Tats', 'Hard Tit For Tat / 3 Tits For Tat', 'Hesitant Q-Learner', 'Hopeless', 'Hot Coffee', 'Humpty 10', 'Hungry', 'Inequity Averse Q-Learner', 'Inverse', 'Inverse Punisher', 'Is There Something New?', 'Isolated Clan', 'Isolated Tit For Tat', 'Japan Empire Emperor', 'Japan Empire Soldier 1', 'Japan Empire Soldier 10', 'Japan Empire Soldier 2', 'Japan Empire Soldier 3', 'Japan Empire Soldier 4', 'Japan Empire Soldier 5', 'Japan Empire Soldier 6', 'Japan Empire Soldier 7', 'Japan Empire Soldier 8', 'Japan Empire Soldier 9', 'Javelin', 'Jem', 'Jester', 'Jesus Petry', 'Josuah', 'Jung', 'Karen', 'Keyman', 'Killer', 'King Of 48 Laws Of Power', 'Knowledgeable Worse & Worse', 'Konflikt Blue', 'Konflikt Green', 'Laran', 'Laws', 'Learner', 'Lenient Grim 2', 'Lenient Grim 3', 'Less Grim', 'Level Punisher', 'Liar Person', 'Lighty-Darky', 'Limited Retaliate', 'Limited Retaliate 2', 'Limited Retaliate 3', 'Line', 'Little Grudger', 'Long Horse', 'Long Term Strategist', 'Look Up / Look Ahead', 'Loyal', 'MARS / Mimicry And Relative Similarity', 'MCMC / Markov Chain Monte Carlo', 'MEM2', 'MENACE / HER', 'MSAgent', 'Mafia A', 'Mafia B', 'Mafia C', 'Mafia D', 'Majapahit', 'Male / Man', 'Malthrin', 'Man In The Middle', 'Manipulator', 'Manipulity', 'Markov', 'Matcher', 'Math Constant Hunter', 'Memory 1', 'Memory Decay', 'Mensa', 'Meta Hunter', 'Meta Majority', 'Meta Minority', 'Meta Mixer', 'Meta Winner', 'Meta Winner Ensemble', 'Michaelos', 'Mirror', 'Modal Defector', 'Modal Tit For Tat', 'Momentum', 'Monkey See, Monkey Do', 'Mosquito', 'MrX', 'N Pavlov', 'N Tits For M Tats', 'Naive Q-Learner', 'Nash', 'Nasty Tit For Tat', 'Negation', 'Neil A', 'Nydegger Benjjo Version', 'Observant', 'Odd-Even Go By Majority', 'Omega Tit For Tat', 'Once Bitten', 'Opportunist', 'Opposite Grudger', 'Out For Tat', 'PIN', 'PSO Gambler 1_1_1', 'PSO Gambler 2_2_2', 'PSO Gambler 2_2_2 Noise 05', 'PSO Gambler Mem 1', 'Parameterized Tit For Tat', 'Paranoid', 'Passive Tit For Tat', 'Patterned Adaptive Fortress', 'Patterned Adaptive Fortress 2', 'Pavlov / Win-Stay, Lose-Shift', 'Pavlov D / Suspicious Pavlov', 'Pavlov Tester', 'Pavolovo', 'Pawlow', 'Perceptron', 'Phi', 'Pi', 'Prabowo', 'Praedator', 'Predator', 'Probable Coop', 'Probe & Punish', 'Prober', 'Prober 2', 'Prober 3', 'Prober 4', 'Prober Abdullah-arif-swe version', 'Procastinater', 'Psycho Attar Version', 'Pun 1', 'Punisher', 'Q-Learning A-Learner', 'REINFORCE', 'RNN & RTRL', 'Racister', 'Rack Block Shooter', 'Raider', 'Random / Moron', 'Random Exploiter 1', 'Random Exploiter 2', 'Random Exploiter 3', 'Random Exploiter 4', 'Random Hunter', 'Random Tit For Tat', 'Reactive Player', 'Rememberable Grudger', 'Remorseful Prober', 'Resurrection', 'Retaliate', 'Retaliate 2', 'Retaliate 3', 'Rice Field', 'Ripoff', 'Risky Q-Learner', 'Rogers & Maslow', 'Rover', 'Rwallace', 'SOVIET UNION! / USSR / Inequality', 'SURPRISE ATTACK!', 'Sarsa Q-Learner', 'Score Equalizer', 'Second Chance', 'Second Chance Attar Version', 'Self Steem', 'Self-Love A-Learner', 'Short Mem', 'Signaling Cheater', 'Simple ANN', 'Simple Exploiter', 'Simple Identity ChecK', 'Simpleton', 'Skinner', 'Slanger', 'Slow Tit For Tat', 'Smart', 'Smart Cat', 'Smart Generous Tit For Tat', 'Smart Go By Majority', 'Smart Snake', 'Smart-Clever', 'Smarter Tat For Tit', 'Smith', 'Smooth Grudger', 'Smooth Tit For Tat', 'Sneaky Tit For Tat', 'Social Average', 'Social Engineering', 'Socio', 'Soft Grim', 'Soft Grudger', 'Solution B1', 'Solution B5', 'Sort', 'Spectrum Attacker', 'Spiteful CC', 'Spiteful Tit For Tat', 'Split Brain Syndrome', 'Springter', 'Stabilize', 'Stalker', 'Star S', 'Star SL', 'Star SN', 'Star Slave 1', 'Star Slave 10', 'Star Slave 2', 'Star Slave 3', 'Star Slave 4', 'Star Slave 5', 'Star Slave 6', 'Star Slave 7', 'Star Slave 8', 'Star Slave 9', 'Statistical Strategy', 'Stefan Pennartz', 'Stochastic Cooperator', 'Stochastic WSLS', 'Stoic Mirror', 'Stoicalist', 'Stupidiot', 'Sumobox Fighter', 'Sun Tzu Bot', 'Suspicious Alternator', 'Suspicious Tit For Tat', 'Sweet Heart', 'Syifa', 'TF 1', 'TF 2', 'TF 3', 'TF2T & 2TFT', 'TOM Level 1 / Theory Of Mind Level 1', 'Tages', 'Teacher Pee While Standing, Student Pee While Running', 'Tester Eckhart Arnold Version', 'The Calculated Mirror With A Fuse', 'The Cave Breaker', 'The Nasty A', 'Theseus', 'Three Times Out', 'Threshold Punisher', 'Thresholded Trust Bot', 'Thue Morse', 'Thue Morse Inverse', 'Thumper', 'Tiny Brain', 'Tip For Tap', 'Tit For 2 Tats / Sample', 'Tit For 3 Tats', 'Tit For Increasing Tat', 'Tit For Tat But Not Too Forgiving', 'Tit For Tat Killer', 'Toxic Mirror', 'Trader', 'Tranquilizer Eckhart Arnold Version', 'Treasure Hunt / Sugar Strategy', 'Tri-Brain', 'Tricky Cooperator', 'Tricky Defector', 'Tricky Level Punisher', 'Trust Ledger', 'Trust Score Sigmoid', 'Trusty', 'Turan', 'Tweedledee', 'Tweedledum', 'Tweetypie', 'Unpredictable Tit For Tat', 'Uranium', 'Usually Cooperates', 'Usually Defects', 'Vandal', 'Vengeful', 'Vengeful Cheater', 'Verity', 'Very Bad', 'Whale', 'William', 'Willing', 'Win-Shift, Lose-Stay', 'Winner 12', 'Winner 21', 'Worse & Worse / Worse & Worse 1', 'Worse & Worse 2', 'Worse & Worse 3', 'Zero Day', 'Zero Determinant 2026 / ZD-2026', 'Zero Determinant Equalizer / ZD-Q', 'Zero Determinant Extortion / ZD-X', 'Zero Determinant Generous / ZD-G', 'Zero Determinant Generous Tit For Tat / ZD-GTFT', 'Zero Determinant Memory 2 / ZD-M2', 'Zero Determinant Mischief / ZD-MS', 'Zero Determinant Psychological War 2026 / ZD-PsyWar2026', 'Zero Determinant Set / ZD-S', 'Ὀδυσσεύς / Odysseus']
-strategies_creator = {'2 Tits For 2 Tats Eckhart Arnold Version': 'Eckhart Arnold', '2 Tits For Tat': 'John Maynard Smith', '3 Seconds Mirror': 'Meta', '3-Tree Of Prediction': 'Attar', 'A-Actor&Critic / A-A&C': 'Attar & Gemini', 'ALLC OR ALLD': 'Marc Harper', 'AMERICA! / USA / Freedoom': 'Attar', 'AON2': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'AQUA': 'Attar', 'Absurdistan 1': 'Christian Erlen', 'Acquaintance & Trust': 'Philip Seehausen', 'Adaptive': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Hhhpraise Version': 'Hhhpraise', 'Adaptive Pavlov 2006': 'J. Li', 'Adaptive Pavlov 2011': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Tit For Tat': 'E. Tzafestas', 'Adaptive Tit For Tat Attar Version': 'Attar', 'Adaptor Brief': 'Christoph Hauert & Olaf Stenull', 'Adaptor Long': 'Christoph Hauert & Olaf Stenull', 'Aggravater': 'Thomas Campbell', 'Alan': 'Attar, Inspired From Alan Turing', 'Alexei / End Game Cheater': 'Alexei / Eckhart Arnold', 'Alternator': 'Robert Axelrod', 'Alternator Hunter': 'Karol Langner', 'Always Cooperate / Cooperator / Saint / Dove': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / Robert Trivers & Richard Dawkins / John Maynard Smith & George R. Price', 'Always Defect / Defector / Shark / Hawk': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / Robert Trivers & Richard Dawkins / John Maynard Smith & George R. Price', 'Always Skip / Skiptor': 'Attar', 'Amazon / Piraha': 'Attar', 'Analogy': 'Robert Gladstein', 'Anatol': 'Attar', 'Angry Tit For Tat': 'Attar', 'Anti Cycler': 'Marc Harper', 'Anti Noise Tit For Tat': 'Attar', 'Anti Tit For Tat / Psycho': 'C. Hilbe & M. A. Nowak & A. Traulsen / D. Ashlock & E. Y. Kim & W. Ashlock', 'Appeaser': 'Jochen Muller', 'Arrogant Q-Learner': 'Geraint Palmer', 'Average Copier': 'Geraint Palmer', 'Axelrod First By Davis': 'Morton Davis', 'Axelrod First By Downing': 'Leslie Downing', 'Axelrod First By Feld': 'Scott Feld', 'Axelrod First By Graaskamp': 'Jim Graaskamp', 'Axelrod First By Grofman': 'Bernard Grofman', 'Axelrod First By Grudger / Grim trigger': 'James W. Friedman', 'Axelrod First By Joss / Naive Prober': 'Johann Joss / J. Li & P. Hingston & G. Kendall', 'Axelrod First By Named Withheld': 'Anonymous', 'Axelrod First By Nydegger': 'Rudy Nydegger', 'Axelrod First By Shubik': 'Martin Shubik', 'Axelrod First By Stein & Rapoport': 'Stein & Anatol Rapoport', 'Axelrod First By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'Axelrod First By Tit For Tat': 'Anatol Rapoport', 'Axelrod First By Tullock': 'Gordon Tullock', 'Axelrod Second By Adams': 'William Adams', 'Axelrod Second By Almy': 'Tom Almy', 'Axelrod Second By Ambuelh & Hickey': 'Dennis Ambuehl & Kevin Hickey', 'Axelrod Second By Anderson': 'R. D. Anderson', 'Axelrod Second By Appold': 'Scott Appold', 'Axelrod Second By Batell': '\tMark F. Batell', 'Axelrod Second By Black': 'Paul E. Black', 'Axelrod Second By Borufsen': 'Otto Borufsen', 'Axelrod Second By Cave': 'Rob Cave', 'Axelrod Second By Champion': 'Danny C. Champion', 'Axelrod Second By Colbert': 'John Willaim Colbert', 'Axelrod Second By Dawes & Batell': 'Robyn M. Dawes & Mark Batell', 'Axelrod Second By Downing': 'Leslie Downing', 'Axelrod Second By Duisman': 'George Duisman', 'Axelrod Second By Eatherley': 'Graham J. Eatherley', 'Axelrod Second By Falk & Lanqsted': 'Robert B. Falk & James M. Langsted', 'Axelrod Second By Friedland': 'Edward Friedland', 'Axelrod Second By Getzler': 'Abraham Getzler', 'Axelrod Second By Gladstein / Tester': 'David Gladstein', 'Axelrod Second By Graaskamp & Katzen': 'Jim Graaskamp & Ken Katzen', 'Axelrod Second By Grisell / Go By Majority / Soft Go By Majority': 'Gail Grisell / Robert Axelrod / S. Mittal & K. Deb', 'Axelrod Second By Grofman': 'Bernard Grofman', 'Axelrod Second By Hall': 'James E. Hall', 'Axelrod Second By Harrington': 'Paul D. Harrington', 'Axelrod Second By Hollander': 'Howard R. Hollander', 'Axelrod Second By Hotz': 'Roger Hotz', 'Axelrod Second By Jones': 'Martyn Jones', 'Axelrod Second By Kluepfel': 'Charles Kluepfel', 'Axelrod Second By Lefevre': 'George Lefevre', 'Axelrod Second By Leyland': 'Robert A. Leyland', 'Axelrod Second By Leyvraz': 'Fransois Leyvraz', 'Axelrod Second By Mauk': 'Fred Mauk', 'Axelrod Second By Mcgurrin': 'Michael F. McGurrin', 'Axelrod Second By Mikkelson': 'Ray Mikkelson', 'Axelrod Second By Newman': 'Steve Newman', 'Axelrod Second By Nussbacher': 'Henry Nussbacher', 'Axelrod Second By Pebley': 'Robert Pebley', 'Axelrod Second By Pinkley': 'Jonathan Pinkley', 'Axelrod Second By Quayle': 'Stanley F. Quayle', 'Axelrod Second By Rabbie': 'Harold Rabbie', 'Axelrod Second By Richard Hufford': 'Richard Hufford', 'Axelrod Second By Robertson': 'William H. Robertson', 'Axelrod Second By Rowsam': 'Glen Rowsam', 'Axelrod Second By Schurmann': 'E. E. H. Schurmann', 'Axelrod Second By Smoody': 'Rik Smoody', 'Axelrod Second By Snodgrass': 'Gene Snodgrass', 'Axelrod Second By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'Axelrod Second By Tranquilizer': 'Craig Feathers', 'Axelrod Second By Weiderman': 'Nelson Weiderman', 'Axelrod Second By Weiner': 'Herb Weiner', 'Axelrod Second By White': 'Edward C. White Jr', 'Axelrod Second By Yamachi': 'Brian Yamachi', 'Axelrod Second By Zimmerman': 'George Zimmerman', 'Back Stabber': 'Thomas Campbell', 'Backrooms': 'Attar', 'Bad Random': 'Robert Axelrod', 'Bahlil': 'Attar', 'Bandit': 'Attar & Gemini', 'Bandit UCB': 'Auer & Cesa-Bianchi & Fischer', 'Bayes Attar Version': 'Attar', 'Bayes Foomii Version': 'Foomii', 'Benjo': 'benjjo', 'Beta Tester': 'Attar', 'Better & Better': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Bluff': 'Attar & My Aunt', 'Bluff Master': 'Perplexity', 'Boltzmann Brain': 'Attar, Inspired From Ludwig Boltzmann', 'Boxer': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bros Mind': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bully / Reverse Tit For Tat': 'John Nachbar', 'Burn Both Ends / BBE': 'Louis Marinoff', 'Burn The Bridge Strategy': 'tigressine', 'Bush Mosteller': 'Luis R. Izquierdo & Segismundo S. Izquierdo', 'Buzzer': 'Attar', 'CS / Collective Strategy': 'J. Li & G. Kendall', 'Caerbannog': 'Caerbannog', 'Calamity': 'Attar, Inspired From KhanhsKMC', 'Calculator': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Calculator The Nerd Of AI Version': 'The Nerd Of AI', 'Capitalist': 'Chat-GPT', 'Capri': 'Y. Murase Et Al', 'Cautious Q-Learner': 'Geraint Palmer', 'Caveman': 'Attar', 'Cerebrum': 'Attar & Chat-GPT & Gemini', 'Charity': 'Attar', 'Chatter': 'Attar', 'Clement Coldridge': 'Attar', 'Collatz': 'Attar', 'Communalist': 'Chat-GPT', 'Continuous Q-Learner Avg': 'Attar', 'Continuous Q-Learner Max': 'Attar', 'Contrite Grudger': 'Attar', 'Contrite Tit For Tat': 'J. Wu & Robert Axelrod', 'Control 1': '[Less Wrong]', 'Control 10': '[Less Wrong]', 'Control 11': '[Less Wrong]', 'Control 2': '[Less Wrong]', 'Control 3': '[Less Wrong]', 'Control 4': '[Less Wrong]', 'Control 5': '[Less Wrong]', 'Control 6': '[Less Wrong]', 'Control 7': '[Less Wrong]', 'Control 8': '[Less Wrong]', 'Control 9': '[Less Wrong]', 'Cooperate Once': 'benjjo', 'Cooperator Hunter': 'Karol Langner', 'Crabby': 'Zachary Danziger', 'Crabby Attar Version': 'Attar', 'Cruelity': 'Attar, Inspired From KhanhsKMC', 'Cult Bishop A': 'Attar', 'Cult Bishop B': 'Attar', 'Cult Citizen A': 'Attar', 'Cult Citizen B': 'Attar', 'Cult Citizen C': 'Attar', 'Cult Leader': 'Attar', 'Curiosity': 'Attar, Inspired From KhanhsKMC', 'Cycle Hunter': 'Marc Harper', 'Cycler CCCCCD': 'Marc Harper', 'Cycler CCCD': 'Marc Harper', 'Cycler CCCDCD': 'Marc Harper', 'Cycler CCD': 'Marc Harper', 'Cycler DC': 'Marc Harper', 'Cycler DCCCC': 'Attar', 'Cycler DDC': 'Marc Harper', 'DBS / Derived Belief Strategy': 'T.-C. Au & D. S. Nau', 'DDoS': 'Attar', 'Darwin': 'Paul Slavin', 'Deadlock Breaker': 'D. Ashlock & E. Y. Kim ', 'Decay Given': 'Attar', 'Defect Once': 'benjjo', 'Defector Hunter': 'Karol Langner', 'Delayed AON1': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'Desire': 'Attar', 'Desprate': 'P. Van Den Berg & F. J. Weissing', 'Detective': 'Nicky Case', 'Devil Staircase': 'Attar', 'Diplomat': 'Perplexity', 'Dont Bite The Hand That Feeds You': 'Attar', 'Double Crosser': 'Thomas Campbell', 'Double Q-Learner': 'Attar', 'Double Resurrection': 'Eckhart Arnold', 'Doubler': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Downing Benjjo Version': 'benjjo', 'Downing Eckhart Arnold Version': 'Eckhart Arnold', 'Dumpty 10': 'Eckhart Arnold', 'Dyna Q-Learner': 'Attar', 'Dynamic 2 Tits For Tat': 'Grant Garrett-Grossman', 'Dynocat': 'rexmhall09', 'EGOist': 'Attar', 'Easy Go / Reverse Grudger': "LIFL(Laboratoire d'Informatique Fondamentale de Lille) / J. Li & P. Hingston & G. Kendall", 'Echo Adaptive': 'Copilot', 'Echo Fisher': 'Attar', 'Egoist A-Learner': 'Attar', 'Eliza / Therapist': 'Attar, Inspired From Joseph Weizenbaum', 'Entropy Sentinel': 'Chat-GPT', 'Envy': 'Bernd Lahno', 'Eric': 'Attar & Erik & Chat-GPT', 'Ethanol / Alcohol': 'Attar', 'Eugine Nier': 'Eugine Nier', 'Euler': 'Timothy Standen', 'Eventual Cycle Hunter': 'Marc Harper', 'Evil Alliance': 'ArisKatsaris', 'Evolvable Cycler Attar Version': 'Attar', 'Evolved FSM 16': 'Marc Harper', 'Evolved FSM 16 Noise 05': 'Marc Harper', 'Evolved FSM 4': 'Marc Harper', 'Evolved FSM 6': 'Frederick Vincent & Dashiell Fryer', 'Evolved HMM 5': 'Marc Harper', 'Evolved Looker Up 1_1_1': 'Marc Harper', 'Evolved Looker Up 2_2_2': 'Marc Harper', 'Exploratory Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Exploratory Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'FAWS': 'FAWS', 'False Cooperator': 'Yaroslav Rosokha & Julian Romero', 'Falsity': 'Attar, Inspired From Xqree', 'Female / Woman': 'Attar', 'Fibonacci': 'Attar', 'Finger Print': 'Eckhart Arnold', 'Firm But Fair / Firm For Tat': 'Marcus R. Frean', 'Fixed Pattern': 'Eckhart Arnold', 'Fool Me Once': 'Marc Harper', 'Forest-RND': 'Attar', 'Forest-XG': 'Attar', 'Forgetable Gradual': 'Attar', 'Forgetful Fool Me Once': 'Marc Harper', 'Forgetful Grudger': 'Geraint Palmer', 'Forgetful Majority Bot': 'abdullah-arif-swe', 'Forgiver': 'Thomas Campbell', 'Forgiving': 'Hhhpraise', 'Forgiving Bot': 'abdullah-arif-swe', 'Forgiving Fate': 'Attar & Nabilah Shafirah', 'Forgiving Tit For Tat': 'Thomas Campbell', 'Fortress 3': 'W. Ashlock & D. Ashlock', 'Fortress 4': 'W. Ashlock & D. Ashlock', 'Frankl': 'Attar, Inspired From Viktor Frankl', 'Free Rider': 'Enquist & Leimar', 'Frequency Analyzer': 'Ian Miller', 'Freud': 'Attar, Inspired From Sigmund Freud', 'Friendly Human': 'Alex Mainzer', 'Gambler Attar Version': 'Attar', 'Game Theory Explorer / GT-E': 'Attar', 'Gaslighter': 'Attar & Nabilah Shafirah', 'Gateman': 'Attar', 'Gen 1_64_200_30_0.3_A': 'Attar', 'Gen 2_64_200_30_0.3_A': 'Attar', 'Gen 3_64_200_30_0.3_A': 'Attar', 'Gen 4_64_200_30_0.3_A': 'Attar', 'Gen 5_64_200_30_0.3_A': 'Attar', 'Generic Downing': 'Sven Sommer', 'Generic Downing Friendly': 'Sven Sommer', 'Generous Tit For Tat': 'Robert Axelrod', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'Axelrod Project Contributor Team', 'Generous Tit For Tat Benjjo Version': 'benjjo', 'Generous Tit For Tat Eckhart Arnold Version 1': 'Eckhart Arnold', 'Generous Tit For Tat Eckhart Arnold Version 2': 'Eckhart Arnold', 'Generous Tit For Tat Less Wrong Version': '[Less Wrong]', 'Genetic Algo 1': 'Attar', 'Genetic Algo 2': 'Attar', 'George': 'Attar', 'Go By Minority': 'Attar', 'Gold Digger': 'Foomii', 'Golden Mean': 'Dola', 'Good': 'Attar', 'Good Random': 'Robert Axelrod', 'Graaskamp Benjjo Version': 'benjjo', 'Gradual': 'B. Beaufils & J. Delahaye & P. Mathieu', 'Gradual Cristal Version': 'CRISTAL Lab & SMAC Team', 'Gradual Killer': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Grudger Alternator': 'Geraint Palmer', 'Grumpy': 'Jason Young', 'HMM Player': 'Marc Harper', 'Half Sin Square': 'Attar', 'Handshake': 'Arthur J. Robson', 'Hard Go By Majority': 'S. Mittal & K. Deb', 'Hard Prober': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Hard Tit For 2 Tats / 2 Tits For 2 Tats': 'A. J. Stewart & J. B. Plotkin / Robert Axelrod', 'Hard Tit For Tat / 3 Tits For Tat': '[PD2017]', 'Hesitant Q-Learner': 'Geraint Palmer', 'Hopeless': 'P. Van Den Berg & F. J. Weissing', 'Hot Coffee': 'Attar', 'Humpty 10': 'Eckhart Arnold', 'Hungry': 'Attar', 'Inequity Averse Q-Learner': 'Attar', 'Inverse': 'Karol Langner', 'Inverse Punisher': 'Geraint Palmer', 'Is There Something New?': 'Attar', 'Isolated Clan': 'Attar', 'Isolated Tit For Tat': 'Attar', 'Japan Empire Emperor': 'Attar', 'Japan Empire Soldier 1': 'Attar', 'Japan Empire Soldier 10': 'Attar', 'Japan Empire Soldier 2': 'Attar', 'Japan Empire Soldier 3': 'Attar', 'Japan Empire Soldier 4': 'Attar', 'Japan Empire Soldier 5': 'Attar', 'Japan Empire Soldier 6': 'Attar', 'Japan Empire Soldier 7': 'Attar', 'Japan Empire Soldier 8': 'Attar', 'Japan Empire Soldier 9': 'Attar', 'Javelin': 'Attar & Angga Febriansyah', 'Jem': 'Jem', 'Jester': 'parzhitsky', 'Jesus Petry': 'Jesus Petry', 'Josuah': 'Attar', 'Jung': 'Attar, Inspired From Carl Jung', 'Karen': 'Attar', 'Keyman': 'Attar', 'Killer': 'Zachary Danziger', 'King Of 48 Laws Of Power': 'Attar, Inspired From Robert Greene', 'Knowledgeable Worse & Worse': 'Adam Pohl', 'Konflikt Blue': 'Attar', 'Konflikt Green': 'Attar', 'Laran': 'Elio Piccolo & Giovanni Squillero', 'Laws': 'Attar', 'Learner': 'Attar', 'Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Lenient Grim 3': 'Yaroslav Rosokha & Julian Romero', 'Less Grim': 'Sven Sommer', 'Level Punisher': 'Eckhart Arnold', 'Liar Person': 'Attar & Angga Febriansyah', 'Lighty-Darky': 'Attar', 'Limited Retaliate': 'Owen Campbell', 'Limited Retaliate 2': 'Owen Campbell', 'Limited Retaliate 3': 'Owen Campbell', 'Line': 'Attar', 'Little Grudger': 'Attar', 'Long Horse': 'Attar, Inspired From LookOut2DD', 'Long Term Strategist': 'The Nerd Of AI', 'Look Up / Look Ahead': 'Alan Gaines', 'Loyal': 'Foomii', 'MARS / Mimicry And Relative Similarity': 'T. L. B. M. Silva & A. L. V. Coelho & C. H. C. Ribeiro', 'MCMC / Markov Chain Monte Carlo': 'Nicholas Metropolis & W.K. Hastings, but implemented by Tuomas Sandholm & Robert Crites', 'MEM2': 'J. Li & G. Kendall', 'MENACE / HER': 'Attar, Inspired From Donald Michie & Martin Gardner', 'MSAgent': 'remcofl', 'Mafia A': 'Attar', 'Mafia B': 'Attar', 'Mafia C': 'Attar', 'Mafia D': 'Attar', 'Majapahit': 'Attar', 'Male / Man': 'Attar', 'Malthrin': 'Malthrin', 'Man In The Middle': 'Attar', 'Manipulator': 'The Nerd Of AI', 'Manipulity': 'Attar, Inspired From KhanhsKMC', 'Markov': 'Attar, Inspired From Andrey Andreyevich Markov', 'Matcher': 'Attar', 'Math Constant Hunter': 'Karol Langner', 'Memory 1': 'SidZRed', 'Memory Decay': 'Axelrod Project Contributor Team', 'Mensa': 'Zachary Danziger', 'Meta Hunter': 'Karol Langner', 'Meta Majority': 'Karol Langner', 'Meta Minority': 'Karol Langner', 'Meta Mixer': 'Karol Langner', 'Meta Winner': 'Karol Langner', 'Meta Winner Ensemble': 'Marc Harper', 'Michaelos': 'Michaelos', 'Mirror': 'Foomii', 'Modal Defector': 'benjjo', 'Modal Tit For Tat': 'benjjo', 'Momentum': 'Dong Won Moon', 'Monkey See, Monkey Do': 'Attar', 'Mosquito': 'Attar', 'MrX': 'Bjoern Van Den Bruck', 'N Pavlov': 'SidZRed', 'N Tits For M Tats': 'Marc Harper', 'Naive Q-Learner': 'Attar', 'Nash': 'Attar, Inspired From John Forbes Nash Jr', 'Nasty Tit For Tat': 'Axelrod Project Contributor Team', 'Negation': '[PD2017]', 'Neil A': 'Attar', 'Nydegger Benjjo Version': 'benjjo', 'Observant': 'Zachary Danziger', 'Odd-Even Go By Majority': 'Attar', 'Omega Tit For Tat': 'W. Slany & W. Kienreich', 'Once Bitten': 'Holly Marissa', 'Opportunist': 'The Nerd Of AI', 'Opposite Grudger': 'Geraint Palmer', 'Out For Tat': 'Attar', 'PIN': 'Philip Seehausen', 'PSO Gambler 1_1_1': 'Marc Harper', 'PSO Gambler 2_2_2': 'Georgios Koutsovoulos & Marc Harper', 'PSO Gambler 2_2_2 Noise 05': 'Marc Harper', 'PSO Gambler Mem 1': 'Marc Harper', 'Parameterized Tit For Tat': 'Eckhart Arnold', 'Paranoid': 'Attar', 'Passive Tit For Tat': 'Attar', 'Patterned Adaptive Fortress': 'Attar & Claude & Gemini & Chat-GPT & Copilot', 'Patterned Adaptive Fortress 2': 'Attar & Claude & Gemini & Chat-GPT & DeepSeek & Dola', 'Pavlov / Win-Stay, Lose-Shift': 'David Kraines & Vivian Kraines', 'Pavlov D / Suspicious Pavlov': 'Zhen Ji', 'Pavlov Tester': 'Attar', 'Pavolovo': 'Attar', 'Pawlow': 'Attar', 'Perceptron': 'Attar', 'Phi': 'Timothy Standen', 'Pi': 'Timothy Standen', 'Prabowo': 'Attar', 'Praedator': 'Attar', 'Predator': 'W. Ashlock & D. Ashlock', 'Probable Coop': 'SidZRed', 'Probe & Punish': 'Eneasz', 'Prober': 'J. Li & P. Hingston & G. Kendall', 'Prober 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 4': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober Abdullah-arif-swe version': 'abdullah-arif-swe', 'Procastinater': 'Attar', 'Psycho Attar Version': 'Attar', 'Pun 1': 'D. Ashlock & E. Y. Kim & N. Leahy', 'Punisher': 'Geraint Palmer', 'Q-Learning A-Learner': 'Attar', 'REINFORCE': 'Attar', 'RNN & RTRL': 'Attar', 'Racister': 'Attar', 'Rack Block Shooter': 'Nic Smith', 'Raider': 'W. Ashlock & J. Tsang & D. Ashlock', 'Random / Moron': 'Robert Axelrod / Zachary Danziger', 'Random Exploiter 1': 'Attar', 'Random Exploiter 2': 'Attar', 'Random Exploiter 3': 'Attar', 'Random Exploiter 4': 'Attar', 'Random Hunter': 'Karol Langner', 'Random Tit For Tat': 'Zachary M. Taylor', 'Reactive Player': 'Martin Nowak & Karl Sigmund', 'Rememberable Grudger': 'Attar', 'Remorseful Prober': 'J. Li & P. Hingston & G. Kendall', 'Resurrection': 'Eckhart Arnold', 'Retaliate': 'Owen Campbell', 'Retaliate 2': 'Owen Campbell', 'Retaliate 3': 'Owen Campbell', 'Rice Field': 'Meta', 'Ripoff': 'D. Ashlock & E. Y. Kim', 'Risky Q-Learner': 'Geraint Palmer', 'Rogers & Maslow': 'Attar, Inspired From Carl Rogers & Abraham Maslow', 'Rover': 'Dugatkin & Wilson', 'Rwallace': 'Rwallace', 'SOVIET UNION! / USSR / Inequality': 'Attar', 'SURPRISE ATTACK!': 'Attar', 'Sarsa Q-Learner': 'Attar', 'Score Equalizer': 'Attar', 'Second Chance': 'Benelliott', 'Second Chance Attar Version': 'Attar, Inspired From My Father', 'Self Steem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Self-Love A-Learner': 'Attar', 'Short Mem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Signaling Cheater': 'Eckhart Arnold', 'Simple ANN': 'Attar', 'Simple Exploiter': 'Attar', 'Simple Identity ChecK': 'Red75', 'Simpleton': 'Eckhart Arnold', 'Skinner': 'Attar, Inspired From B.F. Skinner', 'Slanger': 'Attar', 'Slow Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Smart': 'Sven Sommer', 'Smart Cat': 'Attar & Syarif', 'Smart Generous Tit For Tat': 'Attar', 'Smart Go By Majority': 'Attar', 'Smart Snake': 'Attar, Inspired From Simulife Hub', 'Smart-Clever': 'Attar', 'Smarter Tat For Tit': 'Eckhart Arnold', 'Smith': 'Maynard Smith', 'Smooth Grudger': 'Attar', 'Smooth Tit For Tat': 'Attar', 'Sneaky Tit For Tat': 'Karol Langner', 'Social Average': 'Chat-GPT', 'Social Engineering': 'Attar', 'Socio': 'Attar', 'Soft Grim': 'Eckhart Arnold', 'Soft Grudger': 'J. Li & P. Hingston & G. Kendall', 'Solution B1': 'D. Ashlock & J. A. Brown & P. Hingston', 'Solution B5': 'D. Ashlock & J. A. Brown & P. Hingston', 'Sort': 'Attar', 'Spectrum Attacker': 'Attar', 'Spiteful CC': 'P. Mathieu & J. Delahaye', 'Spiteful Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Split Brain Syndrome': 'Dola', 'Springter': 'Attar', 'Stabilize': 'Paul Boehm', 'Stalker': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Star S': 'Gopal Ramchurn', 'Star SL': 'Gopal Ramchurn', 'Star SN': 'Gopal Ramchurn', 'Star Slave 1': 'Gopal Ramchurn', 'Star Slave 10': 'Gopal Ramchurn', 'Star Slave 2': 'Gopal Ramchurn', 'Star Slave 3': 'Gopal Ramchurn', 'Star Slave 4': 'Gopal Ramchurn', 'Star Slave 5': 'Gopal Ramchurn', 'Star Slave 6': 'Gopal Ramchurn', 'Star Slave 7': 'Gopal Ramchurn', 'Star Slave 8': 'Gopal Ramchurn', 'Star Slave 9': 'Gopal Ramchurn', 'Statistical Strategy': 'd0minik2', 'Stefan Pennartz': 'Stefan Pennartz', 'Stochastic Cooperator': 'C. Adami & A. Hintze', 'Stochastic WSLS': 'Marc Harper', 'Stoic Mirror': 'Gemini', 'Stoicalist': 'Attar & Gemini', 'Stupidiot': 'Attar', 'Sumobox Fighter': 'Attar, Inspired From Simulife Hub', 'Sun Tzu Bot': 'Attar, Inspired From Sun Tzu', 'Suspicious Alternator': 'Robert Axelrod', 'Suspicious Tit For Tat': 'C. Hilbe & M. A. Nowak & A. Traulsen', 'Sweet Heart': 'Deep Seek', 'Syifa': 'Attar & Syifa', 'TF 1': 'Marc Harper', 'TF 2': 'Marc Harper', 'TF 3': 'Marc Harper', 'TF2T & 2TFT': 'Attar', 'TOM Level 1 / Theory Of Mind Level 1': 'David Premack & Guy Woodruff', 'Tages': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Teacher Pee While Standing, Student Pee While Running': 'Attar', 'Tester Eckhart Arnold Version': 'Eckhart Arnold', 'The Calculated Mirror With A Fuse': 'Gemini', 'The Cave Breaker': 'Attar & Gemini', 'The Nasty A': 'Attar', 'Theseus': 'Attar, Inspired From Claude Shannon', 'Three Times Out': 'Philip Seehausen', 'Threshold Punisher': 'Copilot', 'Thresholded Trust Bot': 'Attar', 'Thue Morse': 'Geraint Palmer', 'Thue Morse Inverse': 'Geraint Palmer', 'Thumper': 'D. Ashlock & E. Y. Kim', 'Tiny Brain': 'Attar', 'Tip For Tap': 'Attar', 'Tit For 2 Tats / Sample': 'Robert Axelrod', 'Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'Tit For Increasing Tat': 'Claude', 'Tit For Tat But Not Too Forgiving': 'Attar', 'Tit For Tat Killer': 'Attar', 'Toxic Mirror': 'Deep Seek', 'Trader': 'Attar & Gemini', 'Tranquilizer Eckhart Arnold Version': 'Eckhart Arnold', 'Treasure Hunt / Sugar Strategy': 'D. Ashlock & W. Ashlock', 'Tri-Brain': 'Attar', 'Tricky Cooperator': 'Karol Langner', 'Tricky Defector': 'Karol Langner', 'Tricky Level Punisher': 'Eckhart Arnold', 'Trust Ledger': 'Chat-GPT', 'Trust Score Sigmoid': 'Claude', 'Trusty': 'Foomii', 'Turan': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Tweedledee': 'Eckhart Arnold', 'Tweedledum': 'Eckhart Arnold', 'Tweetypie': 'Eckhart Arnold', 'Unpredictable Tit For Tat': 'Attar', 'Uranium': 'Attar', 'Usually Cooperates': 'D. Ashlock & E. Y. Kim & W. Ashlock', 'Usually Defects': 'D. Ashlock & E. Y.Kim & W. Ashlock', 'Vandal': 'Foomii', 'Vengeful': 'D. Ashlock', 'Vengeful Cheater': 'Vaniver', 'Verity': 'Attar & Gemini, Inspired From ThatMob', 'Very Bad': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Whale': 'Attar & Deep Seek', 'William': 'Attar', 'Willing': 'P. Van Den Berg & F. J. Weissing', 'Win-Shift, Lose-Stay': 'J. Li & P. Hingston & G. Kendall', 'Winner 12': 'P. Mathieu & J. Delahaye', 'Winner 21': 'P. Mathieu & J. Delahaye', 'Worse & Worse / Worse & Worse 1': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Zero Day': 'Attar', 'Zero Determinant 2026 / ZD-2026': 'Attar', 'Zero Determinant Equalizer / ZD-Q': "William H. Press & Freeman Dyson, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Determinant Extortion / ZD-X': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Determinant Generous / ZD-G': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Determinant Generous Tit For Tat / ZD-GTFT': "A. J. Stewart & J. B. Plotkin, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Determinant Memory 2 / ZD-M2': 'Marc Harper', 'Zero Determinant Mischief / ZD-MS': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Determinant Psychological War 2026 / ZD-PsyWar2026': 'Gemini', 'Zero Determinant Set / ZD-S': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Ὀδυσσεύς / Odysseus': 'Attar'}
-strategies_category = {'2 Tits For 2 Tats Eckhart Arnold Version': 'NASTY', '2 Tits For Tat': 'NICE', '3 Seconds Mirror': 'NICE', '3-Tree Of Prediction': 'NICE', 'A-Actor&Critic / A-A&C': 'NASTY', 'ALLC OR ALLD': 'NASTY', 'AMERICA! / USA / Freedoom': 'NASTY', 'AON2': 'NICE', 'AQUA': 'NICE', 'Absurdistan 1': 'NICE', 'Acquaintance & Trust': 'NICE', 'Adaptive': 'NASTY', 'Adaptive Hhhpraise Version': 'NICE', 'Adaptive Pavlov 2006': 'NICE', 'Adaptive Pavlov 2011': 'NICE', 'Adaptive Tit For Tat': 'NICE', 'Adaptive Tit For Tat Attar Version': 'NICE', 'Adaptor Brief': 'NASTY', 'Adaptor Long': 'NASTY', 'Aggravater': 'NASTY', 'Alan': 'NICE', 'Alexei / End Game Cheater': 'NASTY', 'Alternator': 'NASTY', 'Alternator Hunter': 'NICE', 'Always Cooperate / Cooperator / Saint / Dove': 'NICE', 'Always Defect / Defector / Shark / Hawk': 'NASTY', 'Always Skip / Skiptor': 'NICE', 'Amazon / Piraha': 'NICE', 'Analogy': 'NASTY', 'Anatol': 'NICE', 'Angry Tit For Tat': 'NICE', 'Anti Cycler': 'NASTY', 'Anti Noise Tit For Tat': 'NICE', 'Anti Tit For Tat / Psycho': 'NASTY', 'Appeaser': 'NICE', 'Arrogant Q-Learner': 'NASTY', 'Average Copier': 'NASTY', 'Axelrod First By Davis': 'NICE', 'Axelrod First By Downing': 'NASTY', 'Axelrod First By Feld': 'NASTY', 'Axelrod First By Graaskamp': 'NASTY', 'Axelrod First By Grofman': 'NICE', 'Axelrod First By Grudger / Grim trigger': 'NICE', 'Axelrod First By Joss / Naive Prober': 'NASTY', 'Axelrod First By Named Withheld': 'NASTY', 'Axelrod First By Nydegger': 'NICE', 'Axelrod First By Shubik': 'NICE', 'Axelrod First By Stein & Rapoport': 'NASTY', 'Axelrod First By Tideman & Chieruzzi': 'NICE', 'Axelrod First By Tit For Tat': 'NICE', 'Axelrod First By Tullock': 'NASTY', 'Axelrod Second By Adams': 'NICE', 'Axelrod Second By Almy': 'NICE', 'Axelrod Second By Ambuelh & Hickey': 'NASTY', 'Axelrod Second By Anderson': 'NASTY', 'Axelrod Second By Appold': 'NICE', 'Axelrod Second By Batell': 'NASTY', 'Axelrod Second By Black': 'NICE', 'Axelrod Second By Borufsen': 'NICE', 'Axelrod Second By Cave': 'NICE', 'Axelrod Second By Champion': 'NICE', 'Axelrod Second By Colbert': 'NASTY', 'Axelrod Second By Dawes & Batell': 'NASTY', 'Axelrod Second By Downing': 'NICE', 'Axelrod Second By Duisman': 'NICE', 'Axelrod Second By Eatherley': 'NICE', 'Axelrod Second By Falk & Lanqsted': 'NICE', 'Axelrod Second By Friedland': 'NICE', 'Axelrod Second By Getzler': 'NICE', 'Axelrod Second By Gladstein / Tester': 'NASTY', 'Axelrod Second By Graaskamp & Katzen': 'NICE', 'Axelrod Second By Grisell / Go By Majority / Soft Go By Majority': 'NICE', 'Axelrod Second By Grofman': 'NICE', 'Axelrod Second By Hall': 'NICE', 'Axelrod Second By Harrington': 'NASTY', 'Axelrod Second By Hollander': 'NICE', 'Axelrod Second By Hotz': 'NICE', 'Axelrod Second By Jones': 'NASTY', 'Axelrod Second By Kluepfel': 'NICE', 'Axelrod Second By Lefevre': 'NICE', 'Axelrod Second By Leyland': 'NICE', 'Axelrod Second By Leyvraz': 'NICE', 'Axelrod Second By Mauk': 'NICE', 'Axelrod Second By Mcgurrin': 'NICE', 'Axelrod Second By Mikkelson': 'NICE', 'Axelrod Second By Newman': 'NASTY', 'Axelrod Second By Nussbacher': 'NICE', 'Axelrod Second By Pebley': 'NICE', 'Axelrod Second By Pinkley': 'NICE', 'Axelrod Second By Quayle': 'NICE', 'Axelrod Second By Rabbie': 'NICE', 'Axelrod Second By Richard Hufford': 'NASTY', 'Axelrod Second By Robertson': 'NICE', 'Axelrod Second By Rowsam': 'NICE', 'Axelrod Second By Schurmann': 'NICE', 'Axelrod Second By Smoody': 'NICE', 'Axelrod Second By Snodgrass': 'NICE', 'Axelrod Second By Tideman & Chieruzzi': 'NICE', 'Axelrod Second By Tranquilizer': 'NASTY', 'Axelrod Second By Weiderman': 'NICE', 'Axelrod Second By Weiner': 'NICE', 'Axelrod Second By White': 'NICE', 'Axelrod Second By Yamachi': 'NICE', 'Axelrod Second By Zimmerman': 'NASTY', 'Back Stabber': 'NICE', 'Backrooms': 'NASTY', 'Bad Random': 'NASTY', 'Bahlil': 'NASTY', 'Bandit': 'NASTY', 'Bandit UCB': 'NASTY', 'Bayes Attar Version': 'NICE', 'Bayes Foomii Version': 'NICE', 'Benjo': 'NICE', 'Beta Tester': 'NASTY', 'Better & Better': 'NASTY', 'Bluff': 'NASTY', 'Bluff Master': 'NASTY', 'Boltzmann Brain': 'NASTY', 'Boxer': 'NICE', 'Bros Mind': 'NICE', 'Bully / Reverse Tit For Tat': 'NASTY', 'Burn Both Ends / BBE': 'NASTY', 'Burn The Bridge Strategy': 'NASTY', 'Bush Mosteller': 'NASTY', 'Buzzer': 'NASTY', 'CS / Collective Strategy': 'NASTY', 'Caerbannog': 'NASTY', 'Calamity': 'NASTY', 'Calculator': 'NASTY', 'Calculator The Nerd Of AI Version': 'NICE', 'Capitalist': 'NASTY', 'Capri': 'NICE', 'Cautious Q-Learner': 'NASTY', 'Caveman': 'NASTY', 'Cerebrum': 'NICE', 'Charity': 'NICE', 'Chatter': 'NICE', 'Clement Coldridge': 'NICE', 'Collatz': 'NASTY', 'Communalist': 'NICE', 'Continuous Q-Learner Avg': 'NASTY', 'Continuous Q-Learner Max': 'NASTY', 'Contrite Grudger': 'NICE', 'Contrite Tit For Tat': 'NICE', 'Control 1': 'NASTY', 'Control 10': 'NASTY', 'Control 11': 'NASTY', 'Control 2': 'NICE', 'Control 3': 'NASTY', 'Control 4': 'NASTY', 'Control 5': 'NASTY', 'Control 6': 'NICE', 'Control 7': 'NASTY', 'Control 8': 'NASTY', 'Control 9': 'NICE', 'Cooperate Once': 'NASTY', 'Cooperator Hunter': 'NASTY', 'Crabby': 'NICE', 'Crabby Attar Version': 'NASTY', 'Cruelity': 'NICE', 'Cult Bishop A': 'NASTY', 'Cult Bishop B': 'NASTY', 'Cult Citizen A': 'NASTY', 'Cult Citizen B': 'NASTY', 'Cult Citizen C': 'NASTY', 'Cult Leader': 'NASTY', 'Curiosity': 'NICE', 'Cycle Hunter': 'NASTY', 'Cycler CCCCCD': 'NASTY', 'Cycler CCCD': 'NASTY', 'Cycler CCCDCD': 'NASTY', 'Cycler CCD': 'NASTY', 'Cycler DC': 'NASTY', 'Cycler DCCCC': 'NASTY', 'Cycler DDC': 'NASTY', 'DBS / Derived Belief Strategy': 'NICE', 'DDoS': 'NICE', 'Darwin': 'NICE', 'Deadlock Breaker': 'NICE', 'Decay Given': 'NICE', 'Defect Once': 'NASTY', 'Defector Hunter': 'NICE', 'Delayed AON1': 'NICE', 'Desire': 'NICE', 'Desprate': 'NASTY', 'Detective': 'NASTY', 'Devil Staircase': 'NICE', 'Diplomat': 'NICE', 'Dont Bite The Hand That Feeds You': 'NICE', 'Double Crosser': 'NICE', 'Double Q-Learner': 'NASTY', 'Double Resurrection': 'NASTY', 'Doubler': 'NICE', 'Downing Benjjo Version': 'NICE', 'Downing Eckhart Arnold Version': 'NASTY', 'Dumpty 10': 'NASTY', 'Dyna Q-Learner': 'NASTY', 'Dynamic 2 Tits For Tat': 'NICE', 'Dynocat': 'NASTY', 'EGOist': 'NASTY', 'Easy Go / Reverse Grudger': 'NASTY', 'Echo Adaptive': 'NICE', 'Echo Fisher': 'NASTY', 'Egoist A-Learner': 'NICE', 'Eliza / Therapist': 'NICE', 'Entropy Sentinel': 'NASTY', 'Envy': 'NICE', 'Eric': 'NICE', 'Ethanol / Alcohol': 'NASTY', 'Eugine Nier': 'NASTY', 'Euler': 'NASTY', 'Eventual Cycle Hunter': 'NICE', 'Evil Alliance': 'NASTY', 'Evolvable Cycler Attar Version': 'NASTY', 'Evolved FSM 16': 'NICE', 'Evolved FSM 16 Noise 05': 'NICE', 'Evolved FSM 4': 'NICE', 'Evolved FSM 6': 'NASTY', 'Evolved HMM 5': 'NICE', 'Evolved Looker Up 1_1_1': 'NICE', 'Evolved Looker Up 2_2_2': 'NICE', 'Exploratory Lenient Grim 2': 'NASTY', 'Exploratory Tit For 3 Tats': 'NASTY', 'FAWS': 'NASTY', 'False Cooperator': 'NASTY', 'Falsity': 'NICE', 'Female / Woman': 'NASTY', 'Fibonacci': 'NASTY', 'Finger Print': 'NASTY', 'Firm But Fair / Firm For Tat': 'NICE', 'Fixed Pattern': 'NASTY', 'Fool Me Once': 'NICE', 'Forest-RND': 'NICE', 'Forest-XG': 'NICE', 'Forgetable Gradual': 'NICE', 'Forgetful Fool Me Once': 'NICE', 'Forgetful Grudger': 'NICE', 'Forgetful Majority Bot': 'NICE', 'Forgiver': 'NICE', 'Forgiving': 'NICE', 'Forgiving Bot': 'NICE', 'Forgiving Fate': 'NICE', 'Forgiving Tit For Tat': 'NICE', 'Fortress 3': 'NASTY', 'Fortress 4': 'NASTY', 'Frankl': 'NICE', 'Free Rider': 'NASTY', 'Frequency Analyzer': 'NICE', 'Freud': 'NICE', 'Friendly Human': 'NICE', 'Gambler Attar Version': 'NASTY', 'Game Theory Explorer / GT-E': 'NICE', 'Gaslighter': 'NASTY', 'Gateman': 'NICE', 'Gen 1_64_200_30_0.3_A': 'NASTY', 'Gen 2_64_200_30_0.3_A': 'NASTY', 'Gen 3_64_200_30_0.3_A': 'NASTY', 'Gen 4_64_200_30_0.3_A': 'NASTY', 'Gen 5_64_200_30_0.3_A': 'NASTY', 'Generic Downing': 'NASTY', 'Generic Downing Friendly': 'NASTY', 'Generous Tit For Tat': 'NICE', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'NICE', 'Generous Tit For Tat Benjjo Version': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 1': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 2': 'NICE', 'Generous Tit For Tat Less Wrong Version': 'NICE', 'Genetic Algo 1': 'NICE', 'Genetic Algo 2': 'NICE', 'George': 'NASTY', 'Go By Minority': 'NASTY', 'Gold Digger': 'NASTY', 'Golden Mean': 'NICE', 'Good': 'NICE', 'Good Random': 'NASTY', 'Graaskamp Benjjo Version': 'NASTY', 'Gradual': 'NICE', 'Gradual Cristal Version': 'NICE', 'Gradual Killer': 'NASTY', 'Grudger Alternator': 'NICE', 'Grumpy': 'NICE', 'HMM Player': 'NASTY', 'Half Sin Square': 'NICE', 'Handshake': 'NASTY', 'Hard Go By Majority': 'NICE', 'Hard Prober': 'NASTY', 'Hard Tit For 2 Tats / 2 Tits For 2 Tats': 'NICE', 'Hard Tit For Tat / 3 Tits For Tat': 'NICE', 'Hesitant Q-Learner': 'NASTY', 'Hopeless': 'NASTY', 'Hot Coffee': 'NICE', 'Humpty 10': 'NASTY', 'Hungry': 'NASTY', 'Inequity Averse Q-Learner': 'NASTY', 'Inverse': 'NICE', 'Inverse Punisher': 'NICE', 'Is There Something New?': 'NICE', 'Isolated Clan': 'NASTY', 'Isolated Tit For Tat': 'NICE', 'Japan Empire Emperor': 'NICE', 'Japan Empire Soldier 1': 'NICE', 'Japan Empire Soldier 10': 'NICE', 'Japan Empire Soldier 2': 'NICE', 'Japan Empire Soldier 3': 'NICE', 'Japan Empire Soldier 4': 'NICE', 'Japan Empire Soldier 5': 'NICE', 'Japan Empire Soldier 6': 'NICE', 'Japan Empire Soldier 7': 'NICE', 'Japan Empire Soldier 8': 'NICE', 'Japan Empire Soldier 9': 'NICE', 'Javelin': 'NICE', 'Jem': 'NASTY', 'Jester': 'NASTY', 'Jesus Petry': 'NASTY', 'Josuah': 'NASTY', 'Jung': 'NICE', 'Karen': 'NASTY', 'Keyman': 'NASTY', 'Killer': 'NASTY', 'King Of 48 Laws Of Power': 'NICE', 'Knowledgeable Worse & Worse': 'NASTY', 'Konflikt Blue': 'NASTY', 'Konflikt Green': 'NICE', 'Laran': 'NASTY', 'Laws': 'NICE', 'Learner': 'NICE', 'Lenient Grim 2': 'NICE', 'Lenient Grim 3': 'NICE', 'Less Grim': 'NICE', 'Level Punisher': 'NICE', 'Liar Person': 'NASTY', 'Lighty-Darky': 'NASTY', 'Limited Retaliate': 'NICE', 'Limited Retaliate 2': 'NICE', 'Limited Retaliate 3': 'NICE', 'Line': 'NICE', 'Little Grudger': 'NICE', 'Long Horse': 'NASTY', 'Long Term Strategist': 'NICE', 'Look Up / Look Ahead': 'NASTY', 'Loyal': 'NICE', 'MARS / Mimicry And Relative Similarity': 'NICE', 'MCMC / Markov Chain Monte Carlo': 'NICE', 'MEM2': 'NICE', 'MENACE / HER': 'NICE', 'MSAgent': 'NASTY', 'Mafia A': 'NASTY', 'Mafia B': 'NASTY', 'Mafia C': 'NASTY', 'Mafia D': 'NASTY', 'Majapahit': 'NICE', 'Male / Man': 'NICE', 'Malthrin': 'NASTY', 'Man In The Middle': 'NASTY', 'Manipulator': 'NASTY', 'Manipulity': 'NASTY', 'Markov': 'NICE', 'Matcher': 'NICE', 'Math Constant Hunter': 'NICE', 'Memory 1': 'NASTY', 'Memory Decay': 'NICE', 'Mensa': 'NASTY', 'Meta Hunter': 'NASTY', 'Meta Majority': 'NICE', 'Meta Minority': 'NASTY', 'Meta Mixer': 'NASTY', 'Meta Winner': 'NASTY', 'Meta Winner Ensemble': 'NASTY', 'Michaelos': 'NASTY', 'Mirror': 'NICE', 'Modal Defector': 'NASTY', 'Modal Tit For Tat': 'NICE', 'Momentum': 'NICE', 'Monkey See, Monkey Do': 'NASTY', 'Mosquito': 'NASTY', 'MrX': 'NASTY', 'N Pavlov': 'NASTY', 'N Tits For M Tats': 'NICE', 'Naive Q-Learner': 'NASTY', 'Nash': 'NICE', 'Nasty Tit For Tat': 'NASTY', 'Negation': 'NASTY', 'Neil A': 'NICE', 'Nydegger Benjjo Version': 'NICE', 'Observant': 'NICE', 'Odd-Even Go By Majority': 'NICE', 'Omega Tit For Tat': 'NICE', 'Once Bitten': 'NICE', 'Opportunist': 'NASTY', 'Opposite Grudger': 'NASTY', 'Out For Tat': 'NICE', 'PIN': 'NASTY', 'PSO Gambler 1_1_1': 'NICE', 'PSO Gambler 2_2_2': 'NICE', 'PSO Gambler 2_2_2 Noise 05': 'NICE', 'PSO Gambler Mem 1': 'NICE', 'Parameterized Tit For Tat': 'NASTY', 'Paranoid': 'NASTY', 'Passive Tit For Tat': 'NICE', 'Patterned Adaptive Fortress': 'NICE', 'Patterned Adaptive Fortress 2': 'NICE', 'Pavlov / Win-Stay, Lose-Shift': 'NICE', 'Pavlov D / Suspicious Pavlov': 'NASTY', 'Pavlov Tester': 'NASTY', 'Pavolovo': 'NASTY', 'Pawlow': 'NICE', 'Perceptron': 'NASTY', 'Phi': 'NASTY', 'Pi': 'NASTY', 'Prabowo': 'NASTY', 'Praedator': 'NASTY', 'Predator': 'NASTY', 'Probable Coop': 'NASTY', 'Probe & Punish': 'NICE', 'Prober': 'NASTY', 'Prober 2': 'NASTY', 'Prober 3': 'NASTY', 'Prober 4': 'NASTY', 'Prober Abdullah-arif-swe version': 'NASTY', 'Procastinater': 'NICE', 'Psycho Attar Version': 'NICE', 'Pun 1': 'NASTY', 'Punisher': 'NICE', 'Q-Learning A-Learner': 'NICE', 'REINFORCE': 'NASTY', 'RNN & RTRL': 'NASTY', 'Racister': 'NASTY', 'Rack Block Shooter': 'NASTY', 'Raider': 'NASTY', 'Random / Moron': 'NASTY', 'Random Exploiter 1': 'NICE', 'Random Exploiter 2': 'NICE', 'Random Exploiter 3': 'NICE', 'Random Exploiter 4': 'NICE', 'Random Hunter': 'NICE', 'Random Tit For Tat': 'NASTY', 'Reactive Player': 'NASTY', 'Rememberable Grudger': 'NICE', 'Remorseful Prober': 'NASTY', 'Resurrection': 'NICE', 'Retaliate': 'NICE', 'Retaliate 2': 'NICE', 'Retaliate 3': 'NICE', 'Rice Field': 'NASTY', 'Ripoff': 'NASTY', 'Risky Q-Learner': 'NASTY', 'Rogers & Maslow': 'NICE', 'Rover': 'NASTY', 'Rwallace': 'NASTY', 'SOVIET UNION! / USSR / Inequality': 'NASTY', 'SURPRISE ATTACK!': 'NASTY', 'Sarsa Q-Learner': 'NASTY', 'Score Equalizer': 'NICE', 'Second Chance': 'NASTY', 'Second Chance Attar Version': 'NICE', 'Self Steem': 'NASTY', 'Self-Love A-Learner': 'NICE', 'Short Mem': 'NICE', 'Signaling Cheater': 'NASTY', 'Simple ANN': 'NASTY', 'Simple Exploiter': 'NASTY', 'Simple Identity ChecK': 'NASTY', 'Simpleton': 'NASTY', 'Skinner': 'NICE', 'Slanger': 'NICE', 'Slow Tit For Tat': 'NICE', 'Smart': 'NICE', 'Smart Cat': 'NICE', 'Smart Generous Tit For Tat': 'NICE', 'Smart Go By Majority': 'NICE', 'Smart Snake': 'NICE', 'Smart-Clever': 'NICE', 'Smarter Tat For Tit': 'NASTY', 'Smith': 'NICE', 'Smooth Grudger': 'NICE', 'Smooth Tit For Tat': 'NICE', 'Sneaky Tit For Tat': 'NASTY', 'Social Average': 'NASTY', 'Social Engineering': 'NASTY', 'Socio': 'NICE', 'Soft Grim': 'NICE', 'Soft Grudger': 'NICE', 'Solution B1': 'NASTY', 'Solution B5': 'NASTY', 'Sort': 'NICE', 'Spectrum Attacker': 'NASTY', 'Spiteful CC': 'NICE', 'Spiteful Tit For Tat': 'NICE', 'Split Brain Syndrome': 'NICE', 'Springter': 'NICE', 'Stabilize': 'NICE', 'Stalker': 'NICE', 'Star S': 'NASTY', 'Star SL': 'NASTY', 'Star SN': 'NASTY', 'Star Slave 1': 'NASTY', 'Star Slave 10': 'NASTY', 'Star Slave 2': 'NASTY', 'Star Slave 3': 'NASTY', 'Star Slave 4': 'NASTY', 'Star Slave 5': 'NASTY', 'Star Slave 6': 'NASTY', 'Star Slave 7': 'NASTY', 'Star Slave 8': 'NASTY', 'Star Slave 9': 'NASTY', 'Statistical Strategy': 'NASTY', 'Stefan Pennartz': 'NICE', 'Stochastic Cooperator': 'NASTY', 'Stochastic WSLS': 'NASTY', 'Stoic Mirror': 'NICE', 'Stoicalist': 'NICE', 'Stupidiot': 'NASTY', 'Sumobox Fighter': 'NICE', 'Sun Tzu Bot': 'NICE', 'Suspicious Alternator': 'NASTY', 'Suspicious Tit For Tat': 'NASTY', 'Sweet Heart': 'NASTY', 'Syifa': 'NASTY', 'TF 1': 'NASTY', 'TF 2': 'NASTY', 'TF 3': 'NICE', 'TF2T & 2TFT': 'NICE', 'TOM Level 1 / Theory Of Mind Level 1': 'NASTY', 'Tages': 'NASTY', 'Teacher Pee While Standing, Student Pee While Running': 'NICE', 'Tester Eckhart Arnold Version': 'NASTY', 'The Calculated Mirror With A Fuse': 'NASTY', 'The Cave Breaker': 'NASTY', 'The Nasty A': 'NASTY', 'Theseus': 'NICE', 'Three Times Out': 'NICE', 'Threshold Punisher': 'NICE', 'Thresholded Trust Bot': 'NICE', 'Thue Morse': 'NASTY', 'Thue Morse Inverse': 'NASTY', 'Thumper': 'NICE', 'Tiny Brain': 'NASTY', 'Tip For Tap': 'NICE', 'Tit For 2 Tats / Sample': 'NICE', 'Tit For 3 Tats': 'NICE', 'Tit For Increasing Tat': 'NICE', 'Tit For Tat But Not Too Forgiving': 'NICE', 'Tit For Tat Killer': 'NASTY', 'Toxic Mirror': 'NASTY', 'Trader': 'NICE', 'Tranquilizer Eckhart Arnold Version': 'NASTY', 'Treasure Hunt / Sugar Strategy': 'NASTY', 'Tri-Brain': 'NICE', 'Tricky Cooperator': 'NASTY', 'Tricky Defector': 'NASTY', 'Tricky Level Punisher': 'NICE', 'Trust Ledger': 'NICE', 'Trust Score Sigmoid': 'NASTY', 'Trusty': 'NICE', 'Turan': 'NASTY', 'Tweedledee': 'NICE', 'Tweedledum': 'NICE', 'Tweetypie': 'NASTY', 'Unpredictable Tit For Tat': 'NASTY', 'Uranium': 'NICE', 'Usually Cooperates': 'NICE', 'Usually Defects': 'NASTY', 'Vandal': 'NASTY', 'Vengeful': 'NICE', 'Vengeful Cheater': 'NASTY', 'Verity': 'NICE', 'Very Bad': 'NICE', 'Whale': 'NICE', 'William': 'NICE', 'Willing': 'NASTY', 'Win-Shift, Lose-Stay': 'NASTY', 'Winner 12': 'NICE', 'Winner 21': 'NICE', 'Worse & Worse / Worse & Worse 1': 'NASTY', 'Worse & Worse 2': 'NASTY', 'Worse & Worse 3': 'NICE', 'Zero Day': 'NASTY', 'Zero Determinant 2026 / ZD-2026': 'NICE', 'Zero Determinant Equalizer / ZD-Q': 'NASTY', 'Zero Determinant Extortion / ZD-X': 'NASTY', 'Zero Determinant Generous / ZD-G': 'NICE', 'Zero Determinant Generous Tit For Tat / ZD-GTFT': 'NICE', 'Zero Determinant Memory 2 / ZD-M2': 'NASTY', 'Zero Determinant Mischief / ZD-MS': 'NASTY', 'Zero Determinant Psychological War 2026 / ZD-PsyWar2026': 'NICE', 'Zero Determinant Set / ZD-S': 'NASTY', 'Ὀδυσσεύς / Odysseus': 'NICE'}
+strategies = ['2 Tits For 2 Tats / Hard Tit For 2 Tats', '2 Tits For 2 Tats Eckhart Arnold Version', '2 Tits For Tat', '3 Seconds Mirror', '3 Tits For Tat / Hard Tit For Tat', '3-Tree Of Prediction', 'A-A&C / A-Actor&Critic', 'ALLC OR ALLD', 'AMERICA! / Freedoom / USA', 'AON2', 'AQUA', 'Absurdistan 1', 'Acquaintance & Trust', 'Adaptive', 'Adaptive Hhhpraise Version', 'Adaptive Pavlov 2006', 'Adaptive Pavlov 2011', 'Adaptive Tit For Tat', 'Adaptive Tit For Tat Attariq Version', 'Adaptor Brief', 'Adaptor Long', 'Aggravater', 'Alan', 'Alcohol / Ethanol', 'Alexei / End Game Cheater', 'Alternator / Second By Duisman', 'Alternator Hunter', 'Always Cooperate / Cooperator / Dove / Saint', 'Always Defect / Defector / Hawk / Shark', 'Always Out / Outtor', 'Amazon / Piraha', 'Analogy', 'Anatol', 'Angry Tit For Tat', 'Anti Cycler', 'Anti Noise Tit For Tat', 'Anti Tit For Tat / Psycho', 'Appeaser', 'Arrogant Q-Learner', 'Average Copier', 'BBE / Burn Both Ends', 'Back Stabber', 'Backrooms', 'Bahlil', 'Bandit', 'Bandit UCB', 'Bayes Attariq Version', 'Bayes Foomii Version', 'Benjo', 'Beta Tester', 'Better & Better', 'Bluff', 'Bluff Master', 'Boltzmann Brain', 'Bookend Cooperator', 'Boxer', 'Bros Mind', 'Bully / Reverse Tit For Tat', 'Burn The Bridge Strategy', 'Bush Mosteller', 'Buzzer', 'CS / Collective Strategy', 'Caerbannog', 'Calamity', 'Calculator', 'Calculator The Nerd Of AI Version', 'Capitalist', 'Capri', 'Cautious Q-Learner', 'Caveman', 'Cerebrum', 'Charity', 'Chatter', 'Clement Coldridge', 'Coin', 'Collatz', 'Communalist', 'Continuous Q-Learner Avg', 'Continuous Q-Learner Max', 'Contrite Grudger', 'Contrite Tit For Tat', 'Control 1', 'Control 10', 'Control 11', 'Control 2', 'Control 3', 'Control 4', 'Control 5', 'Control 6', 'Control 7', 'Control 8', 'Control 9', 'Cooperate Once', 'Cooperator Hunter', 'Crabby', 'Crabby Attariq Version', 'Cruelity', 'Cult Bishop A', 'Cult Bishop B', 'Cult Citizen A', 'Cult Citizen B', 'Cult Citizen C', 'Cult Leader', 'Curiosity', 'Cycle Hunter', 'Cycler CCCCCD', 'Cycler CCCD', 'Cycler CCCDCD', 'Cycler CCD', 'Cycler DC', 'Cycler DCCCC', 'Cycler DDC', 'DBS / Derived Belief Strategy', 'DDoS', 'Darwin', 'Deadlock Breaker', 'Decay Given', 'Defect Once', 'Defector Hunter', 'Delayed AON1', 'Desire', 'Desprate', 'Detective', 'Devil Staircase', 'Diplomat', 'Dont Bite The Hand That Feeds You', 'Double Crosser', 'Double Q-Learner', 'Double Resurrection', 'Doubler', 'Downing Benjjo Version', 'Downing Eckhart Arnold Version', 'Dumpty 10', 'Dyna Q-Learner', 'Dynamic 2 Tits For Tat', 'Dynocat', 'EGOist', 'Easy Go / Reverse Grudger', 'Echo Adaptive', 'Echo Fisher', 'Egoist A-Learner', 'Eliza / Therapist', 'Entropy Sentinel', 'Envy', 'Eric', 'Eugine Nier', 'Euler', 'Eventual Cycle Hunter', 'Evil Alliance', 'Evolvable Cycler Attariq Version', 'Evolved FSM 16', 'Evolved FSM 16 Noise 05', 'Evolved FSM 4', 'Evolved FSM 6', 'Evolved HMM 5', 'Evolved Looker Up 1_1_1', 'Evolved Looker Up 2_2_2', 'Exploratory Lenient Grim 2', 'Exploratory Tit For 3 Tats', 'FAWS', 'False Cooperator', 'Falsity', 'Female / Woman', 'Fibonacci', 'Finger Print', 'Firm But Fair / Firm For Tat', 'First By Davis', 'First By Downing', 'First By Downing, But Get Revised By Axelrod', 'First By Feld', 'First By Graaskamp / Second By Mauk', 'First By Grofman', 'First By Grudger / Grim Trigger', 'First By Joss / Naive Prober', 'First By Named Withheld', 'First By Nydegger', 'First By Shubik', 'First By Stein & Rapoport', 'First By Tideman & Chieruzzi', 'First By Tit For Tat', 'First By Tullock', 'Fixed Pattern', 'Fool Me Once', 'Forest-RND', 'Forest-XG', 'Forgetable Gradual', 'Forgetful Fool Me Once', 'Forgetful Grudger', 'Forgetful Majority Bot', 'Forgiver', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14', 'Forgiving', 'Forgiving Fate', 'Forgiving Grudger', 'Forgiving Tit For Tat', 'Fortress 3', 'Fortress 4', 'Frankl', 'Free Rider', 'Frequency Analyzer', 'Freud', 'Friendly Human', 'GT-E / Game Theory Explorer', 'Gambler Attariq Version', 'Gaslighter', 'Gen 1_64_200_30_0.3_A', 'Gen 2_64_200_30_0.3_A', 'Gen 3_64_200_30_0.3_A', 'Gen 4_64_200_30_0.3_A', 'Gen 5_64_200_30_0.3_A', 'Generic Downing', 'Generic Downing Friendly', 'Generous Tit For Tat', 'Generous Tit For Tat Axelrod Project Contributor Team Version', 'Generous Tit For Tat Benjjo Version', 'Generous Tit For Tat Eckhart Arnold Version 1', 'Generous Tit For Tat Eckhart Arnold Version 2', 'Generous Tit For Tat Less Wrong Version', 'Genetic Algo 1', 'Genetic Algo 2', 'George', 'Go By Majority / Second By Grisell / Soft Go By Majority', 'Go By Minority', 'Gold Digger', 'Golden Mean', 'Good', 'GossipAgent', 'Graaskamp Benjjo Version', 'Gradual', 'Gradual Cristal Version', 'Gradual Killer', 'Grateful / S9', 'Grudger Alternator', 'Grumpy', 'HER / MENACE', 'HMM Player', 'Half Sin Square', 'Handshake', 'Hard Go By Majority', 'Hard Prober', 'Hesitant Q-Learner', 'Hopeless', 'Hot Coffee', 'Humpty 10', 'Hungry', 'Inequality / SOVIET UNION! / USSR', 'Inequity Averse Q-Learner', 'Inverse', 'Inverse Punisher', 'Is There Something New?', 'Isolated Clan', 'Isolated Tit For Tat', 'Japan Empire Emperor', 'Japan Empire Soldier 1', 'Japan Empire Soldier 10', 'Japan Empire Soldier 2', 'Japan Empire Soldier 3', 'Japan Empire Soldier 4', 'Japan Empire Soldier 5', 'Japan Empire Soldier 6', 'Japan Empire Soldier 7', 'Japan Empire Soldier 8', 'Japan Empire Soldier 9', 'Javelin', 'Jem', 'Jester', 'Jesus Petry', 'Josuah', 'Jung', 'Karen', 'Keyman', 'Killer', 'King Of 48 Laws Of Power', 'Knowledgeable Worse & Worse', 'Konflikt Blue', 'Konflikt Green', 'L-BODOR / Learning Based On Derivative Of Reward', 'LCG', 'Laran', 'Laws', 'Learner', 'Lenient Grim 2', 'Lenient Grim 3', 'Less Grim', 'Level Punisher', 'Liar Person', 'Lighty-Darky', 'Limited Retaliate', 'Limited Retaliate 2', 'Limited Retaliate 3', 'Line', 'Little Grudger', 'Long Horse', 'Long Term Strategist', 'Look Ahead / Look Up', 'Loyal', 'MARS / Mimicry And Relative Similarity', 'MCMC / Markov Chain Monte Carlo', 'MEM2', 'MSAgent', 'Mafia A', 'Mafia B', 'Mafia C', 'Mafia D', 'Majapahit', 'Male / Man', 'Malthrin', 'Man In The Middle', 'Manipulator', 'Manipulity', 'Markov', 'Matcher', 'Math Constant Hunter', 'Memory 1', 'Memory Decay', 'Mensa', 'Meta Hunter', 'Meta Majority', 'Meta Minority', 'Meta Mixer', 'Meta Winner', 'Meta Winner Ensemble', 'Michaelos', 'Mirror', 'Mystical Logic', 'Modal Defector', 'Modal Tit For Tat', 'Momentum', 'Monkey See, Monkey Do', 'Mosquito', 'MrX', 'N Pavlov', 'N Tits For M Tats', 'Naive Q-Learner', 'Nash', 'Nasty Tit For Tat', 'Negation', 'Neil A', 'Newton', 'Nydegger Benjjo Version', 'Observant', 'Odd-Even Go By Majority', 'Odysseus / Ὀδυσσεύς', 'Omega Tit For Tat', 'Once Bitten', 'Opportunist', 'Opposite Grudger', 'Out For Tat', 'PIN', 'PSO Gambler 1_1_1', 'PSO Gambler 2_2_2', 'PSO Gambler 2_2_2 Noise 05', 'PSO Gambler Mem 1', 'Paradoxic Grim / S21', 'Parameterized Tit For Tat', 'Paranoid', 'Passive Tit For Tat', 'Patient Cooperator', 'Pattern Reader', 'Patterned Adaptive Fortress', 'Patterned Adaptive Fortress 2', 'Pavlov / Win-Stay, Lose-Shift', 'Pavlov D / Suspicious Pavlov', 'Pavlov Tester', 'Pavolovo', 'Pawlow', 'Perceptron', 'Phi', 'Pi', 'Prabowo', 'Praedator', 'Predator', 'Probable Coop', 'Probe & Exploit', 'Probe & Punish', 'Prober', 'Prober 2', 'Prober 3', 'Prober 4', 'Prober Abdullah-arif-swe version', 'Procastinater', 'Psycho Attariq Version', 'Pun 1', 'Punisher', 'Q-Learning A-Learner', 'REINFORCE', 'RLAgent', 'RLGossipAgent', 'RNN & RTRL', 'Racister', 'Rack Block Shooter', 'Raider', 'Random', 'Random Exploiter 1', 'Random Exploiter 2', 'Random Exploiter 3', 'Random Exploiter 4', 'Random Hunter', 'Random Tit For Tat', 'Reactive Player', 'Rememberable Grudger', 'Remorseful Prober', 'Resurrection', 'Retaliate', 'Retaliate 2', 'Retaliate 3', 'Rice Field', 'Ripoff', 'Risky Q-Learner', 'Rogers & Maslow', 'Rover', 'Rwallace', 'S11', 'S12 / Suspicious Forgiver', 'S18', 'S19', 'S2', 'S23', 'S24', 'S6', 'S7', 'SURPRISE ATTACK!', 'Sample / Second By Tit For 2 Tats', 'Sarsa Q-Learner', 'Scorched Earth', 'Score Equalizer', 'Second By Almy', 'Second By Ambuehl & Hickey', 'Second By Anderson', 'Second By Appold', 'Second By Batell', 'Second By Black', 'Second By Borufsen', 'Second By Cave', 'Second By Champion', 'Second By Colbert', 'Second By Dawes & Batell', 'Second By Eatherley', 'Second By Falk & Langsted', 'Second By Feld', 'Second By Friedland', 'Second By Friedland, But Get Revised By Axelrod', 'Second By George Hufford', 'Second By Getzler', 'Second By Gladstein / Tester', 'Second By Graaskamp & Katzen', 'Second By Grofman', 'Second By Hall', 'Second By Harrington', 'Second By Hollander', 'Second By Hotz', 'Second By Jones', 'Second By Joss', 'Second By Kluepfel', 'Second By Lefevre', 'Second By Leyland', 'Second By Leyvraz', 'Second By Mcgurrin', 'Second By Mikkelson', 'Second By Named Withheld', 'Second By Newman', 'Second By Nussbacher', 'Second By Nydegger', 'Second By Pebly', 'Second By Pinkley', 'Second By Quayle', 'Second By Rabbie', 'Second By Richard Hufford', 'Second By Robert Adams', 'Second By Robertson', 'Second By Rowsam', 'Second By Schurmann', 'Second By Smith', 'Second By Smoody', 'Second By Snodgrass', 'Second By Tideman & Chieruzzi', 'Second By Tranquilizer', 'Second By Weiderman', 'Second By Weiner', 'Second By White', 'Second By Wiliam Adams', 'Second By Yamachi', 'Second By Zimmerman', 'Second Chance', 'Second Chance Attariq Version', 'Self Steem', 'Self-Love A-Learner', 'Short Mem', 'Signaling Cheater', 'Simple ANN', 'Simple Exploiter', 'Simple Identity ChecK', 'Simpleton', 'Skinner', 'Slanger', 'Slow Tit For Tat', 'Smart', 'Smart Cat', 'Smart Generous Tit For Tat', 'Smart Go By Majority', 'Smart Snake', 'Smart-Clever', 'Smarter Tat For Tit', 'Smooth Grudger', 'Smooth Tit For Tat', 'Sneaky Tit For Tat', 'Social Average', 'Social Engineering', 'Socio', 'Soft Grim', 'Soft Grudger', 'Solution B1', 'Solution B5', 'Sort', 'Spectrum Attacker', 'Spiteful CC', 'Spiteful Tit For Tat', 'Split Brain Syndrome', 'Springter', 'Stabilize', 'Stalker', 'Star S', 'Star SL', 'Star SN', 'Star Slave 1', 'Star Slave 10', 'Star Slave 2', 'Star Slave 3', 'Star Slave 4', 'Star Slave 5', 'Star Slave 6', 'Star Slave 7', 'Star Slave 8', 'Star Slave 9', 'Statistical Strategy', 'Stefan Pennartz', 'Stochastic Cooperator', 'Stochastic WSLS', 'Stoic Mirror', 'Stoicalist', 'Strategist', 'Stupidiot', 'Sugar Strategy / Treasure Hunt', 'Sumobox Fighter', 'Sun Tzu Bot', 'Suspicious Alternator', 'Suspicious Tit For Tat', 'Sweet Heart', 'Syifa', 'TF 1', 'TF 2', 'TF 3', 'TF2T & 2TFT', 'TOM Level 1 / Theory Of Mind Level 1', 'TOM Level 2 / Theory Of Mind Level 2', 'TOM Level 3 / Theory Of Mind Level 3', 'TPMS / Tree Predictive Matrix Strategy', 'Tages', 'Teacher Pee While Standing, Student Pee While Running', 'Tester Eckhart Arnold Version', 'The Calculated Mirror With A Fuse', 'The Cave Breaker', 'The Nasty A', 'Theseus', 'Three Times Out', 'Threshold Punisher', 'Thresholded Trust Bot', 'Thue Morse', 'Thue Morse Inverse', 'Thumper', 'Tiny Brain', 'Tip For Tap', 'Tit For 3 Tats', 'Tit For Increasing Tat', 'Tit For Tat But Not Too Forgiving', 'Tit For Tat Killer', 'Toxic Mirror', 'Trader', 'Tranquilizer Eckhart Arnold Version', 'Tri-Brain', 'Tricky Cooperator', 'Tricky Defector', 'Tricky Level Punisher', 'Trust Ledger', 'Trust Score Sigmoid', 'Trusty', 'Turan', 'Tweedledee', 'Tweedledum', 'Tweetypie', 'Unpredictable Tit For Tat', 'Uranium', 'Usually Cooperates', 'Usually Defects', 'Vandal', 'Vengeful', 'Vengeful Cheater', 'Verity', 'Very Bad', 'WHAgent', 'Whale', 'William', 'Willing', 'Win-Shift, Lose-Stay', 'Winner 12', 'Winner 21', 'Worse & Worse / Worse & Worse 1', 'Worse & Worse 2', 'Worse & Worse 3', 'Your Choice Or My Choice', 'ZD-2026 / Zero Determinant 2026', 'ZD-G / Zero Determinant Generous', 'ZD-GTFT / Zero Determinant Generous Tit For Tat', 'ZD-M2 / Zero Determinant Memory 2', 'ZD-MS / Zero Determinant Mischief', 'ZD-PW2026 / Zero Determinant Psychological War 2026', 'ZD-Q / Zero Determinant Equalizer', 'ZD-S / Zero Determinant Set', 'ZD-X / Zero Determinant Extortion', 'Zero Day']
+strategies_creator = {'2 Tits For 2 Tats / Hard Tit For 2 Tats': 'A. J. Stewart & J. B. Plotkin / Robert Axelrod', '2 Tits For 2 Tats Eckhart Arnold Version': 'Eckhart Arnold', '2 Tits For Tat': 'John Maynard Smith', '3 Seconds Mirror': 'Meta', '3 Tits For Tat / Hard Tit For Tat': '[PD2017]', '3-Tree Of Prediction': 'M. A. M. Attariq', 'A-A&C / A-Actor&Critic': 'M. A. M. Attariq & Gemini', 'ALLC OR ALLD': 'Marc Harper', 'AMERICA! / Freedoom / USA': 'M. A. M. Attariq', 'AON2': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'AQUA': 'M. A. M. Attariq', 'Absurdistan 1': 'Christian Erlen', 'Acquaintance & Trust': 'Philip Seehausen', 'Adaptive': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Hhhpraise Version': 'Hhhpraise', 'Adaptive Pavlov 2006': 'J. Li', 'Adaptive Pavlov 2011': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Tit For Tat': 'E. Tzafestas', 'Adaptive Tit For Tat Attariq Version': 'M. A. M. Attariq', 'Adaptor Brief': 'Christoph Hauert & Olaf Stenull', 'Adaptor Long': 'Christoph Hauert & Olaf Stenull', 'Aggravater': 'Thomas Campbell', 'Alan': 'M. A. M. Attariq, Inspired From Alan Turing', 'Alcohol / Ethanol': 'M. A. M. Attariq', 'Alexei / End Game Cheater': 'Alexei / Eckhart Arnold', 'Alternator / Second By Duisman': 'Robert Axelrod / George Duisman', 'Alternator Hunter': 'Karol Langner', 'Always Cooperate / Cooperator / Dove / Saint': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / John Maynard Smith & George R. Price / Robert Trivers & Richard Dawkins', 'Always Defect / Defector / Hawk / Shark': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / John Maynard Smith & George R. Price / Robert Trivers & Richard Dawkins', 'Always Out / Outtor': 'M. A. M. Attariq', 'Amazon / Piraha': 'M. A. M. Attariq', 'Analogy': 'Robert Gladstein', 'Anatol': 'M. A. M. Attariq', 'Angry Tit For Tat': 'M. A. M. Attariq', 'Anti Cycler': 'Marc Harper', 'Anti Noise Tit For Tat': 'M. A. M. Attariq', 'Anti Tit For Tat / Psycho': 'C. Hilbe & M. A. Nowak & A. Traulsen / D. Ashlock & E. Y. Kim & W. Ashlock', 'Appeaser': 'Jochen Muller', 'Arrogant Q-Learner': 'Geraint Palmer', 'Average Copier': 'Geraint Palmer', 'BBE / Burn Both Ends': 'Louis Marinoff', 'Back Stabber': 'Thomas Campbell', 'Backrooms': 'M. A. M. Attariq', 'Bahlil': 'M. A. M. Attariq', 'Bandit': 'M. A. M. Attariq & Gemini', 'Bandit UCB': 'Auer & Cesa-Bianchi & Fischer', 'Bayes Attariq Version': 'M. A. M. Attariq', 'Bayes Foomii Version': 'Foomii', 'Benjo': 'benjjo', 'Beta Tester': 'M. A. M. Attariq', 'Better & Better': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Bluff': 'M. A. M. Attariq & My Aunt', 'Bluff Master': 'Perplexity', 'Boltzmann Brain': 'M. A. M. Attariq, Inspired From Ludwig Boltzmann', 'Bookend Cooperator': 'Explerify.com', 'Boxer': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bros Mind': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bully / Reverse Tit For Tat': 'John Nachbar', 'Burn The Bridge Strategy': 'tigressine', 'Bush Mosteller': 'Luis R. Izquierdo & Segismundo S. Izquierdo', 'Buzzer': 'M. A. M. Attariq', 'CS / Collective Strategy': 'J. Li & G. Kendall', 'Caerbannog': 'Caerbannog', 'Calamity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Calculator': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Calculator The Nerd Of AI Version': 'The Nerd Of AI', 'Capitalist': 'Chat-GPT', 'Capri': 'Y. Murase Et Al', 'Cautious Q-Learner': 'Geraint Palmer', 'Caveman': 'M. A. M. Attariq', 'Cerebrum': 'M. A. M. Attariq & Chat-GPT & Gemini', 'Charity': 'M. A. M. Attariq', 'Chatter': 'M. A. M. Attariq', 'Clement Coldridge': 'M. A. M. Attariq', 'Coin': 'M. A. M. Attariq', 'Collatz': 'M. A. M. Attariq', 'Communalist': 'Chat-GPT', 'Continuous Q-Learner Avg': 'M. A. M. Attariq', 'Continuous Q-Learner Max': 'M. A. M. Attariq', 'Contrite Grudger': 'M. A. M. Attariq', 'Contrite Tit For Tat': 'J. Wu & Robert Axelrod', 'Control 1': '[Less Wrong]', 'Control 10': '[Less Wrong]', 'Control 11': '[Less Wrong]', 'Control 2': '[Less Wrong]', 'Control 3': '[Less Wrong]', 'Control 4': '[Less Wrong]', 'Control 5': '[Less Wrong]', 'Control 6': '[Less Wrong]', 'Control 7': '[Less Wrong]', 'Control 8': '[Less Wrong]', 'Control 9': '[Less Wrong]', 'Cooperate Once': 'benjjo', 'Cooperator Hunter': 'Karol Langner', 'Crabby': 'Zachary Danziger', 'Crabby Attariq Version': 'M. A. M. Attariq', 'Cruelity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Cult Bishop A': 'M. A. M. Attariq', 'Cult Bishop B': 'M. A. M. Attariq', 'Cult Citizen A': 'M. A. M. Attariq', 'Cult Citizen B': 'M. A. M. Attariq', 'Cult Citizen C': 'M. A. M. Attariq', 'Cult Leader': 'M. A. M. Attariq', 'Curiosity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Cycle Hunter': 'Marc Harper', 'Cycler CCCCCD': 'Marc Harper', 'Cycler CCCD': 'Marc Harper', 'Cycler CCCDCD': 'Marc Harper', 'Cycler CCD': 'Marc Harper', 'Cycler DC': 'Marc Harper', 'Cycler DCCCC': 'M. A. M. Attariq', 'Cycler DDC': 'Marc Harper', 'DBS / Derived Belief Strategy': 'T.-C. Au & D. S. Nau', 'DDoS': 'M. A. M. Attariq', 'Darwin': 'Paul Slavin', 'Deadlock Breaker': 'D. Ashlock & E. Y. Kim ', 'Decay Given': 'M. A. M. Attariq', 'Defect Once': 'benjjo', 'Defector Hunter': 'Karol Langner', 'Delayed AON1': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'Desire': 'M. A. M. Attariq', 'Desprate': 'P. Van Den Berg & F. J. Weissing', 'Detective': 'Nicky Case', 'Devil Staircase': 'M. A. M. Attariq', 'Diplomat': 'Perplexity', 'Dont Bite The Hand That Feeds You': 'M. A. M. Attariq', 'Double Crosser': 'Thomas Campbell', 'Double Q-Learner': 'M. A. M. Attariq', 'Double Resurrection': 'Eckhart Arnold', 'Doubler': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Downing Benjjo Version': 'benjjo', 'Downing Eckhart Arnold Version': 'Eckhart Arnold', 'Dumpty 10': 'Eckhart Arnold', 'Dyna Q-Learner': 'M. A. M. Attariq', 'Dynamic 2 Tits For Tat': 'Grant Garrett-Grossman', 'Dynocat': 'rexmhall09', 'EGOist': 'M. A. M. Attariq', 'Easy Go / Reverse Grudger': "LIFL(Laboratoire d'Informatique Fondamentale de Lille) / J. Li & P. Hingston & G. Kendall", 'Echo Adaptive': 'Copilot', 'Echo Fisher': 'M. A. M. Attariq', 'Egoist A-Learner': 'M. A. M. Attariq', 'Eliza / Therapist': 'M. A. M. Attariq, Inspired From Joseph Weizenbaum', 'Entropy Sentinel': 'Chat-GPT', 'Envy': 'Bernd Lahno', 'Eric': 'M. A. M. Attariq & Erik & Chat-GPT', 'Eugine Nier': 'Eugine Nier', 'Euler': 'Timothy Standen', 'Eventual Cycle Hunter': 'Marc Harper', 'Evil Alliance': 'ArisKatsaris', 'Evolvable Cycler Attariq Version': 'M. A. M. Attariq', 'Evolved FSM 16': 'Marc Harper', 'Evolved FSM 16 Noise 05': 'Marc Harper', 'Evolved FSM 4': 'Marc Harper', 'Evolved FSM 6': 'Frederick Vincent & Dashiell Fryer', 'Evolved HMM 5': 'Marc Harper', 'Evolved Looker Up 1_1_1': 'Marc Harper', 'Evolved Looker Up 2_2_2': 'Marc Harper', 'Exploratory Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Exploratory Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'FAWS': 'FAWS', 'False Cooperator': 'Yaroslav Rosokha & Julian Romero', 'Falsity': 'M. A. M. Attariq, Inspired From Xqree', 'Female / Woman': 'M. A. M. Attariq', 'Fibonacci': 'M. A. M. Attariq', 'Finger Print': 'Eckhart Arnold', 'Firm But Fair / Firm For Tat': 'Marcus R. Frean', 'First By Davis': 'Morton Davis', 'First By Downing': 'Leslie Downing', 'First By Downing, But Get Revised By Axelrod': 'Leslie Downing', 'First By Feld': 'Scott Feld', 'First By Graaskamp / Second By Mauk': 'Jim Graaskamp / Fred Mauk', 'First By Grofman': 'Bernard Grofman', 'First By Grudger / Grim Trigger': 'James W. Friedman', 'First By Joss / Naive Prober': 'Johann Joss / J. Li & P. Hingston & G. Kendall', 'First By Named Withheld': 'Anonymous', 'First By Nydegger': 'Rudy Nydegger', 'First By Shubik': 'Martin Shubik', 'First By Stein & Rapoport': 'Stein & Anatol Rapoport', 'First By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'First By Tit For Tat': 'Anatol Rapoport', 'First By Tullock': 'Gordon Tullock', 'Fixed Pattern': 'Eckhart Arnold', 'Fool Me Once': 'Marc Harper', 'Forest-RND': 'M. A. M. Attariq', 'Forest-XG': 'M. A. M. Attariq', 'Forgetable Gradual': 'M. A. M. Attariq', 'Forgetful Fool Me Once': 'Marc Harper', 'Forgetful Grudger': 'Geraint Palmer', 'Forgetful Majority Bot': 'abdullah-arif-swe', 'Forgiver': 'Thomas Campbell', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Forgiving': 'Hhhpraise', 'Forgiving Fate': 'M. A. M. Attariq & Nabilah Shafirah', 'Forgiving Grudger': 'Explerify.com', 'Forgiving Tit For Tat': 'Thomas Campbell', 'Fortress 3': 'W. Ashlock & D. Ashlock', 'Fortress 4': 'W. Ashlock & D. Ashlock', 'Frankl': 'M. A. M. Attariq, Inspired From Viktor Frankl', 'Free Rider': 'Enquist & Leimar', 'Frequency Analyzer': 'Ian Miller', 'Freud': 'M. A. M. Attariq, Inspired From Sigmund Freud', 'Friendly Human': 'Alex Mainzer', 'GT-E / Game Theory Explorer': 'M. A. M. Attariq', 'Gambler Attariq Version': 'M. A. M. Attariq', 'Gaslighter': 'M. A. M. Attariq & Nabilah Shafirah', 'Gen 1_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 2_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 3_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 4_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 5_64_200_30_0.3_A': 'M. A. M. Attariq', 'Generic Downing': 'Sven Sommer', 'Generic Downing Friendly': 'Sven Sommer', 'Generous Tit For Tat': 'Robert Axelrod', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'Axelrod Project Contributor Team', 'Generous Tit For Tat Benjjo Version': 'benjjo', 'Generous Tit For Tat Eckhart Arnold Version 1': 'Eckhart Arnold', 'Generous Tit For Tat Eckhart Arnold Version 2': 'Eckhart Arnold', 'Generous Tit For Tat Less Wrong Version': '[Less Wrong]', 'Genetic Algo 1': 'M. A. M. Attariq', 'Genetic Algo 2': 'M. A. M. Attariq', 'George': 'M. A. M. Attariq', 'Go By Majority / Second By Grisell / Soft Go By Majority': 'Robert Axelrod / Gail Grisell / S. Mittal & K. Deb', 'Go By Minority': 'M. A. M. Attariq', 'Gold Digger': 'Foomii', 'Golden Mean': 'Dola', 'Good': 'M. A. M. Attariq', 'GossipAgent': 'remcofl', 'Graaskamp Benjjo Version': 'benjjo', 'Gradual': 'B. Beaufils & J. Delahaye & P. Mathieu', 'Gradual Cristal Version': 'CRISTAL Lab & SMAC Team', 'Gradual Killer': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Grateful / S9': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Grudger Alternator': 'Geraint Palmer', 'Grumpy': 'Jason Young', 'HER / MENACE': 'M. A. M. Attariq, Inspired From Martin Gardner & Donald Michie', 'HMM Player': 'Marc Harper', 'Half Sin Square': 'M. A. M. Attariq', 'Handshake': 'Arthur J. Robson', 'Hard Go By Majority': 'S. Mittal & K. Deb', 'Hard Prober': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Hesitant Q-Learner': 'Geraint Palmer', 'Hopeless': 'P. Van Den Berg & F. J. Weissing', 'Hot Coffee': 'M. A. M. Attariq', 'Humpty 10': 'Eckhart Arnold', 'Hungry': 'M. A. M. Attariq', 'Inequality / SOVIET UNION! / USSR': 'M. A. M. Attariq', 'Inequity Averse Q-Learner': 'M. A. M. Attariq', 'Inverse': 'Karol Langner', 'Inverse Punisher': 'Geraint Palmer', 'Is There Something New?': 'M. A. M. Attariq', 'Isolated Clan': 'M. A. M. Attariq', 'Isolated Tit For Tat': 'M. A. M. Attariq', 'Japan Empire Emperor': 'M. A. M. Attariq', 'Japan Empire Soldier 1': 'M. A. M. Attariq', 'Japan Empire Soldier 10': 'M. A. M. Attariq', 'Japan Empire Soldier 2': 'M. A. M. Attariq', 'Japan Empire Soldier 3': 'M. A. M. Attariq', 'Japan Empire Soldier 4': 'M. A. M. Attariq', 'Japan Empire Soldier 5': 'M. A. M. Attariq', 'Japan Empire Soldier 6': 'M. A. M. Attariq', 'Japan Empire Soldier 7': 'M. A. M. Attariq', 'Japan Empire Soldier 8': 'M. A. M. Attariq', 'Japan Empire Soldier 9': 'M. A. M. Attariq', 'Javelin': 'M. A. M. Attariq & Angga Febriansyah', 'Jem': 'Jem', 'Jester': 'parzhitsky', 'Jesus Petry': 'Jesus Petry', 'Josuah': 'M. A. M. Attariq', 'Jung': 'M. A. M. Attariq, Inspired From Carl Jung', 'Karen': 'M. A. M. Attariq', 'Keyman': 'M. A. M. Attariq', 'Killer': 'Zachary Danziger', 'King Of 48 Laws Of Power': 'M. A. M. Attariq, Inspired From Robert Greene', 'Knowledgeable Worse & Worse': 'Adam Pohl', 'Konflikt Blue': 'M. A. M. Attariq', 'Konflikt Green': 'M. A. M. Attariq', 'L-BODOR / Learning Based On Derivative Of Reward': 'M. A. M. Attariq', 'LCG': 'M. A. M. Attariq', 'Laran': 'Elio Piccolo & Giovanni Squillero', 'Laws': 'M. A. M. Attariq', 'Learner': 'M. A. M. Attariq', 'Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Lenient Grim 3': 'Yaroslav Rosokha & Julian Romero', 'Less Grim': 'Sven Sommer', 'Level Punisher': 'Eckhart Arnold', 'Liar Person': 'M. A. M. Attariq & Angga Febriansyah', 'Lighty-Darky': 'M. A. M. Attariq', 'Limited Retaliate': 'Owen Campbell', 'Limited Retaliate 2': 'Owen Campbell', 'Limited Retaliate 3': 'Owen Campbell', 'Line': 'M. A. M. Attariq', 'Little Grudger': 'M. A. M. Attariq', 'Long Horse': 'M. A. M. Attariq, Inspired From LookOut2DD', 'Long Term Strategist': 'The Nerd Of AI', 'Look Ahead / Look Up': 'Alan Gaines', 'Loyal': 'Foomii', 'MARS / Mimicry And Relative Similarity': 'T. L. B. M. Silva & A. L. V. Coelho & C. H. C. Ribeiro', 'MCMC / Markov Chain Monte Carlo': 'Nicholas Metropolis & W.K. Hastings, but implemented by Tuomas Sandholm & Robert Crites', 'MEM2': 'J. Li & G. Kendall', 'MSAgent': 'remcofl', 'Mafia A': 'M. A. M. Attariq', 'Mafia B': 'M. A. M. Attariq', 'Mafia C': 'M. A. M. Attariq', 'Mafia D': 'M. A. M. Attariq', 'Majapahit': 'M. A. M. Attariq', 'Male / Man': 'M. A. M. Attariq', 'Malthrin': 'Malthrin', 'Man In The Middle': 'M. A. M. Attariq', 'Manipulator': 'The Nerd Of AI', 'Manipulity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Markov': 'M. A. M. Attariq, Inspired From Andrey Andreyevich Markov', 'Matcher': 'M. A. M. Attariq', 'Math Constant Hunter': 'Karol Langner', 'Memory 1': 'SidZRed', 'Memory Decay': 'Axelrod Project Contributor Team', 'Mensa': 'Zachary Danziger', 'Meta Hunter': 'Karol Langner', 'Meta Majority': 'Karol Langner', 'Meta Minority': 'Karol Langner', 'Meta Mixer': 'Karol Langner', 'Meta Winner': 'Karol Langner', 'Meta Winner Ensemble': 'Marc Harper', 'Michaelos': 'Michaelos', 'Mirror': 'Foomii', 'Mystical Logic': 'M. A. M. Attariq', 'Modal Defector': 'benjjo', 'Modal Tit For Tat': 'benjjo', 'Momentum': 'Dong Won Moon', 'Monkey See, Monkey Do': 'M. A. M. Attariq', 'Mosquito': 'M. A. M. Attariq', 'MrX': 'Bjoern Van Den Bruck', 'N Pavlov': 'SidZRed', 'N Tits For M Tats': 'Marc Harper', 'Naive Q-Learner': 'M. A. M. Attariq', 'Nash': 'M. A. M. Attariq, Inspired From John Forbes Nash Jr', 'Nasty Tit For Tat': 'Axelrod Project Contributor Team', 'Negation': '[PD2017]', 'Neil A': 'M. A. M. Attariq', 'Newton': 'M. A. M. Attariq, Inspired From Newton Second Law', 'Nydegger Benjjo Version': 'benjjo', 'Observant': 'Zachary Danziger', 'Odd-Even Go By Majority': 'M. A. M. Attariq', 'Odysseus / Ὀδυσσεύς': 'M. A. M. Attariq', 'Omega Tit For Tat': 'W. Slany & W. Kienreich', 'Once Bitten': 'Holly Marissa', 'Opportunist': 'The Nerd Of AI', 'Opposite Grudger': 'Geraint Palmer', 'Out For Tat': 'M. A. M. Attariq', 'PIN': 'Philip Seehausen', 'PSO Gambler 1_1_1': 'Marc Harper', 'PSO Gambler 2_2_2': 'Georgios Koutsovoulos & Marc Harper', 'PSO Gambler 2_2_2 Noise 05': 'Marc Harper', 'PSO Gambler Mem 1': 'Marc Harper', 'Paradoxic Grim / S21': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Parameterized Tit For Tat': 'Eckhart Arnold', 'Paranoid': 'M. A. M. Attariq', 'Passive Tit For Tat': 'M. A. M. Attariq', 'Patient Cooperator': 'Explerify.com', 'Pattern Reader': 'Explerify.com', 'Patterned Adaptive Fortress': 'M. A. M. Attariq & Claude & Gemini & Chat-GPT & Copilot', 'Patterned Adaptive Fortress 2': 'M. A. M. Attariq & Claude & Gemini & Chat-GPT & DeepSeek & Dola', 'Pavlov / Win-Stay, Lose-Shift': 'David Kraines & Vivian Kraines', 'Pavlov D / Suspicious Pavlov': 'Zhen Ji', 'Pavlov Tester': 'M. A. M. Attariq', 'Pavolovo': 'M. A. M. Attariq', 'Pawlow': 'M. A. M. Attariq', 'Perceptron': 'M. A. M. Attariq', 'Phi': 'Timothy Standen', 'Pi': 'Timothy Standen', 'Prabowo': 'M. A. M. Attariq', 'Praedator': 'M. A. M. Attariq', 'Predator': 'W. Ashlock & D. Ashlock', 'Probable Coop': 'SidZRed', 'Probe & Exploit': 'Explerify.com', 'Probe & Punish': 'Eneasz', 'Prober': 'J. Li & P. Hingston & G. Kendall', 'Prober 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 4': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober Abdullah-arif-swe version': 'abdullah-arif-swe', 'Procastinater': 'M. A. M. Attariq', 'Psycho Attariq Version': 'M. A. M. Attariq', 'Pun 1': 'D. Ashlock & E. Y. Kim & N. Leahy', 'Punisher': 'Geraint Palmer', 'Q-Learning A-Learner': 'M. A. M. Attariq', 'REINFORCE': 'M. A. M. Attariq', 'RLAgent': 'remcofl', 'RLGossipAgent': 'remcofl', 'RNN & RTRL': 'M. A. M. Attariq', 'Racister': 'M. A. M. Attariq', 'Rack Block Shooter': 'Nic Smith', 'Raider': 'W. Ashlock & J. Tsang & D. Ashlock', 'Random': 'Robert Axelrod', 'Random Exploiter 1': 'M. A. M. Attariq', 'Random Exploiter 2': 'M. A. M. Attariq', 'Random Exploiter 3': 'M. A. M. Attariq', 'Random Exploiter 4': 'M. A. M. Attariq', 'Random Hunter': 'Karol Langner', 'Random Tit For Tat': 'Zachary M. Taylor', 'Reactive Player': 'Martin Nowak & Karl Sigmund', 'Rememberable Grudger': 'M. A. M. Attariq', 'Remorseful Prober': 'J. Li & P. Hingston & G. Kendall', 'Resurrection': 'Eckhart Arnold', 'Retaliate': 'Owen Campbell', 'Retaliate 2': 'Owen Campbell', 'Retaliate 3': 'Owen Campbell', 'Rice Field': 'Meta', 'Ripoff': 'D. Ashlock & E. Y. Kim', 'Risky Q-Learner': 'Geraint Palmer', 'Rogers & Maslow': 'M. A. M. Attariq, Inspired From Carl Rogers & Abraham Maslow', 'Rover': 'Dugatkin & Wilson', 'Rwallace': 'Rwallace', 'S11': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S12 / Suspicious Forgiver': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S18': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S19': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S2': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S23': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S24': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S6': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S7': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'SURPRISE ATTACK!': 'M. A. M. Attariq', 'Sample / Second By Tit For 2 Tats': 'Robert Axelrod / John Maynard Smith', 'Sarsa Q-Learner': 'M. A. M. Attariq', 'Scorched Earth': 'Explerify.com', 'Score Equalizer': 'M. A. M. Attariq', 'Second By Almy': 'Tom Almy', 'Second By Ambuehl & Hickey': 'Dennis Ambuehl & Kevin Hickey', 'Second By Anderson': 'R. D. Anderson', 'Second By Appold': 'Scott Appold', 'Second By Batell': 'Mark F. Batell', 'Second By Black': 'Paul E. Black', 'Second By Borufsen': 'Otto Borufsen', 'Second By Cave': 'Rob Cave', 'Second By Champion': 'Danny C. Champion', 'Second By Colbert': 'John Willaim Colbert', 'Second By Dawes & Batell': 'Robyn M. Dawes & Mark Batell', 'Second By Eatherley': 'Graham J. Eatherley', 'Second By Falk & Langsted': 'Robert B. Falk & James M. Langsted', 'Second By Feld': 'Scott Feld', 'Second By Friedland': 'Edward Friedland', 'Second By Friedland, But Get Revised By Axelrod': 'Robert Axelrod', 'Second By George Hufford': 'George Hufford', 'Second By Getzler': 'Abraham Getzler', 'Second By Gladstein / Tester': 'David Gladstein', 'Second By Graaskamp & Katzen': 'Jim Graaskamp & Ken Katzen', 'Second By Grofman': 'Bernard Grofman', 'Second By Hall': 'James E. Hall', 'Second By Harrington': 'Paul D. Harrington', 'Second By Hollander': 'Howard R. Hollander', 'Second By Hotz': 'Roger Hotz', 'Second By Jones': 'Martyn Jones', 'Second By Joss': 'Johann Joss', 'Second By Kluepfel': 'Charles Kluepfel', 'Second By Lefevre': 'George Lefevre', 'Second By Leyland': 'Robert A. Leyland', 'Second By Leyvraz': 'Fransois Leyvraz', 'Second By Mcgurrin': 'Michael F. McGurrin', 'Second By Mikkelson': 'Ray Mikkelson', 'Second By Named Withheld': 'Anonymous2', 'Second By Newman': 'Steve Newman', 'Second By Nussbacher': 'Henry Nussbacher', 'Second By Nydegger': 'Rudy Nydegger', 'Second By Pebly': 'Robert Pebly', 'Second By Pinkley': 'Jonathan Pinkley', 'Second By Quayle': 'Stanley F. Quayle', 'Second By Rabbie': 'Harold Rabbie', 'Second By Richard Hufford': 'Richard Hufford', 'Second By Robert Adams': 'Robert Adams', 'Second By Robertson': 'William H. Robertson', 'Second By Rowsam': 'Glen Rowsam', 'Second By Schurmann': 'E. E. H. Schurmann', 'Second By Smith': 'David A. Smith', 'Second By Smoody': 'Rik Smoody', 'Second By Snodgrass': 'Gene Snodgrass', 'Second By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'Second By Tranquilizer': 'Craig Feathers', 'Second By Weiderman': 'Nelson Weiderman', 'Second By Weiner': 'Herb Weiner', 'Second By White': 'Edward C. White Jr', 'Second By Wiliam Adams': 'William Adams', 'Second By Yamachi': 'Brian Yamachi', 'Second By Zimmerman': 'George Zimmerman', 'Second Chance': 'Benelliott', 'Second Chance Attariq Version': 'M. A. M. Attariq, Inspired From My Father', 'Self Steem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Self-Love A-Learner': 'M. A. M. Attariq', 'Short Mem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Signaling Cheater': 'Eckhart Arnold', 'Simple ANN': 'M. A. M. Attariq', 'Simple Exploiter': 'M. A. M. Attariq', 'Simple Identity ChecK': 'Red75', 'Simpleton': 'Eckhart Arnold', 'Skinner': 'M. A. M. Attariq, Inspired From B.F. Skinner', 'Slanger': 'M. A. M. Attariq', 'Slow Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Smart': 'Sven Sommer', 'Smart Cat': 'M. A. M. Attariq & Syarif', 'Smart Generous Tit For Tat': 'M. A. M. Attariq', 'Smart Go By Majority': 'M. A. M. Attariq', 'Smart Snake': 'M. A. M. Attariq, Inspired From Simulife Hub', 'Smart-Clever': 'M. A. M. Attariq', 'Smarter Tat For Tit': 'Eckhart Arnold', 'Smooth Grudger': 'M. A. M. Attariq', 'Smooth Tit For Tat': 'M. A. M. Attariq', 'Sneaky Tit For Tat': 'Karol Langner', 'Social Average': 'Chat-GPT', 'Social Engineering': 'M. A. M. Attariq', 'Socio': 'M. A. M. Attariq', 'Soft Grim': 'Eckhart Arnold', 'Soft Grudger': 'J. Li & P. Hingston & G. Kendall', 'Solution B1': 'D. Ashlock & J. A. Brown & P. Hingston', 'Solution B5': 'D. Ashlock & J. A. Brown & P. Hingston', 'Sort': 'M. A. M. Attariq', 'Spectrum Attacker': 'M. A. M. Attariq', 'Spiteful CC': 'P. Mathieu & J. Delahaye', 'Spiteful Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Split Brain Syndrome': 'Dola', 'Springter': 'M. A. M. Attariq', 'Stabilize': 'Paul Boehm', 'Stalker': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Star S': 'Gopal Ramchurn', 'Star SL': 'Gopal Ramchurn', 'Star SN': 'Gopal Ramchurn', 'Star Slave 1': 'Gopal Ramchurn', 'Star Slave 10': 'Gopal Ramchurn', 'Star Slave 2': 'Gopal Ramchurn', 'Star Slave 3': 'Gopal Ramchurn', 'Star Slave 4': 'Gopal Ramchurn', 'Star Slave 5': 'Gopal Ramchurn', 'Star Slave 6': 'Gopal Ramchurn', 'Star Slave 7': 'Gopal Ramchurn', 'Star Slave 8': 'Gopal Ramchurn', 'Star Slave 9': 'Gopal Ramchurn', 'Statistical Strategy': 'd0minik2', 'Stefan Pennartz': 'Stefan Pennartz', 'Stochastic Cooperator': 'C. Adami & A. Hintze', 'Stochastic WSLS': 'Marc Harper', 'Stoic Mirror': 'Gemini', 'Stoicalist': 'M. A. M. Attariq & Gemini', 'Strategist': 'Explerify.com', 'Stupidiot': 'M. A. M. Attariq', 'Sugar Strategy / Treasure Hunt': 'D. Ashlock & W. Ashlock', 'Sumobox Fighter': 'M. A. M. Attariq, Inspired From Simulife Hub', 'Sun Tzu Bot': 'M. A. M. Attariq, Inspired From Sun Tzu', 'Suspicious Alternator': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Suspicious Tit For Tat': 'C. Hilbe & M. A. Nowak & A. Traulsen', 'Sweet Heart': 'DeepSeek', 'Syifa': 'M. A. M. Attariq & Syifa', 'TF 1': 'Marc Harper', 'TF 2': 'Marc Harper', 'TF 3': 'Marc Harper', 'TF2T & 2TFT': 'M. A. M. Attariq', 'TOM Level 1 / Theory Of Mind Level 1': 'M. A. M. Attariq', 'TOM Level 2 / Theory Of Mind Level 2': 'M. A. M. Attariq', 'TOM Level 3 / Theory Of Mind Level 3': 'M. A. M. Attariq', 'TPMS / Tree Predictive Matrix Strategy': 'M. A. M. Attariq', 'Tages': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Teacher Pee While Standing, Student Pee While Running': 'M. A. M. Attariq', 'Tester Eckhart Arnold Version': 'Eckhart Arnold', 'The Calculated Mirror With A Fuse': 'Gemini', 'The Cave Breaker': 'M. A. M. Attariq & Gemini', 'The Nasty A': 'M. A. M. Attariq', 'Theseus': 'M. A. M. Attariq, Inspired From Claude Shannon', 'Three Times Out': 'Philip Seehausen', 'Threshold Punisher': 'Copilot', 'Thresholded Trust Bot': 'M. A. M. Attariq', 'Thue Morse': 'Geraint Palmer', 'Thue Morse Inverse': 'Geraint Palmer', 'Thumper': 'D. Ashlock & E. Y. Kim', 'Tiny Brain': 'M. A. M. Attariq', 'Tip For Tap': 'M. A. M. Attariq', 'Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'Tit For Increasing Tat': 'Claude', 'Tit For Tat But Not Too Forgiving': 'M. A. M. Attariq', 'Tit For Tat Killer': 'M. A. M. Attariq', 'Toxic Mirror': 'DeepSeek', 'Trader': 'M. A. M. Attariq & Gemini', 'Tranquilizer Eckhart Arnold Version': 'Eckhart Arnold', 'Tri-Brain': 'M. A. M. Attariq', 'Tricky Cooperator': 'Karol Langner', 'Tricky Defector': 'Karol Langner', 'Tricky Level Punisher': 'Eckhart Arnold', 'Trust Ledger': 'Chat-GPT', 'Trust Score Sigmoid': 'Claude', 'Trusty': 'Foomii', 'Turan': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Tweedledee': 'Eckhart Arnold', 'Tweedledum': 'Eckhart Arnold', 'Tweetypie': 'Eckhart Arnold', 'Unpredictable Tit For Tat': 'M. A. M. Attariq', 'Uranium': 'M. A. M. Attariq', 'Usually Cooperates': 'D. Ashlock & E. Y. Kim & W. Ashlock', 'Usually Defects': 'D. Ashlock & E. Y.Kim & W. Ashlock', 'Vandal': 'Foomii', 'Vengeful': 'D. Ashlock', 'Vengeful Cheater': 'Vaniver', 'Verity': 'M. A. M. Attariq & Gemini, Inspired From ThatMob', 'Very Bad': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'WHAgent': 'remcofl', 'Whale': 'M. A. M. Attariq & DeepSeek', 'William': 'M. A. M. Attariq', 'Willing': 'P. Van Den Berg & F. J. Weissing', 'Win-Shift, Lose-Stay': 'J. Li & P. Hingston & G. Kendall', 'Winner 12': 'P. Mathieu & J. Delahaye', 'Winner 21': 'P. Mathieu & J. Delahaye', 'Worse & Worse / Worse & Worse 1': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Your Choice Or My Choice': 'M. A. M. Attariq', 'ZD-2026 / Zero Determinant 2026': 'M. A. M. Attariq', 'ZD-G / Zero Determinant Generous': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-GTFT / Zero Determinant Generous Tit For Tat': "A. J. Stewart & J. B. Plotkin, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-M2 / Zero Determinant Memory 2': 'Marc Harper', 'ZD-MS / Zero Determinant Mischief': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-PW2026 / Zero Determinant Psychological War 2026': 'Gemini', 'ZD-Q / Zero Determinant Equalizer': "William H. Press & Freeman Dyson, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-S / Zero Determinant Set': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-X / Zero Determinant Extortion': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Day': 'M. A. M. Attariq'}
+strategies_category = {'2 Tits For 2 Tats / Hard Tit For 2 Tats': 'NICE', '2 Tits For 2 Tats Eckhart Arnold Version': 'NASTY', '2 Tits For Tat': 'NICE', '3 Seconds Mirror': 'NICE', '3 Tits For Tat / Hard Tit For Tat': 'NICE', '3-Tree Of Prediction': 'NICE', 'A-A&C / A-Actor&Critic': 'NASTY', 'ALLC OR ALLD': 'NASTY', 'AMERICA! / Freedoom / USA': 'NASTY', 'AON2': 'NICE', 'AQUA': 'NICE', 'Absurdistan 1': 'NICE', 'Acquaintance & Trust': 'NICE', 'Adaptive': 'NASTY', 'Adaptive Hhhpraise Version': 'NICE', 'Adaptive Pavlov 2006': 'NICE', 'Adaptive Pavlov 2011': 'NICE', 'Adaptive Tit For Tat': 'NICE', 'Adaptive Tit For Tat Attariq Version': 'NICE', 'Adaptor Brief': 'NASTY', 'Adaptor Long': 'NASTY', 'Aggravater': 'NASTY', 'Alan': 'NICE', 'Alcohol / Ethanol': 'NASTY', 'Alexei / End Game Cheater': 'NASTY', 'Alternator / Second By Duisman': 'NASTY', 'Alternator Hunter': 'NICE', 'Always Cooperate / Cooperator / Dove / Saint': 'NICE', 'Always Defect / Defector / Hawk / Shark': 'NASTY', 'Always Out / Outtor': 'NICE', 'Amazon / Piraha': 'NICE', 'Analogy': 'NASTY', 'Anatol': 'NICE', 'Angry Tit For Tat': 'NICE', 'Anti Cycler': 'NASTY', 'Anti Noise Tit For Tat': 'NICE', 'Anti Tit For Tat / Psycho': 'NASTY', 'Appeaser': 'NICE', 'Arrogant Q-Learner': 'NASTY', 'Average Copier': 'NASTY', 'BBE / Burn Both Ends': 'NASTY', 'Back Stabber': 'NICE', 'Backrooms': 'NASTY', 'Bahlil': 'NASTY', 'Bandit': 'NASTY', 'Bandit UCB': 'NASTY', 'Bayes Attariq Version': 'NICE', 'Bayes Foomii Version': 'NICE', 'Benjo': 'NICE', 'Beta Tester': 'NASTY', 'Better & Better': 'NASTY', 'Bluff': 'NASTY', 'Bluff Master': 'NASTY', 'Boltzmann Brain': 'NASTY', 'Bookend Cooperator': 'NASTY', 'Boxer': 'NICE', 'Bros Mind': 'NICE', 'Bully / Reverse Tit For Tat': 'NASTY', 'Burn The Bridge Strategy': 'NASTY', 'Bush Mosteller': 'NASTY', 'Buzzer': 'NASTY', 'CS / Collective Strategy': 'NASTY', 'Caerbannog': 'NASTY', 'Calamity': 'NASTY', 'Calculator': 'NASTY', 'Calculator The Nerd Of AI Version': 'NICE', 'Capitalist': 'NASTY', 'Capri': 'NICE', 'Cautious Q-Learner': 'NASTY', 'Caveman': 'NASTY', 'Cerebrum': 'NICE', 'Charity': 'NICE', 'Chatter': 'NICE', 'Clement Coldridge': 'NICE', 'Coin': 'NASTY', 'Collatz': 'NASTY', 'Communalist': 'NICE', 'Continuous Q-Learner Avg': 'NASTY', 'Continuous Q-Learner Max': 'NASTY', 'Contrite Grudger': 'NICE', 'Contrite Tit For Tat': 'NICE', 'Control 1': 'NASTY', 'Control 10': 'NASTY', 'Control 11': 'NASTY', 'Control 2': 'NICE', 'Control 3': 'NASTY', 'Control 4': 'NASTY', 'Control 5': 'NASTY', 'Control 6': 'NICE', 'Control 7': 'NASTY', 'Control 8': 'NASTY', 'Control 9': 'NICE', 'Cooperate Once': 'NASTY', 'Cooperator Hunter': 'NASTY', 'Crabby': 'NICE', 'Crabby Attariq Version': 'NASTY', 'Cruelity': 'NICE', 'Cult Bishop A': 'NASTY', 'Cult Bishop B': 'NASTY', 'Cult Citizen A': 'NASTY', 'Cult Citizen B': 'NASTY', 'Cult Citizen C': 'NASTY', 'Cult Leader': 'NASTY', 'Curiosity': 'NICE', 'Cycle Hunter': 'NASTY', 'Cycler CCCCCD': 'NASTY', 'Cycler CCCD': 'NASTY', 'Cycler CCCDCD': 'NASTY', 'Cycler CCD': 'NASTY', 'Cycler DC': 'NASTY', 'Cycler DCCCC': 'NASTY', 'Cycler DDC': 'NASTY', 'DBS / Derived Belief Strategy': 'NICE', 'DDoS': 'NICE', 'Darwin': 'NICE', 'Deadlock Breaker': 'NICE', 'Decay Given': 'NICE', 'Defect Once': 'NASTY', 'Defector Hunter': 'NICE', 'Delayed AON1': 'NICE', 'Desire': 'NICE', 'Desprate': 'NASTY', 'Detective': 'NASTY', 'Devil Staircase': 'NICE', 'Diplomat': 'NICE', 'Dont Bite The Hand That Feeds You': 'NICE', 'Double Crosser': 'NICE', 'Double Q-Learner': 'NASTY', 'Double Resurrection': 'NASTY', 'Doubler': 'NICE', 'Downing Benjjo Version': 'NICE', 'Downing Eckhart Arnold Version': 'NASTY', 'Dumpty 10': 'NASTY', 'Dyna Q-Learner': 'NASTY', 'Dynamic 2 Tits For Tat': 'NICE', 'Dynocat': 'NASTY', 'EGOist': 'NASTY', 'Easy Go / Reverse Grudger': 'NASTY', 'Echo Adaptive': 'NICE', 'Echo Fisher': 'NASTY', 'Egoist A-Learner': 'NICE', 'Eliza / Therapist': 'NICE', 'Entropy Sentinel': 'NASTY', 'Envy': 'NICE', 'Eric': 'NICE', 'Eugine Nier': 'NASTY', 'Euler': 'NASTY', 'Eventual Cycle Hunter': 'NICE', 'Evil Alliance': 'NASTY', 'Evolvable Cycler Attariq Version': 'NASTY', 'Evolved FSM 16': 'NICE', 'Evolved FSM 16 Noise 05': 'NICE', 'Evolved FSM 4': 'NICE', 'Evolved FSM 6': 'NASTY', 'Evolved HMM 5': 'NICE', 'Evolved Looker Up 1_1_1': 'NICE', 'Evolved Looker Up 2_2_2': 'NICE', 'Exploratory Lenient Grim 2': 'NASTY', 'Exploratory Tit For 3 Tats': 'NASTY', 'FAWS': 'NASTY', 'False Cooperator': 'NASTY', 'Falsity': 'NICE', 'Female / Woman': 'NASTY', 'Fibonacci': 'NASTY', 'Finger Print': 'NASTY', 'Firm But Fair / Firm For Tat': 'NICE', 'First By Davis': 'NICE', 'First By Downing': 'NASTY', 'First By Downing, But Get Revised By Axelrod': 'NICE', 'First By Feld': 'NASTY', 'First By Graaskamp / Second By Mauk': 'NASTY', 'First By Grofman': 'NICE', 'First By Grudger / Grim Trigger': 'NICE', 'First By Joss / Naive Prober': 'NASTY', 'First By Named Withheld': 'NASTY', 'First By Nydegger': 'NICE', 'First By Shubik': 'NICE', 'First By Stein & Rapoport': 'NASTY', 'First By Tideman & Chieruzzi': 'NICE', 'First By Tit For Tat': 'NICE', 'First By Tullock': 'NASTY', 'Fixed Pattern': 'NASTY', 'Fool Me Once': 'NICE', 'Forest-RND': 'NICE', 'Forest-XG': 'NICE', 'Forgetable Gradual': 'NICE', 'Forgetful Fool Me Once': 'NICE', 'Forgetful Grudger': 'NICE', 'Forgetful Majority Bot': 'NICE', 'Forgiver': 'NICE', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14': 'NICE', 'Forgiving': 'NICE', 'Forgiving Fate': 'NICE', 'Forgiving Grudger': 'NICE', 'Forgiving Tit For Tat': 'NICE', 'Fortress 3': 'NASTY', 'Fortress 4': 'NASTY', 'Frankl': 'NICE', 'Free Rider': 'NASTY', 'Frequency Analyzer': 'NICE', 'Freud': 'NICE', 'Friendly Human': 'NICE', 'GT-E / Game Theory Explorer': 'NICE', 'Gambler Attariq Version': 'NASTY', 'Gaslighter': 'NASTY', 'Gen 1_64_200_30_0.3_A': 'NASTY', 'Gen 2_64_200_30_0.3_A': 'NASTY', 'Gen 3_64_200_30_0.3_A': 'NASTY', 'Gen 4_64_200_30_0.3_A': 'NASTY', 'Gen 5_64_200_30_0.3_A': 'NASTY', 'Generic Downing': 'NASTY', 'Generic Downing Friendly': 'NASTY', 'Generous Tit For Tat': 'NICE', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'NICE', 'Generous Tit For Tat Benjjo Version': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 1': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 2': 'NICE', 'Generous Tit For Tat Less Wrong Version': 'NICE', 'Genetic Algo 1': 'NICE', 'Genetic Algo 2': 'NICE', 'George': 'NASTY', 'Go By Majority / Second By Grisell / Soft Go By Majority': 'NICE', 'Go By Minority': 'NASTY', 'Gold Digger': 'NASTY', 'Golden Mean': 'NICE', 'Good': 'NICE', 'GossipAgent': 'NASTY', 'Graaskamp Benjjo Version': 'NASTY', 'Gradual': 'NICE', 'Gradual Cristal Version': 'NICE', 'Gradual Killer': 'NASTY', 'Grateful / S9': 'NASTY', 'Grudger Alternator': 'NICE', 'Grumpy': 'NICE', 'HER / MENACE': 'NICE', 'HMM Player': 'NASTY', 'Half Sin Square': 'NICE', 'Handshake': 'NASTY', 'Hard Go By Majority': 'NICE', 'Hard Prober': 'NASTY', 'Hesitant Q-Learner': 'NASTY', 'Hopeless': 'NASTY', 'Hot Coffee': 'NICE', 'Humpty 10': 'NASTY', 'Hungry': 'NASTY', 'Inequality / SOVIET UNION! / USSR': 'NASTY', 'Inequity Averse Q-Learner': 'NASTY', 'Inverse': 'NICE', 'Inverse Punisher': 'NICE', 'Is There Something New?': 'NICE', 'Isolated Clan': 'NASTY', 'Isolated Tit For Tat': 'NICE', 'Japan Empire Emperor': 'NICE', 'Japan Empire Soldier 1': 'NICE', 'Japan Empire Soldier 10': 'NICE', 'Japan Empire Soldier 2': 'NICE', 'Japan Empire Soldier 3': 'NICE', 'Japan Empire Soldier 4': 'NICE', 'Japan Empire Soldier 5': 'NICE', 'Japan Empire Soldier 6': 'NICE', 'Japan Empire Soldier 7': 'NICE', 'Japan Empire Soldier 8': 'NICE', 'Japan Empire Soldier 9': 'NICE', 'Javelin': 'NICE', 'Jem': 'NASTY', 'Jester': 'NASTY', 'Jesus Petry': 'NASTY', 'Josuah': 'NASTY', 'Jung': 'NICE', 'Karen': 'NASTY', 'Keyman': 'NASTY', 'Killer': 'NASTY', 'King Of 48 Laws Of Power': 'NICE', 'Knowledgeable Worse & Worse': 'NASTY', 'Konflikt Blue': 'NASTY', 'Konflikt Green': 'NICE', 'L-BODOR / Learning Based On Derivative Of Reward': 'NICE', 'LCG': 'NASTY', 'Laran': 'NASTY', 'Laws': 'NICE', 'Learner': 'NICE', 'Lenient Grim 2': 'NICE', 'Lenient Grim 3': 'NICE', 'Less Grim': 'NICE', 'Level Punisher': 'NICE', 'Liar Person': 'NASTY', 'Lighty-Darky': 'NASTY', 'Limited Retaliate': 'NICE', 'Limited Retaliate 2': 'NICE', 'Limited Retaliate 3': 'NICE', 'Line': 'NICE', 'Little Grudger': 'NICE', 'Long Horse': 'NASTY', 'Long Term Strategist': 'NICE', 'Look Ahead / Look Up': 'NASTY', 'Loyal': 'NICE', 'MARS / Mimicry And Relative Similarity': 'NICE', 'MCMC / Markov Chain Monte Carlo': 'NICE', 'MEM2': 'NICE', 'MSAgent': 'NASTY', 'Mafia A': 'NASTY', 'Mafia B': 'NASTY', 'Mafia C': 'NASTY', 'Mafia D': 'NASTY', 'Majapahit': 'NICE', 'Male / Man': 'NICE', 'Malthrin': 'NASTY', 'Man In The Middle': 'NASTY', 'Manipulator': 'NASTY', 'Manipulity': 'NASTY', 'Markov': 'NICE', 'Matcher': 'NICE', 'Math Constant Hunter': 'NICE', 'Memory 1': 'NASTY', 'Memory Decay': 'NASTY', 'Mensa': 'NASTY', 'Meta Hunter': 'NASTY', 'Meta Majority': 'NICE', 'Meta Minority': 'NASTY', 'Meta Mixer': 'NASTY', 'Meta Winner': 'NASTY', 'Meta Winner Ensemble': 'NASTY', 'Michaelos': 'NASTY', 'Mirror': 'NICE', 'Mystical Logic': 'NASTY', 'Modal Defector': 'NASTY', 'Modal Tit For Tat': 'NICE', 'Momentum': 'NICE', 'Monkey See, Monkey Do': 'NASTY', 'Mosquito': 'NASTY', 'MrX': 'NASTY', 'N Pavlov': 'NASTY', 'N Tits For M Tats': 'NICE', 'Naive Q-Learner': 'NASTY', 'Nash': 'NICE', 'Nasty Tit For Tat': 'NASTY', 'Negation': 'NASTY', 'Neil A': 'NICE', 'Newton': 'NASTY', 'Nydegger Benjjo Version': 'NICE', 'Observant': 'NICE', 'Odd-Even Go By Majority': 'NICE', 'Odysseus / Ὀδυσσεύς': 'NICE', 'Omega Tit For Tat': 'NICE', 'Once Bitten': 'NICE', 'Opportunist': 'NASTY', 'Opposite Grudger': 'NASTY', 'Out For Tat': 'NICE', 'PIN': 'NASTY', 'PSO Gambler 1_1_1': 'NICE', 'PSO Gambler 2_2_2': 'NICE', 'PSO Gambler 2_2_2 Noise 05': 'NICE', 'PSO Gambler Mem 1': 'NICE', 'Paradoxic Grim / S21': 'NASTY', 'Parameterized Tit For Tat': 'NASTY', 'Paranoid': 'NASTY', 'Passive Tit For Tat': 'NICE', 'Patient Cooperator': 'NICE', 'Pattern Reader': 'NICE', 'Patterned Adaptive Fortress': 'NICE', 'Patterned Adaptive Fortress 2': 'NICE', 'Pavlov / Win-Stay, Lose-Shift': 'NICE', 'Pavlov D / Suspicious Pavlov': 'NASTY', 'Pavlov Tester': 'NASTY', 'Pavolovo': 'NASTY', 'Pawlow': 'NICE', 'Perceptron': 'NASTY', 'Phi': 'NASTY', 'Pi': 'NASTY', 'Prabowo': 'NASTY', 'Praedator': 'NASTY', 'Predator': 'NASTY', 'Probable Coop': 'NASTY', 'Probe & Exploit': 'NASTY', 'Probe & Punish': 'NICE', 'Prober': 'NASTY', 'Prober 2': 'NASTY', 'Prober 3': 'NASTY', 'Prober 4': 'NASTY', 'Prober Abdullah-arif-swe version': 'NASTY', 'Procastinater': 'NICE', 'Psycho Attariq Version': 'NICE', 'Pun 1': 'NASTY', 'Punisher': 'NICE', 'Q-Learning A-Learner': 'NICE', 'REINFORCE': 'NASTY', 'RLAgent': 'NASTY', 'RLGossipAgent': 'NASTY', 'RNN & RTRL': 'NASTY', 'Racister': 'NASTY', 'Rack Block Shooter': 'NASTY', 'Raider': 'NASTY', 'Random': 'NASTY', 'Random Exploiter 1': 'NICE', 'Random Exploiter 2': 'NICE', 'Random Exploiter 3': 'NICE', 'Random Exploiter 4': 'NICE', 'Random Hunter': 'NICE', 'Random Tit For Tat': 'NASTY', 'Reactive Player': 'NASTY', 'Rememberable Grudger': 'NICE', 'Remorseful Prober': 'NASTY', 'Resurrection': 'NICE', 'Retaliate': 'NICE', 'Retaliate 2': 'NICE', 'Retaliate 3': 'NICE', 'Rice Field': 'NASTY', 'Ripoff': 'NASTY', 'Risky Q-Learner': 'NASTY', 'Rogers & Maslow': 'NICE', 'Rover': 'NASTY', 'Rwallace': 'NASTY', 'S11': 'NASTY', 'S12 / Suspicious Forgiver': 'NASTY', 'S18': 'NASTY', 'S19': 'NASTY', 'S2': 'NASTY', 'S23': 'NASTY', 'S24': 'NASTY', 'S6': 'NASTY', 'S7': 'NASTY', 'SURPRISE ATTACK!': 'NASTY', 'Sample / Second By Tit For 2 Tats': 'NICE', 'Sarsa Q-Learner': 'NASTY', 'Scorched Earth': 'NICE', 'Score Equalizer': 'NICE', 'Second By Almy': 'NASTY', 'Second By Ambuehl & Hickey': 'NICE', 'Second By Anderson': 'NASTY', 'Second By Appold': 'NICE', 'Second By Batell': 'NICE', 'Second By Black': 'NICE', 'Second By Borufsen': 'NICE', 'Second By Cave': 'NICE', 'Second By Champion': 'NICE', 'Second By Colbert': 'NASTY', 'Second By Dawes & Batell': 'NICE', 'Second By Eatherley': 'NICE', 'Second By Falk & Langsted': 'NICE', 'Second By Feld': 'NASTY', 'Second By Friedland': 'NASTY', 'Second By Friedland, But Get Revised By Axelrod': 'NASTY', 'Second By George Hufford': 'NASTY', 'Second By Getzler': 'NICE', 'Second By Gladstein / Tester': 'NASTY', 'Second By Graaskamp & Katzen': 'NICE', 'Second By Grofman': 'NICE', 'Second By Hall': 'NASTY', 'Second By Harrington': 'NASTY', 'Second By Hollander': 'NASTY', 'Second By Hotz': 'NASTY', 'Second By Jones': 'NICE', 'Second By Joss': 'NASTY', 'Second By Kluepfel': 'NICE', 'Second By Lefevre': 'NICE', 'Second By Leyland': 'NASTY', 'Second By Leyvraz': 'NICE', 'Second By Mcgurrin': 'NASTY', 'Second By Mikkelson': 'NICE', 'Second By Named Withheld': 'NASTY', 'Second By Newman': 'NICE', 'Second By Nussbacher': 'NICE', 'Second By Nydegger': 'NICE', 'Second By Pebly': 'NICE', 'Second By Pinkley': 'NICE', 'Second By Quayle': 'NICE', 'Second By Rabbie': 'NASTY', 'Second By Richard Hufford': 'NASTY', 'Second By Robert Adams': 'NICE', 'Second By Robertson': 'NASTY', 'Second By Rowsam': 'NICE', 'Second By Schurmann': 'NICE', 'Second By Smith': 'NASTY', 'Second By Smoody': 'NASTY', 'Second By Snodgrass': 'NASTY', 'Second By Tideman & Chieruzzi': 'NICE', 'Second By Tranquilizer': 'NASTY', 'Second By Weiderman': 'NICE', 'Second By Weiner': 'NICE', 'Second By White': 'NICE', 'Second By Wiliam Adams': 'NICE', 'Second By Yamachi': 'NICE', 'Second By Zimmerman': 'NICE', 'Second Chance': 'NASTY', 'Second Chance Attariq Version': 'NICE', 'Self Steem': 'NASTY', 'Self-Love A-Learner': 'NICE', 'Short Mem': 'NICE', 'Signaling Cheater': 'NASTY', 'Simple ANN': 'NASTY', 'Simple Exploiter': 'NASTY', 'Simple Identity ChecK': 'NASTY', 'Simpleton': 'NASTY', 'Skinner': 'NICE', 'Slanger': 'NICE', 'Slow Tit For Tat': 'NICE', 'Smart': 'NICE', 'Smart Cat': 'NICE', 'Smart Generous Tit For Tat': 'NICE', 'Smart Go By Majority': 'NICE', 'Smart Snake': 'NICE', 'Smart-Clever': 'NICE', 'Smarter Tat For Tit': 'NASTY', 'Smooth Grudger': 'NICE', 'Smooth Tit For Tat': 'NICE', 'Sneaky Tit For Tat': 'NASTY', 'Social Average': 'NASTY', 'Social Engineering': 'NASTY', 'Socio': 'NICE', 'Soft Grim': 'NICE', 'Soft Grudger': 'NICE', 'Solution B1': 'NASTY', 'Solution B5': 'NASTY', 'Sort': 'NICE', 'Spectrum Attacker': 'NASTY', 'Spiteful CC': 'NICE', 'Spiteful Tit For Tat': 'NICE', 'Split Brain Syndrome': 'NICE', 'Springter': 'NICE', 'Stabilize': 'NICE', 'Stalker': 'NICE', 'Star S': 'NASTY', 'Star SL': 'NASTY', 'Star SN': 'NASTY', 'Star Slave 1': 'NASTY', 'Star Slave 10': 'NASTY', 'Star Slave 2': 'NASTY', 'Star Slave 3': 'NASTY', 'Star Slave 4': 'NASTY', 'Star Slave 5': 'NASTY', 'Star Slave 6': 'NASTY', 'Star Slave 7': 'NASTY', 'Star Slave 8': 'NASTY', 'Star Slave 9': 'NASTY', 'Statistical Strategy': 'NASTY', 'Stefan Pennartz': 'NICE', 'Stochastic Cooperator': 'NASTY', 'Stochastic WSLS': 'NASTY', 'Stoic Mirror': 'NICE', 'Stoicalist': 'NICE', 'Strategist': 'NASTY', 'Stupidiot': 'NASTY', 'Sugar Strategy / Treasure Hunt': 'NASTY', 'Sumobox Fighter': 'NICE', 'Sun Tzu Bot': 'NICE', 'Suspicious Alternator': 'NASTY', 'Suspicious Tit For Tat': 'NASTY', 'Sweet Heart': 'NASTY', 'Syifa': 'NASTY', 'TF 1': 'NASTY', 'TF 2': 'NASTY', 'TF 3': 'NICE', 'TF2T & 2TFT': 'NICE', 'TOM Level 1 / Theory Of Mind Level 1': 'NASTY', 'TOM Level 2 / Theory Of Mind Level 2': 'NASTY', 'TOM Level 3 / Theory Of Mind Level 3': 'NICE', 'TPMS / Tree Predictive Matrix Strategy': 'NICE', 'Tages': 'NASTY', 'Teacher Pee While Standing, Student Pee While Running': 'NICE', 'Tester Eckhart Arnold Version': 'NASTY', 'The Calculated Mirror With A Fuse': 'NASTY', 'The Cave Breaker': 'NASTY', 'The Nasty A': 'NASTY', 'Theseus': 'NICE', 'Three Times Out': 'NICE', 'Threshold Punisher': 'NICE', 'Thresholded Trust Bot': 'NICE', 'Thue Morse': 'NASTY', 'Thue Morse Inverse': 'NASTY', 'Thumper': 'NICE', 'Tiny Brain': 'NASTY', 'Tip For Tap': 'NICE', 'Tit For 3 Tats': 'NICE', 'Tit For Increasing Tat': 'NICE', 'Tit For Tat But Not Too Forgiving': 'NICE', 'Tit For Tat Killer': 'NASTY', 'Toxic Mirror': 'NASTY', 'Trader': 'NICE', 'Tranquilizer Eckhart Arnold Version': 'NASTY', 'Tri-Brain': 'NICE', 'Tricky Cooperator': 'NASTY', 'Tricky Defector': 'NASTY', 'Tricky Level Punisher': 'NICE', 'Trust Ledger': 'NICE', 'Trust Score Sigmoid': 'NASTY', 'Trusty': 'NICE', 'Turan': 'NASTY', 'Tweedledee': 'NICE', 'Tweedledum': 'NICE', 'Tweetypie': 'NASTY', 'Unpredictable Tit For Tat': 'NASTY', 'Uranium': 'NICE', 'Usually Cooperates': 'NICE', 'Usually Defects': 'NASTY', 'Vandal': 'NASTY', 'Vengeful': 'NICE', 'Vengeful Cheater': 'NASTY', 'Verity': 'NICE', 'Very Bad': 'NICE', 'WHAgent': 'NASTY', 'Whale': 'NICE', 'William': 'NICE', 'Willing': 'NASTY', 'Win-Shift, Lose-Stay': 'NASTY', 'Winner 12': 'NICE', 'Winner 21': 'NICE', 'Worse & Worse / Worse & Worse 1': 'NASTY', 'Worse & Worse 2': 'NASTY', 'Worse & Worse 3': 'NICE', 'Your Choice Or My Choice': 'NICE', 'ZD-2026 / Zero Determinant 2026': 'NICE', 'ZD-G / Zero Determinant Generous': 'NICE', 'ZD-GTFT / Zero Determinant Generous Tit For Tat': 'NICE', 'ZD-M2 / Zero Determinant Memory 2': 'NASTY', 'ZD-MS / Zero Determinant Mischief': 'NASTY', 'ZD-PW2026 / Zero Determinant Psychological War 2026': 'NICE', 'ZD-Q / Zero Determinant Equalizer': 'NASTY', 'ZD-S / Zero Determinant Set': 'NASTY', 'ZD-X / Zero Determinant Extortion': 'NASTY', 'Zero Day': 'NASTY'}
 
 strategies_many_name = []
 for i in range(len(strategies)):
@@ -11616,17 +13378,26 @@ if __name__ == "__main__":
                                             if the_play != 'guess random strategy':
                                                 if the_play != 'categorize':
                                                     if the_play != 'search':
-                                                        input_strategy = input('enemy strategy: ')
-                                                        if input_strategy.lower() != 'player':
-                                                            the_strategy = many_name_strategies_function(input_strategy)
-                                                            print(f"\033[{1};1H\033[K", end="")
-                                                            print(f"\033[{2};1H\033[K", end="")
-                                                            the_play = 'play game'
+                                                        if the_play != 'strategies that not from this tournament':
+                                                            if the_play != 'strategies that from this tournament':
+                                                                input_strategy = input('enemy strategy: ')
+                                                                if input_strategy.lower() != 'player':
+                                                                    the_strategy = many_name_strategies_function(input_strategy)
+                                                                    print(f"\033[{1};1H\033[K", end="")
+                                                                    print(f"\033[{2};1H\033[K", end="")
+                                                                    the_play = 'play game'
+                                                                else:
+                                                                    the_play = 'play with friends'
+                                                            else:
+                                                                print([i for i in strategies if any(j in strategies_creator[i] for j in ('M. A. M. Attariq', 'Gemini', 'Chat-GPT', 'Claude', 'Dola', 'DeepSeek', 'Perplexity', 'Copilot', 'Meta'))])
                                                         else:
-                                                            the_play = 'play with friends'
+                                                            print([i for i in strategies if not any(j in strategies_creator[i] for j in ('M. A. M. Attariq', 'Gemini', 'Chat-GPT', 'Claude', 'Dola', 'DeepSeek', 'Perplexity', 'Copilot', 'Meta'))])
                                                     else:
                                                         searching = input('search what? ')
-                                                        print([i for i in strategies if searching in i])
+                                                        if '[CREATED BY]' not in searching:
+                                                            print([i for i in strategies if searching in i])
+                                                        else:
+                                                            print([i for i in strategies if searching.replace('[CREATED BY]', '') in strategies_creator[i]])
                                             else:
                                                 the_strategy = rnd.choice(strategies)
                                                 print(f"\033[{1};1H\033[K", end="")
@@ -11644,6 +13415,8 @@ if __name__ == "__main__":
                                         print('number of strategies'); print('NICE:NASTY')
                                         print('check comman list'); print('sort'); print('guess random strategy')
                                         print('categorize'); print('search')
+                                        print('strategies that not from this tournament')
+                                        print('strategies that from this tournament')
                                 else:
                                     NICE_sum = sum(1 for i in range(len(strategies)) if strategies_category[strategies[i]] == 'NICE')
                                     NASTY_sum = len(strategies) - NICE_sum
@@ -11665,7 +13438,7 @@ if __name__ == "__main__":
             strategy_score = [0] * len(strategies)
             strategies_category = {i: 'NICE' for i in strategies}
             tournament_try = 20
-            pairs = [(i, strategies.index('Always Cooperate / Cooperator / Saint / Dove')) for i in range(len(strategies))]
+            pairs = [(i, strategies.index('Always Cooperate / Cooperator / Dove / Saint')) for i in range(len(strategies))]
             tasks = [(i, j, False, 0) for i, j in pairs for _ in range(tournament_try)]
             print(f'processing categorize with {len(strategies)} strategies across {mp.cpu_count()} cores')
             with mp.Pool(processes=mp.cpu_count()) as pool:
@@ -11687,13 +13460,13 @@ if __name__ == "__main__":
                         elif sh_st.lower() == 'w':
                             player_choice = 'D'
                         elif sh_st.lower() == 's':
-                            player_choice = '[SKIP]'
+                            player_choice = '[OUT]'
                         else:
                             player_choice = rnd.choice(['C', 'D'])
-                        enemy_choice = think(the_strategy, 0, 'Player')
-                        if enemy_choice not in ('C', 'D', '[SKIP]'):
+                        enemy_choice = call_strategy(the_strategy, 0, 'Player')
+                        if enemy_choice not in ('C', 'D', '[OUT]'):
                             raise ValueError(f'ERROR {the_strategy}')
-                        if enemy_choice == '[SKIP]' or player_choice == '[SKIP]':
+                        if enemy_choice == '[OUT]' or player_choice == '[OUT]':
                             break
                         memory.append((player_choice, enemy_choice))
                         if player_choice == enemy_choice:
@@ -11703,16 +13476,16 @@ if __name__ == "__main__":
                         game_round += 1
                 else:
                     strategy_next_chat = [[''], ['']]
-                    strategy1_choice = think(strategy1, 1, strategy2)
-                    strategy2_choice = think(strategy2, 0, strategy1)
-                    if (strategy1_choice not in ('C', 'D', '[SKIP]')) or (strategy2_choice not in ('C', 'D', '[SKIP]')):
+                    strategy1_choice = call_strategy(strategy1, 1, strategy2)
+                    strategy2_choice = call_strategy(strategy2, 0, strategy1)
+                    if (strategy1_choice not in ('C', 'D', '[OUT]')) or (strategy2_choice not in ('C', 'D', '[OUT]')):
                         ERROR = []
-                        if strategy1_choice not in ('C', 'D', '[SKIP]'):
+                        if strategy1_choice not in ('C', 'D', '[OUT]'):
                             ERROR.append(strategy1)
-                        if strategy2_choice not in ('C', 'D', '[SKIP]'):
+                        if strategy2_choice not in ('C', 'D', '[OUT]'):
                             ERROR.append(strategy2)
                         raise NameError(f'ERROR {ERROR}')
-                    if '[SKIP]' in (strategy1_choice, strategy2_choice):
+                    if '[OUT]' in (strategy1_choice, strategy2_choice):
                         break
                     memory.append((strategy1_choice, strategy2_choice))
                     if strategy1_choice == strategy2_choice:
@@ -11823,7 +13596,7 @@ if __name__ == "__main__":
     else:
         with_noise = input('with noise? ')
         with_noise_flag = with_noise in ('yes', 'Y', 'True', '+', 'noise')
-        noise_prob = 0.05
+        noise_prob = max(min(float(input('noise value? ')), 1), 0) if with_noise_flag else 0.0
         tournament_try = 5
         strategy_score = [0] * len(strategies)
         strategy_win = [0] * len(strategies)
@@ -11833,7 +13606,7 @@ if __name__ == "__main__":
         tasks = [(i, j, with_noise_flag, noise_prob) for i, j in pairs for _ in range(tournament_try)]
         print(f'processing tournament with {len(strategies)} strategies across {mp.cpu_count()} cores')
         with mp.Pool(processes=mp.cpu_count()) as pool:
-            results = pool.map(run_match, tasks)
+            results = pool.map(run_match, tasks, chunksize=2000)
         for i, j, s1, s2 in results:
             strategy_score[i] += s1
             strategy_score[j] += s2
