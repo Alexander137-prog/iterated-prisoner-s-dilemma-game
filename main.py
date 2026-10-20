@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import multiprocessing as mp
 from scipy.stats import chisquare
+from scipy.optimize import minimize
 
 def plot_tournament_results(sorted_result, strategies_category, strategies_creator,
                              tournament_divider, time_divider, top_n=30, show_worst=False):
@@ -1122,25 +1123,140 @@ def reset_think_memory():
             [0,0], # 405
             [0, 0, 0, 0], # 406
             {
-                "riwayat_gerakan": [0, 0, 0, 0],
-                "gerakan_terakhir": 0,
-                "status_game": 0,
-                "counter_acak": 0
+                "history of move": [0, 0, 0, 0],
+                "last move": 0,
+                "game status": 0,
+                "random counter": 0
             }, # 407
             False, # 408
+            [False, False], # 409
+            {}, # 410
+            [False, False], # 411
+            0.5, # 412
+            [{'C':0.0, 'D':0.0}, -1.0], # 413
+            [{'C':0.0, 'D':0.0}, -1.0], # 414
+            {'s':0.5, 'l':3.0, 'SCO':{'C':0.0, 'D':0.0}}, # 415
+            {
+                "state": "COOPERATIVE",
+                "is_red_line": False,
+                "epoch_step": 0,
+                "debt": 0,
+                "systemic": 0,
+                "queue": [],
+                "opp_len": 0,
+                "opp_defects": 0,
+                "my_D": 0,
+                "my_C": 0,
+                "opp_coops_after_my_D": 0,
+                "opp_defects_after_my_C": 0,
+                "opp_coops_after_my_C": 0,
+                "opp_defects_after_my_D": 0,
+                "last_my": 'C',
+                "late_defects": 0,
+                "opp_last3": [],
+                "echo_forgive": 0,
+                "one_shot_forgives": 0,
+                "clean_peace": 0,
+                "deadlock": 0,
+                "probe_fired": False,
+                "warmth": rnd.uniform(0.40, 0.60),
+                "target_warmth": 0.50,
+                "intent": "normal",
+                "tactical": "adaptive",
+                "contrite": False,
+                "last_D_reason": None,
+                "consecutive_forgiven": 0,
+                "apology_mode": False,
+                "apology_steps": 0,
+                "apology_tries": 0,
+                "apology_max_tries": 2,
+                "first_D_was_noise": False,
+                "apology_opp_moves": [],
+                "forgiveness_exploiter": 0,
+                "opening_d": False,
+                "cc_pairs": 0,
+                "unprovoked_d": 0,
+                "p_noise_est": 0.0,
+                "intended_prev": 'C',
+                "bad_standing": False,
+                "bad_standing_turns": 0,
+                "red_line_cooldown": 0,
+                "nl_evidence": 0,
+                "nl_window": [],
+                "nl_scheduled": [],
+                "nl_debt_ledger": 0,
+                "nl_pardoned": 0,
+                "nl_balance": 0,
+                "nl_harvest_left": 0,
+                "nl_harvest_size": 0,
+                "nl_harvest_postponed": 0,
+                "nl_harvest_scheduled_at": 0,
+                "nl_my_flips": 0,
+                "nl_my_obs": 0,
+                "nl_provoked_until": 0,
+                "nl_pardon_step": 0,
+                "pending_reason": None,
+                "step_hint": 0,
+                "harvest_window": rnd.randint(3, 6),
+            }, # 416
+            {
+                "state": "COOPERATIVE",
+                "is_red_line": False,
+                "epoch_step": 0,
+                "debt": 0,
+                "systemic": 0,
+                "queue": [],
+                "opp_len": 0,
+                "opp_defects": 0,
+                "opp_coops_after_my_D": 0,
+                "my_D": 0,
+                "last_my": 'C',
+                "late_defects": 0,
+            }, # 417
+            {'Alpha':1.0, 'Beta':1.0, 'Forgiveness Threshold':0.45, 'Uncertainty Factor':2.5}, # 418
+            {'noise':0.0, 'n_tft_would_c':0, 'n_d_when_tft_would_c':0, 'z':0.0}, # 419
+            {
+                "discount_factor": 0.99,
+                "ewma_CC": [1.0, 1.0],
+                "ewma_CD": [1.0, 1.0],
+                "ewma_DC": [0.0, 1.0],
+                "ewma_DD": [0.0, 1.0],
+                "opp_model": np.array([1.0, 0.0, 1.0, 0.0]),
+                "my_policy": np.array([1.0, 0.0, 1.0, 0.0]),
+            }, # 420
+            {
+                "iso_mem": {
+                    "discount_factor": 0.99,
+                    "ewma_CC": [1.0, 1.0],
+                    "ewma_CD": [1.0, 1.0],
+                    "ewma_DC": [0.0, 1.0],
+                    "ewma_DD": [0.0, 1.0],
+                    "opp_model": np.array([1.0, 0.0, 1.0, 0.0]),
+                    "my_policy": np.array([1.0, 0.0, 1.0, 0.0]),
+                },
+                "n_tft_would_c": 0,
+                "n_d_when_tft_would_c": 0,
+                "z": 0.0,
+                "playing_iso": False,
+                "reward_history": [],
+            }, # 421
+            0.5, # 422
            ]
 
 def reset_immortal_memory():
     return [
-            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()},
-            [],
-            [],
-            {},
-            {},
-            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()},
-            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()},
-            {'Trust':rnd.random(), 'Trustworthiness':rnd.random(), 'Memory':{}},
-            {'Trust':rnd.random(), 'Trustworthiness':rnd.random(), 'Memory':{}},
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()}, # 0
+            [], # 1
+            [], # 2
+            {}, # 3
+            {}, # 4
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()}, # 5
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random()}, # 6
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random(), 'Memory':{}}, # 7
+            {'Trust':rnd.random(), 'Trustworthiness':rnd.random(), 'Memory':{}}, # 8
+            {},  # 9
+            {},  # 10
+            {},  # 11
            ]
 
 def cycle_detec(opp_index, min_ = 1, max_ = 12, offset = 0):
@@ -1163,16 +1279,16 @@ def flip(the_choice):
 def rnd_prob(prob):
     return 'C' if rnd.random() <= prob else 'D'
 
-def frequency(myType, opType, opp_index):
+def frequency(myAction, opResponse, opp_index):
     self_index = 1 - opp_index
     unziped_memory = list(zip(*memory))
     self_history, opp_history = unziped_memory[self_index], unziped_memory[opp_index]
     i = game_round-1
     N = 0;  M = 0
     while i > 0:
-        if self_history[-(i+1)] == myType:
+        if self_history[-(i+1)] == myAction:
             N += 1
-            if opp_history[-i] == opType:
+            if opp_history[-i] == opResponse:
                 M += 1
         i -= 1
     if N == 0:  return None
@@ -1827,7 +1943,7 @@ def call_strategy(strategy,opp_index,opp_name):
                     think_memory[35][0] = True
                 think_memory[35][2] = 0
             return try_return(memory[-1][opp_index] if game_round > 0 else 'C')
-    elif strategy == 'Easy Go / Reverse Grudger':
+    elif strategy == 'Easy Go / Reverse Grudger / Fool Me Forever':
         if game_round > 0:
             if (think_memory[64] == 1) or (memory[-1][opp_index] == 'D'):
                 if think_memory[64] == 0:
@@ -3799,11 +3915,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         fortress_rule = instruction[think_memory[208]][(memory[-1][opp_index] == 'D')]
@@ -3818,11 +3934,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         fortress_rule = instruction[think_memory[209]][(memory[-1][opp_index] == 'D')]
@@ -4297,11 +4413,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[247]][(memory[-1][opp_index] == 'D')]
@@ -4316,11 +4432,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[248]][(memory[-1][opp_index] == 'D')]
@@ -4335,11 +4451,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[249]][(memory[-1][opp_index] == 'D')]
@@ -4354,11 +4470,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[250]][(memory[-1][opp_index] == 'D')]
@@ -4373,11 +4489,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[251]][(memory[-1][opp_index] == 'D')]
@@ -4392,11 +4508,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[252]][(memory[-1][opp_index] == 'D')]
@@ -4411,11 +4527,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[253]][(memory[-1][opp_index] == 'D')]
@@ -4430,11 +4546,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[254]][(memory[-1][opp_index] == 'D')]
@@ -4449,11 +4565,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[255]][(memory[-1][opp_index] == 'D')]
@@ -4468,11 +4584,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[256]][(memory[-1][opp_index] == 'D')]
@@ -4487,11 +4603,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[257]][(memory[-1][opp_index] == 'D')]
@@ -4506,11 +4622,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[258]][(memory[-1][opp_index] == 'D')]
@@ -4525,11 +4641,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[259]][(memory[-1][opp_index] == 'D')]
@@ -4544,11 +4660,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[260]][(memory[-1][opp_index] == 'D')]
@@ -4563,11 +4679,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[261]][(memory[-1][opp_index] == 'D')]
@@ -4582,11 +4698,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[262]][(memory[-1][opp_index] == 'D')]
@@ -5653,83 +5769,107 @@ def call_strategy(strategy,opp_index,opp_name):
             probability = 20 / current_round
             return 'C' if rnd.random() <= probability else 'D'
     elif strategy == 'ZD-X / Zero Determinant Extortion':
+        if not game_round:
+            return 'C'
         phi = 0.2
         s = 0.1
         l = 1.0
-        s_min = -min((RPST['T'] - l) / (l - RPST['S']), (l - RPST['S']) / (RPST['T'] - l))
-        if (l < RPST['P']) or (l > RPST['R']) or (s > 1) or (s < s_min):
-           raise ValueError
+        clamped_l = max(min(l, RPST['R']), RPST['P'])
+        s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+        phi = max(min(phi, 1), 0)
+        s = max(min(s, 1), s_min)
+        l = clamped_l
         p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
         p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
         p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
-        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
     elif strategy == 'ZD-G / Zero Determinant Generous':
+        if not game_round:
+            return 'C'
         phi = 1/8
         s = 0.5
         l = 3.0
-        s_min = -min((RPST['T'] - l) / (l - RPST['S']), (l - RPST['S']) / (RPST['T'] - l))
-        if (l < RPST['P']) or (l > RPST['R']) or (s > 1) or (s < s_min):
-           raise ValueError
+        clamped_l = max(min(l, RPST['R']), RPST['P'])
+        s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+        phi = max(min(phi, 1), 0)
+        s = max(min(s, 1), s_min)
+        l = clamped_l
         p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
         p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
         p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
-        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
     elif strategy == 'ZD-GTFT / Zero Determinant Generous Tit For Tat':
+        if not game_round:
+            return 'C'
         phi = 0.25
         s = 0.5
         l = 3.0
-        s_min = -min((RPST['T'] - l) / (l - RPST['S']), (l - RPST['S']) / (RPST['T'] - l))
-        if (l < RPST['P']) or (l > RPST['R']) or (s > 1) or (s < s_min):
-           raise ValueError
+        clamped_l = max(min(l, RPST['R']), RPST['P'])
+        s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+        phi = max(min(phi, 1), 0)
+        s = max(min(s, 1), s_min)
+        l = clamped_l
         p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
         p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
         p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
-        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
     elif strategy == 'ZD-MS / Zero Determinant Mischief':
+        if not game_round:
+            return 'C'
         phi = 0.1
         s = 0.0
         l = 1.0
-        s_min = -min((RPST['T'] - l) / (l - RPST['S']), (l - RPST['S']) / (RPST['T'] - l))
-        if (l < RPST['P']) or (l > RPST['R']) or (s > 1) or (s < s_min):
-           raise ValueError
+        clamped_l = max(min(l, RPST['R']), RPST['P'])
+        s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+        phi = max(min(phi, 1), 0)
+        s = max(min(s, 1), s_min)
+        l = clamped_l
         p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
         p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
         p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
-        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
     elif strategy == 'ZD-S / Zero Determinant Set':
+        if not game_round:
+            return 'C'
         phi = 1/4
         s = 0.0
         l = 2.0
-        s_min = -min((RPST['T'] - l) / (l - RPST['S']), (l - RPST['S']) / (RPST['T'] - l))
-        if (l < RPST['P']) or (l > RPST['R']) or (s > 1) or (s < s_min):
-           raise ValueError
+        clamped_l = max(min(l, RPST['R']), RPST['P'])
+        s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+        phi = max(min(phi, 1), 0)
+        s = max(min(s, 1), s_min)
+        l = clamped_l
         p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
         p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
         p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
-        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
     elif strategy == 'ZD-Q / Zero Determinant Equalizer':
+        if not game_round:
+            return 'C'
         phi = 0.125
         s = 0.0
         l = 2.0
-        s_min = -min((RPST['T'] - l) / (l - RPST['S']), (l - RPST['S']) / (RPST['T'] - l))
-        if (l < RPST['P']) or (l > RPST['R']) or (s > 1) or (s < s_min):
-           raise ValueError
+        clamped_l = max(min(l, RPST['R']), RPST['P'])
+        s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+        phi = max(min(phi, 1), 0)
+        s = max(min(s, 1), s_min)
+        l = clamped_l
         p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
         p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
         p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
         p4 = phi * (1 - s) * (l - RPST['P'])
         four_vector = [p1, p2, p3, p4]
-        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D')) if game_round > 0 else 0] else 'D'
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
     elif strategy == 'Laran':
         if not game_round:
             return "C"
@@ -5817,11 +5957,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[319]][(memory[-1][opp_index] == 'D')]
@@ -5836,11 +5976,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[320]][(memory[-1][opp_index] == 'D')]
@@ -5855,11 +5995,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         finite_state_rule = instruction[think_memory[321]][(memory[-1][opp_index] == 'D')]
@@ -7226,7 +7366,7 @@ def call_strategy(strategy,opp_index,opp_name):
                     E = memory[-1][opp_index]
                 else:
                     E = flip(memory[-1][opp_index])
-                if A == 'D':
+                if E == 'D':
                     return '[OUT]'
             else:
                 if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
@@ -7268,7 +7408,7 @@ def call_strategy(strategy,opp_index,opp_name):
                     E = memory[-1][opp_index]
                 else:
                     E = flip(memory[-1][opp_index])
-                if A == 'D':
+                if E == 'D':
                     return '[OUT]'
             else:
                 if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
@@ -7303,7 +7443,7 @@ def call_strategy(strategy,opp_index,opp_name):
                     E = memory[-1][opp_index]
                 else:
                     E = flip(memory[-1][opp_index])
-                if A == 'D':
+                if E == 'D':
                     return '[OUT]'
             else:
                 if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
@@ -7344,14 +7484,14 @@ def call_strategy(strategy,opp_index,opp_name):
                 immortal_memory[8]['Memory'][opp_name] = 'GOOD'
             else:
                 immortal_memory[8]['Memory'][opp_name] = 'BAD'
-            if rnd.random() < immortal_memory[7]['Trust']:
+            if rnd.random() < immortal_memory[8]['Trust']:
                 p_c = sum((memory[i][opp_index] == 'C') for i in range(game_round)) / game_round
                 A = 0.5 + abs(p_c - 0.5)
                 if rnd.random() < A:
                     E = memory[-1][opp_index]
                 else:
                     E = flip(memory[-1][opp_index])
-                if A == 'D':
+                if E == 'D':
                     return '[OUT]'
             else:
                 if opp_name not in ['MSAgent', 'WHAgent', 'RLAgent', 'GossipAgent', 'RLGossipAgent']:
@@ -7635,11 +7775,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[392]][(memory[-1][opp_index] == 'D')]
@@ -7654,11 +7794,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[393]][(memory[-1][opp_index] == 'D')]
@@ -7673,11 +7813,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[394]][(memory[-1][opp_index] == 'D')]
@@ -7692,11 +7832,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[395]][(memory[-1][opp_index] == 'D')]
@@ -7711,11 +7851,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[396]][(memory[-1][opp_index] == 'D')]
@@ -7730,11 +7870,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[397]][(memory[-1][opp_index] == 'D')]
@@ -7749,11 +7889,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[398]][(memory[-1][opp_index] == 'D')]
@@ -7768,11 +7908,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[399]][(memory[-1][opp_index] == 'D')]
@@ -7787,11 +7927,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[400]][(memory[-1][opp_index] == 'D')]
@@ -7806,11 +7946,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[401]][(memory[-1][opp_index] == 'D')]
@@ -7825,11 +7965,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[402]][(memory[-1][opp_index] == 'D')]
@@ -7844,11 +7984,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         rule = instruction[think_memory[403]][(memory[-1][opp_index] == 'D')]
@@ -7917,7 +8057,7 @@ def call_strategy(strategy,opp_index,opp_name):
         E_sh = (pc * RPST['R']) + ((1 - pc) * RPST['S'])
         E_st = (pd * RPST['T']) + ((1 - pd) * RPST['P'])
         return 'D' if E_st > E_sh else 'C'
-    elif strategy == 'Second By Named Withheld':
+    elif strategy == 'Second By GRASR\'s Author':
         turn = game_round + 1
         r = rnd.random()
         grasr = (memory[-1][self_index] == 'D') if game_round > 0 else 0
@@ -7937,80 +8077,1172 @@ def call_strategy(strategy,opp_index,opp_name):
             else:
                 if turn < 57:
                     if turn > 52:
-                        think_memory[407]["riwayat_gerakan"][turn - 52 - 1] = think_memory[407]["gerakan_terakhir"] + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
+                        think_memory[407]["history of move"][turn - 52 - 1] = think_memory[407]["last move"] + ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
                     grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
                     if grasr - 1 < 0:
-                        think_memory[407]["gerakan_terakhir"] = 2
+                        think_memory[407]["last move"] = 2
                     else:
-                        think_memory[407]["gerakan_terakhir"] = 4
+                        think_memory[407]["last move"] = 4
                     return 'CD'[grasr]
                 elif turn == 57:
                     if score[opp_index] <= 135:
-                        think_memory[407]["status_game"] = 3
+                        think_memory[407]["game status"] = 3
                         grasr = 1
                         return 'CD'[grasr]
                     else:
-                        j = think_memory[407]["riwayat_gerakan"][1]
+                        j = think_memory[407]["history of move"][1]
                         if j == 3:
-                            if think_memory[407]["riwayat_gerakan"][0] == 2:
-                                if think_memory[407]["riwayat_gerakan"][2] == 4:
-                                    if think_memory[407]["riwayat_gerakan"][3] == 2:
-                                        think_memory[407]["status_game"] = 4
+                            if think_memory[407]["history of move"][0] == 2:
+                                if think_memory[407]["history of move"][2] == 4:
+                                    if think_memory[407]["history of move"][3] == 2:
+                                        think_memory[407]["game status"] = 4
                                         grasr = 0
                                         if turn >= 118:
-                                            think_memory[407]["status_game"] = 2
+                                            think_memory[407]["game status"] = 2
                                         return 'CD'[grasr]
-                            think_memory[407]["status_game"] = 1
-                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            think_memory[407]["game status"] = 1
+                            think_memory[407]["random counter"] = int(r * 10.0 + 5.0)
                             grasr = 0
                             return 'CD'[grasr]
                         elif j == 4:
-                            if think_memory[407]["riwayat_gerakan"][0] == 3:
-                                if think_memory[407]["riwayat_gerakan"][2] == 3:
-                                    think_memory[407]["status_game"] = 2
+                            if think_memory[407]["history of move"][0] == 3:
+                                if think_memory[407]["history of move"][2] == 3:
+                                    think_memory[407]["game status"] = 2
                                     grasr = 0
                                     return 'CD'[grasr]
-                            think_memory[407]["status_game"] = 1
-                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            think_memory[407]["game status"] = 1
+                            think_memory[407]["random counter"] = int(r * 10.0 + 5.0)
                             grasr = 0
                             return 'CD'[grasr]
                         elif j == 5:
-                            if think_memory[407]["riwayat_gerakan"][0] == 5:
-                                if think_memory[407]["riwayat_gerakan"][2] == 5:
-                                    think_memory[407]["status_game"] = 2
+                            if think_memory[407]["history of move"][0] == 5:
+                                if think_memory[407]["history of move"][2] == 5:
+                                    think_memory[407]["game status"] = 2
                                     grasr = 0
                                     return 'CD'[grasr]
-                            think_memory[407]["status_game"] = 1
-                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            think_memory[407]["game status"] = 1
+                            think_memory[407]["random counter"] = int(r * 10.0 + 5.0)
                             grasr = 0
                             return 'CD'[grasr]
                         else:
-                            think_memory[407]["status_game"] = 1
-                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            think_memory[407]["game status"] = 1
+                            think_memory[407]["random counter"] = int(r * 10.0 + 5.0)
                             grasr = 0
                             return 'CD'[grasr]
                 else:
-                    if think_memory[407]["status_game"] == 1:
-                        if think_memory[407]["counter_acak"] <= 0:
+                    if think_memory[407]["game status"] == 1:
+                        if think_memory[407]["random counter"] <= 0:
                             grasr = 1
-                            think_memory[407]["counter_acak"] = int(r * 10.0 + 5.0)
+                            think_memory[407]["random counter"] = int(r * 10.0 + 5.0)
                             return 'CD'[grasr]
                         else:
                             grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
-                            think_memory[407]["counter_acak"] = think_memory[407]["counter_acak"] - 1
+                            think_memory[407]["random counter"] = think_memory[407]["random counter"] - 1
                             return 'CD'[grasr]
-                    elif think_memory[407]["status_game"] == 2:
+                    elif think_memory[407]["game status"] == 2:
                         grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
                         return 'CD'[grasr]
-                    elif think_memory[407]["status_game"] == 3:
+                    elif think_memory[407]["game status"] == 3:
                         grasr = 1
                         return 'CD'[grasr]
-                    elif think_memory[407]["status_game"] == 4:
+                    elif think_memory[407]["game status"] == 4:
                         grasr = 0
                         return 'CD'[grasr]
                     else:
                         grasr = ((memory[-1][opp_index] == 'D') if game_round > 0 else 0)
                         return 'CD'[grasr]
+    elif strategy == 'Schwoba Sen Gnitz':
+        if not game_round:
+            return 'C'
+        if not think_memory[409][0] and memory[-1][opp_index] == 'D':
+            think_memory[409][0] = True
+        if not think_memory[409][0]:
+            return 'C'
+        if game_round >= 10:
+            letzte_10_gegner = [memory[-i][opp_index] for i in range(10, 0, -1)]
+            if all(zug == 'D' for zug in letzte_10_gegner):
+                think_memory[409][1] = True
+        if think_memory[409][1]:
+            return 'D'
+        if memory[-1][opp_index] == 'D':
+            return rnd_prob(0.897)
+        return rnd_prob(1 - 0.102)
+    elif strategy == 'Chimera':
+        PROBE_FSM = "0C8D6C0D3C2D0C3D1D6D2C8D3C1D4D2C5CBDAD7CDD7DFD3D3C8D5D7D3D7CBC8D"
+        FSMS = {
+            "CCCCC": "0D0CAD4D0CBD5C3D9C7D5CDD6C6DAD8C2DDDEDBD0C9C3D9D7C3CED6CBD1C1D2DCD",
+            "CCCCD": "0C0CCD7C7DFDBC3D3DDDCDCC2C5DCC3CBC9D5C2D0C6DADFCED3CEC1C4D4D4CED0D",
+            "CCCDC": "CDDD3DFD2D1D8C3C2CFD3C2C7CFCCC8CADCDAD9DCCACAC9DDCEDADCC7CCDCD5DFC",
+            "CCCDD": "0C9DDDACAC0CED3C3D4D0D6C0D5C4DECCC5D1CAC5D8D6CFD7C3DBDDDDDDC5CFD6C",
+            "CCDCC": "1D4CCC7CCD2C3D3D3D4D6DCD4C5CACBCDD8DEC9D3D2DFDBDFD2C4C3DAC1D5CAD6D",
+            "CCDCD": "8CBCDC1C1D5D4C7D1DED6C8DEC8C7C4D6CEDED1D8C6D7D1DCC8C9DFC0C8CCC5D4C",
+            "CCDDC": "5CDDEDFCDC6D7D9D9DAD7C1CDD7DFDAD4CED2CBD5D2CFD8D0CCC4DFD3D0C8DCD7D",
+            "CCDDD": "6DED7DEC0DAC6C4D7D6DBDAC1C2D4CFC0C6D6D9DCD7D2C8CFC4D2D6CDD6DBD8D8D",
+            "CDCCC": "0C0CCD3D6C2DED3D3D0C0DCDAD5CCD3D1C5C5C0C0DBD8CFD5D8CBDDD7DDDDDFD2C",
+            "CDCCD": "0C0DCD7D6C2DED3D3D0C0CCDAD5CCD3C1C5C5C0C0DBC8DFD5D8DBDDD7CBDDC4D6C",
+            "CDCDC": "1C0C0D3D6C2DEC3D3D0D0CCDAD5C3D3C1C5D5C0C0DBD8CFD5C8CCCDD7DDDDDFD2D",
+            "CDCDD": "0C0CCD3C6D2CED3D3D9C0CCCAD5CDC3D1C5C5D0D0D5D8CFD5C8CBCDD7DDCDDFC2C",
+            "CDDCC": "0C0DCC3D0C2DED3D3D0D0DCDAD5CCD3D1C5C5C0D0DBD8CFD5D8CBDDD7DDDDDFD4C",
+            "CDDCD": "0C0CDDFD6C2DED3D3D0C0DCDDD5DCC3D1D6C5CFD0DBD8DED5D5CBDDD7DDDDDDD2C",
+            "CDDDD": "ED1CDCDDCCFD6C6D8DFDDD5D6D5D6D2CCDADCD8C0DCD3CBC5DACDC5D8DDDBC4D2C",
+            "DCCCC": "3C9DCD2D3CEC0D8DFDBD5C9C9D4D8C7C5D4CAD7C3C2D7D6DEDCCFD3C3DDCECFDFC",
+            "DCCDC": "1C0DCC3D6C2CED3D3D2D0DCCAD5CCC3D1D5D5D0CEDBD8CFD5D8DBDDDBDDD8CFD2C",
+            "DCDCD": "0C0DFC6C1D9D9C7D8DBC2CCDDC5CEC9D6C6DAD4C2CCD5CFDADECADDC7D8C3D8CBD",
+            "DCDDD": "3D1CED9C9D1D9C8DDC2C8C1CDD5CCD7C0C5CEC5C4CBDBC8C6C2D7D8CACBCAC0D5D",
+            "DDCCC": "3D9D9CAD5D5D5D3D3D4DAD1C7DFC3DCDAC6DBD4DBC7C6C1D7C5DDDDC7D5C7D4DFD",
+            "DDCCD": "0CBCCD3D6C2C3D0DFC0D0CCDAD5D7D4C4C5D2C0C7DBD8CFD8C8C0D5D7DDDDCFC8C",
+            "DDCDC": "0CDCDD3C6C2DEC3D3D5CADCDAD1CCC3D1C5C5D6D0DBD8CFD5D8DBDDD7DDDDDFD2C",
+            "DDCDD": "3D1D4DCDBCFD4C1C4C9DFD4DFD7CAD4C1C3DFD5C4DDC4C3C7D0C4D6CFD0DFDCDAD",
+            "DDDCD": "CC0DCC3D6C2D8D7C3D0C4D5CFD5DCC3C5C5D5C0D0DBDECFD5D6D2D2D7CDD7C8C8D",
+            "DDDDC": "3CFDCDAC2D1DED3DDD0D0DCCAC5CCD7C7C5C0C8D0CBD8CFD5D0CBD6D7DEDDDFD6D",
+            "DDDDD": "8D8D1CED6CBCCC0D4CADFD1DDC2C6DDC5D5CDCED2C7D5C6D8DCC5CDDDD2D1D0D2D",
+        }
+        def decode_fsm(enc):
+            trans = {}
+            for state in range(16):
+                for i, inp in enumerate(['C', 'D']):
+                    idx = (state * 2 + i) * 2
+                    trans[(state, inp)] = (int(enc[idx], 16), enc[idx + 1])
+            return trans
+        def _load_fsm(pattern):
+            if pattern not in FSMS:
+                pattern = "DDDDD"
+            if pattern not in think_memory[410]['cache']:
+                data = FSMS[pattern]
+                think_memory[410]['cache'][pattern] = (
+                    int(data[0], 16),
+                    data[1],
+                    decode_fsm(data[2:])
+                )
+            think_memory[410]['state'], init_act, think_memory[410]['trans'] = think_memory[410]['cache'][pattern]
+            return init_act
+        CHECK_INTERVAL = 28
+        RESET_THRESHOLD = -20
+        def _reset_state():
+            think_memory[410]['trans'] = None
+            think_memory[410]['state'] = 0
+            think_memory[410]['probe state'] = 0
+            think_memory[410]['in probe'] = True
+            think_memory[410]['in alld'] = False
+        if not game_round:
+            think_memory[410]['probe'] = decode_fsm(PROBE_FSM)
+            think_memory[410]['cache'] = {}
+            _reset_state()
+        chimera_score = score[self_index] - score[opp_index]
+        if think_memory[410]['in probe']:
+            if game_round == 0:
+                return 'C'
+            if game_round < 5:
+                think_memory[410]['probe state'], out = think_memory[410]['probe'][(think_memory[410]['probe state'], memory[-1][opp_index])]
+                return out
+            think_memory[410]['in probe'] = False
+            pattern = ''.join([memory[m][opp_index] for m in range(5)])
+            _load_fsm(pattern)
+            key = (think_memory[410]['state'], memory[-1][opp_index])
+            if key in think_memory[410]['trans']:
+                think_memory[410]['state'], out = think_memory[410]['trans'][key]
+                return out
+            return 'C'
+        if not think_memory[410]['in alld'] and game_round >= CHECK_INTERVAL and chimera_score < RESET_THRESHOLD:
+            think_memory[410]['in alld'] = True
+        if think_memory[410]['in alld']:
+            return 'D'
+        key = (think_memory[410]['state'], memory[-1][opp_index])
+        if key in think_memory[410]['trans']:
+            think_memory[410]['state'], out = think_memory[410]['trans'][key]
+            return out
+        return 'C'
+    elif strategy == 'Adaptive Cooperator':
+        if score[opp_index] > score[self_index] * 2:
+            think_memory[411][1] = True
+        elif score[opp_index] > score[self_index]:
+            think_memory[411][0] = True
+        if think_memory[411][1]:
+            return 'D'
+        elif think_memory[411][0]:
+            if not game_round:
+                return 'C'
+            else:
+                return memory[-1][opp_index]
+        else:
+            return 'C'
+    elif strategy == 'Hill Climb':
+        if not game_round:
+            return 'C'
+        if memory[-1][opp_index] == 'D':
+            think_memory[412] += 1 / 100
+            if(think_memory[412] >= 1):
+                think_memory[412] = 0.5
+        if memory[-1][opp_index] == 'C':
+            think_memory[412] -= 1 / 100
+            if(think_memory[412] <= 0):
+                think_memory[412] = 0.1
+        return rnd_prob(think_memory[412])
+    elif strategy == 'Greedy':
+        pay_off_matrix = {
+            ('C', 'C'):RPST['R'],
+            ('C', 'D'):RPST['S'],
+            ('D', 'C'):RPST['T'],
+            ('D', 'D'):RPST['P'],
+        }
+        UNIFORM = -1
+        if not game_round:
+            think_memory[413][1] = UNIFORM
+        if game_round > 0:
+            if think_memory[413][1] == UNIFORM:
+                weight = 1 / sum((memory[i][self_index] == memory[-1][self_index]) for i in range(game_round))
+            else:
+                weight = think_memory[413][1]
+            think_memory[413][0][memory[-1][self_index]] += weight * (pay_off_matrix[(memory[-1][self_index], memory[-1][opp_index])] - think_memory[413][0][memory[-1][self_index]])
+        return max(think_memory[413][0], key=think_memory[413][0].get)
+    elif strategy == 'Epsilon-Greedy':
+        pay_off_matrix = {
+            ('C', 'C'):RPST['R'],
+            ('C', 'D'):RPST['S'],
+            ('D', 'C'):RPST['T'],
+            ('D', 'D'):RPST['P'],
+        }
+        UNIFORM = -1
+        epsilon = 0.1
+        if not game_round:
+            think_memory[414][1] = UNIFORM
+        if game_round > 0:
+            if think_memory[414][1] == UNIFORM:
+                weight = 1 / sum((memory[i][self_index] == memory[-1][self_index]) for i in range(game_round))
+            else:
+                weight = think_memory[414][1]
+            think_memory[414][0][memory[-1][self_index]] += weight * (pay_off_matrix[(memory[-1][self_index], memory[-1][opp_index])] - think_memory[414][0][memory[-1][self_index]])
+        if rnd.random() <= epsilon:
+            return rnd_prob(0.5)
+        else:
+            return max(think_memory[414][0], key=think_memory[414][0].get)
+    elif strategy == 'AZD / Adaptive Zero Determinant':
+        payoff = {
+            ('C', 'C'):RPST['R'],
+            ('D', 'C'):RPST['S'],
+            ('C', 'D'):RPST['T'],
+            ('D', 'D'):RPST['P'],
+        }
+        if not game_round:
+            return 'C'
+        phi = 0.125
+        s = think_memory[415]['s']
+        l = think_memory[415]['l']
+        if game_round > 0:
+            think_memory[415]['SCO'][memory[-1][self_index]] += payoff[(memory[-1][self_index], memory[-1][opp_index])]
+            d = rnd.randint(0, 9) / 1000
+            if think_memory[415]['SCO']['C'] > think_memory[415]['SCO']['D']:
+                if l + d > RPST['R']:
+                    l = (l + RPST['R']) / 2
+                else:
+                    l += d
+                clamped_l = max(min(l, RPST['R']), RPST['P'])
+                s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+                if s - d < s_min:
+                    s = (s + s_min) / 2
+                else:
+                    s = s - d
+            else:
+                if l - d < RPST['P']:
+                    l = (l + RPST['P']) / 2
+                else:
+                    l -= d
+                clamped_l = max(min(l, RPST['R']), RPST['P'])
+                s_min = -min((RPST['T'] - clamped_l) / (clamped_l - RPST['S']), (clamped_l - RPST['S']) / (RPST['T'] - clamped_l))
+                if s + d > 1:
+                    s = (s + 1) / 2
+                else:
+                    s += d
+            think_memory[415]['s'] = s
+            think_memory[415]['l'] = l
+        phi = max(min(phi, 1), 0)
+        s = max(min(s, 1), s_min)
+        l = clamped_l
+        p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
+        p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
+        p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
+        p4 = phi * (1 - s) * (l - RPST['P'])
+        four_vector = [p1, p2, p3, p4]
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
+    elif strategy == 'ZeroResp V5.3':
+        zr = think_memory[416]
+        step = game_round + 1
+        eff_len = tournament_avg_round
+        remaining = max(0, eff_len - step + 1)
+        my_hist = [m[self_index] for m in memory]
+        opp_hist = [m[opp_index] for m in memory]
+        zr['pending_reason'] = None
+        zr['step_hint'] = 0
+        def zr_pay(a, b):
+            if a == 'C':
+                return RPST['R'] if b == 'C' else RPST['S']
+            return RPST['T'] if b == 'C' else RPST['P']
+        def zr_push3(x):
+            zr['opp_last3'].append(x)
+            if len(zr['opp_last3']) > 4:
+                zr['opp_last3'].pop(0)
+        def zr_live_coop():
+            return 1.0 if zr['opp_len'] == 0 else 1.0 - (zr['opp_defects'] / zr['opp_len'])
+        def zr_late_threshold():
+            return int(eff_len * 0.75)
+        def zr_is_hostile():
+            return zr['opp_len'] >= 10 and zr_live_coop() < 0.40
+        def zr_is_soft_hostile():
+            return zr['opp_len'] >= 10 and zr_live_coop() < 0.65
+        def zr_adaptive_epoch():
+            if zr['warmth'] < 0.3:
+                return 10
+            if zr['warmth'] > 0.7:
+                return 40
+            return 25
+        def zr_detect_intent():
+            if zr['my_C'] == 0 or zr['opp_len'] < 15:
+                return "normal"
+            r = zr['opp_defects_after_my_C'] / max(1, zr['my_C'])
+            if r > 0.40:
+                return "exploitation"
+            if r < 0.25 and 0.02 < (zr['opp_defects'] / max(1, zr['opp_len'])) < 0.25:
+                return "noise"
+            return "normal"
+        def zr_classify_tactical():
+            if zr['opp_len'] < 15:
+                return "adaptive"
+            cr = zr_live_coop()
+            if cr > 0.95:
+                return "cooperator"
+            if cr < 0.35:
+                return "aggressor"
+            if zr['opp_len'] > eff_len * 0.65:
+                early = zr['opp_defects'] - zr['late_defects']
+                if early <= 3 and zr['late_defects'] >= 1:
+                    return "backstabber"
+            if zr['my_D'] > 0 and zr['opp_coops_after_my_D'] == 0 and zr['opp_defects'] > 5:
+                return "grudger"
+            if zr['deadlock'] >= 2 or (zr['opp_len'] > 20 and 0.40 < cr < 0.60):
+                return "oscillator"
+            return "adaptive"
+        def zr_update_target_warmth():
+            if zr['opp_len'] < 10:
+                return
+            ca = zr['opp_coops_after_my_C'] / max(1, zr['my_C'])
+            od = zr['opp_defects'] / max(1, zr['opp_len'])
+            md = zr['my_D'] / max(1, zr['opp_len'])
+            t = 0.5 + 0.3 * (ca - 0.5) - 0.4 * max(0.0, od - 0.02) - 0.2 * max(0.0, md - od)
+            if zr['tactical'] == "cooperator":
+                t += 0.20
+            elif zr['tactical'] == "aggressor":
+                t -= 0.30
+            elif zr['tactical'] == "oscillator":
+                t -= 0.15
+            elif zr['tactical'] == "backstabber" and zr['opp_len'] > eff_len * 0.65:
+                t -= 0.25
+            if zr['forgiveness_exploiter'] >= 2:
+                t -= 0.20
+            zr['target_warmth'] = max(0.10, min(0.90, t))
+        def zr_align_warmth(st):
+            if st % 5 == 0 and st <= 25:
+                zr['warmth'] += (zr['target_warmth'] - zr['warmth']) * 0.10
+            elif st > 25 and st % zr_adaptive_epoch() == 0:
+                zr['warmth'] = max(0.10, min(0.90, zr['warmth'] + (zr['target_warmth'] - zr['warmth']) * 0.25))
+        def zr_nl_proven():
+            return zr['nl_my_flips'] > 0
+        def zr_nl_active():
+            return zr_nl_proven() and zr['nl_balance'] >= 0
+        def zr_is_noisy():
+            if zr_nl_active():
+                return zr['p_noise_est'] > 0.015 and (zr['cc_pairs'] + zr['nl_my_obs']) > 10
+            return zr['p_noise_est'] > 0.015 and zr['cc_pairs'] > 10
+        def zr_nl_is_unexplained():
+            if zr['bad_standing'] or zr['contrite']:
+                return False
+            if not my_hist:
+                return True
+            if zr['nl_provoked_until'] and zr['step_hint'] <= zr['nl_provoked_until']:
+                return False
+            return my_hist[-1] == 'C'
+        def zr_enter_red_line():
+            if zr_is_noisy():
+                zr['state'] = 'RED_LINE_COOLDOWN'
+                zr['is_red_line'] = True
+                zr['red_line_cooldown'] = int(12 + 20 * (1 - min(zr['p_noise_est'] * 10, 0.9)))
+                zr['warmth'] = 0.15
+                zr['queue'].clear()
+                zr['debt'] = 0
+                return
+            zr['state'] = 'RED_LINE'
+            zr['is_red_line'] = True
+            zr['warmth'] = 0.0
+            zr['target_warmth'] = 0.0
+            zr['queue'].clear()
+            zr['debt'] = 0
+            zr['echo_forgive'] = 0
+            zr['apology_mode'] = False
+        def zr_budget():
+            jitter = rnd.randint(0, 2)
+            if zr['warmth'] > 0.7:
+                jitter += 1
+            if zr['warmth'] < 0.4:
+                jitter -= 1
+            if zr['tactical'] == "aggressor":
+                jitter = max(jitter - 2, 0)
+            if zr_is_noisy():
+                jitter += int(zr['p_noise_est'] * 40)
+            return max(2, min(12, 3 + jitter))
+        def zr_play(action, reason="normal", intended=None):
+            if intended is None:
+                intended = action
+            zr['intended_prev'] = intended
+            zr['last_my'] = action
+            zr['last_D_reason'] = reason if action == 'D' else None
+            return action
+        def zr_close_epoch():
+            if zr['is_red_line'] and zr['state'] == 'RED_LINE':
+                return
+            if zr['epoch_step'] >= zr_adaptive_epoch() and zr['debt'] <= 0 and not zr['queue']:
+                zr['epoch_step'] = 0
+                zr['systemic'] = 0
+                if zr['state'] != 'RED_LINE_COOLDOWN':
+                    zr['state'] = 'COOPERATIVE'
+        def zr_nl_ladder(st):
+            if zr['nl_window'] and (st - zr['nl_window'][-1]) > 12:
+                zr['nl_evidence'] = 0
+                zr['nl_window'].clear()
+            zr['nl_evidence'] += 1
+            zr['nl_window'].append(st)
+            if zr['nl_pardon_step'] and (st - zr['nl_pardon_step']) <= 6:
+                zr['forgiveness_exploiter'] += 1
+                zr['nl_pardon_step'] = 0
+            if zr['nl_evidence'] == 1:
+                zr['nl_pardoned'] += 1
+                zr['nl_debt_ledger'] += 1
+                zr['pending_reason'] = "nl_deferred"
+                return True
+            if zr['nl_evidence'] == 2:
+                zr['nl_pardoned'] += 1
+                zr['nl_debt_ledger'] += 1
+                zr['pending_reason'] = "nl_deferred"
+                if not any(r.get("kind") == "strike" for r in zr['nl_scheduled']):
+                    zr['nl_scheduled'].append({"turn": st + rnd.randint(8, 20), "kind": "strike"})
+                forg = zr['opp_coops_after_my_D'] / max(1, zr['my_D'])
+                if forg > 0.6 and zr['my_D'] >= 3 and zr['nl_balance'] >= 0 and not zr_is_noisy():
+                    zr['nl_harvest_size'] = rnd.randint(3, 4)
+                    zr['nl_harvest_left'] = 0
+                    zr['nl_harvest_postponed'] = 0
+                    zr['nl_harvest_scheduled_at'] = st + rnd.randint(6, 10)
+                return True
+            if zr['nl_evidence'] >= 3:
+                if zr_live_coop() < 0.40 and (not zr_is_noisy() or zr['nl_evidence'] >= 8):
+                    zr_enter_red_line()
+                    return False
+            return None
+        def zr_on_defect(st):
+            zr['step_hint'] = st
+            if zr['bad_standing']:
+                zr['bad_standing_turns'] -= 1
+                if zr['bad_standing_turns'] <= 0:
+                    zr['bad_standing'] = False
+                zr['contrite'] = False
+                return True
+            if zr['last_D_reason'] in ('harvest', 'probe') and zr['tactical'] == 'cooperator':
+                zr['last_D_reason'] = None
+                return True
+            if zr['echo_forgive'] > 0:
+                if not (zr_nl_active() and zr_nl_is_unexplained()):
+                    zr['echo_forgive'] -= 1
+                    return True
+            if zr_is_noisy():
+                if zr_live_coop() > 0.90 and zr['opp_len'] > 20:
+                    return True
+                p_forgive = min(0.6, zr['p_noise_est'] * 7 + 0.05 + (zr['warmth'] - 0.5) * 0.2)
+                if len(zr['opp_last3']) >= 3 and zr['opp_last3'][-2:] == ['D', 'D']:
+                    p_forgive *= 0.3
+                if rnd.random() < p_forgive:
+                    return True
+            maxf = 2 + (1 if zr['warmth'] > 0.60 else 0)
+            if zr_is_noisy():
+                maxf += 2
+            if (
+                zr['one_shot_forgives'] < maxf
+                and zr['opp_defects'] <= 5
+                and st > 5
+                and zr['clean_peace'] >= 12
+                and zr['debt'] <= 0
+                and not zr['queue']
+                and zr['state'] == 'COOPERATIVE'
+                and zr['late_defects'] == 0
+                and not zr_is_soft_hostile()
+                and zr['warmth'] > 0.35
+            ):
+                zr['one_shot_forgives'] += 1
+                zr['nl_pardon_step'] = st
+                return True
+            if zr_nl_active() and zr_nl_is_unexplained():
+                handled = zr_nl_ladder(st)
+                if handled is not None:
+                    return handled
+            if zr['intent'] != "noise":
+                if zr['debt'] > 0 or zr['queue'] or zr['state'] == 'EQUALIZING':
+                    zr['systemic'] += 1
+            zr['debt'] += 1
+            zr['state'] = 'EQUALIZING'
+            thr = 3
+            if zr['warmth'] < 0.40 or zr_is_soft_hostile() or zr['late_defects'] > 0:
+                thr = 2
+            if zr['intent'] == "exploitation":
+                thr = 2
+            if zr_is_noisy():
+                thr = 8
+            if zr['systemic'] >= thr:
+                zr_enter_red_line()
+                return False
+            zr['queue'].append(st + 1)
+            return False
+        def zr_harvest_action(rem):
+            if zr_is_noisy():
+                if rem > 2:
+                    return None
+            forg = zr['opp_coops_after_my_D'] / max(1, zr['my_D'])
+            low = (zr['opp_defects'] / max(1, zr['opp_len'])) < 0.02
+            high = forg > 0.80
+            is_victim = high or low
+            is_grim = zr['opp_len'] > 50 and zr['opp_defects'] == 0
+            if is_grim:
+                if rem <= 1:
+                    return 'D'
+                if zr['probe_fired']:
+                    return 'D'
+                return None
+            if zr['probe_fired'] and rem <= 3:
+                return 'D'
+            if is_victim and zr['tactical'] in ("cooperator", "adaptive"):
+                return 'D'
+            return None
+        if game_round > 0:
+            last_realized = my_hist[-1]
+            if last_realized != zr['intended_prev'] and last_realized == 'D' and zr['intended_prev'] == 'C':
+                zr['contrite'] = True
+                zr['first_D_was_noise'] = zr['my_D'] <= 1
+                zr['bad_standing'] = True
+                zr['bad_standing_turns'] = 1
+                zr['nl_my_flips'] += 1
+            if zr['intended_prev'] == 'C':
+                zr['nl_my_obs'] += 1
+            zr['nl_balance'] += zr_pay(last_realized, opp_hist[-1]) - zr_pay(opp_hist[-1], last_realized)
+            if game_round >= 2:
+                if my_hist[-2] == 'C' and opp_hist[-2] == 'C':
+                    zr['cc_pairs'] += 1
+                    if opp_hist[-1] == 'D':
+                        zr['unprovoked_d'] += 1
+                    if zr['cc_pairs'] % 5 == 0 and zr['cc_pairs'] > 10:
+                        if zr_nl_active():
+                            total = zr['cc_pairs'] + zr['nl_my_obs']
+                            est_n = zr['unprovoked_d'] + zr['nl_my_flips']
+                        else:
+                            total, est_n = zr['cc_pairs'], zr['unprovoked_d']
+                        zr['p_noise_est'] = est_n / max(1, total)
+        if zr['apology_mode']:
+            if game_round > 0:
+                opp_last = opp_hist[-1]
+                my_prev = zr['last_my']
+                zr['apology_opp_moves'].append(opp_last)
+                zr['opp_len'] += 1
+                zr_push3(opp_last)
+                if opp_last == 'D':
+                    zr['opp_defects'] += 1
+                    if my_prev == 'C':
+                        zr['opp_defects_after_my_C'] += 1
+                    if step > zr_late_threshold():
+                        zr['late_defects'] += 1
+                    zr['clean_peace'] = 0
+                else:
+                    if my_prev == 'D':
+                        zr['opp_coops_after_my_D'] += 1
+                    if my_prev == 'C':
+                        zr['opp_coops_after_my_C'] += 1
+                        zr['clean_peace'] += 1
+                    else:
+                        zr['clean_peace'] = 0
+                if my_prev == 'D':
+                    zr['my_D'] += 1
+                else:
+                    zr['my_C'] += 1
+            zr['apology_steps'] -= 1
+            if zr['apology_steps'] <= 0:
+                if any(m == 'C' for m in zr['apology_opp_moves']):
+                    zr['apology_mode'] = False
+                    zr['apology_tries'] = 0
+                    zr['first_D_was_noise'] = False
+                    zr['contrite'] = False
+                    zr['apology_opp_moves'] = []
+                    zr['debt'] = 0
+                    zr['systemic'] = 0
+                    zr['queue'].clear()
+                    zr['echo_forgive'] = 1
+                    zr['state'] = 'COOPERATIVE'
+                    zr['epoch_step'] = 0
+                    zr['warmth'] = 0.60
+                    zr['target_warmth'] = 0.60
+                    zr['tactical'] = "adaptive"
+                    zr_close_epoch()
+                    return zr_play('C', "apology_success", 'C')
+                zr['apology_tries'] += 1
+                zr['apology_opp_moves'] = []
+                if zr['apology_tries'] >= zr['apology_max_tries']:
+                    zr_enter_red_line()
+                    return zr_play('D', "red_line", 'D')
+                zr['apology_mode'] = False
+            else:
+                zr['epoch_step'] += 1
+                zr_close_epoch()
+                return zr_play('C', "apology", 'C')
+        if (
+            not zr['is_red_line']
+            and not zr['apology_mode']
+            and zr['first_D_was_noise']
+            and len(zr['opp_last3']) >= 2
+            and zr['opp_last3'][-2:] == ['D', 'D']
+            and zr['apology_tries'] < zr['apology_max_tries']
+            and zr['opp_len'] < 300
+        ):
+            zr['apology_mode'] = True
+            zr['apology_steps'] = zr_budget()
+            zr['apology_opp_moves'] = []
+            zr['epoch_step'] += 1
+            zr_close_epoch()
+            return zr_play('C', "apology", 'C')
+        if game_round > 0 and zr['opp_len'] < game_round:
+            opp_last = opp_hist[-1]
+            my_prev = zr['last_my']
+            if zr['bad_standing']:
+                zr['opp_len'] += 1
+                zr_push3(opp_last)
+                if opp_last == 'D':
+                    zr['opp_defects'] += 1
+                    if step > zr_late_threshold():
+                        zr['late_defects'] += 1
+                    zr['clean_peace'] = 0
+                else:
+                    zr['clean_peace'] += 1 if my_prev == 'C' else 0
+                    if my_prev == 'D':
+                        zr['opp_coops_after_my_D'] += 1
+                if my_prev == 'D':
+                    zr['my_D'] += 1
+                else:
+                    zr['my_C'] += 1
+                zr['bad_standing_turns'] -= 1
+                if zr['bad_standing_turns'] <= 0:
+                    zr['bad_standing'] = False
+                zr['contrite'] = False
+                if zr['opp_len'] % 5 == 0:
+                    zr['intent'] = zr_detect_intent()
+                    zr['tactical'] = zr_classify_tactical()
+                    zr_update_target_warmth()
+                zr_align_warmth(step)
+                zr['epoch_step'] += 1
+                zr_close_epoch()
+                return zr_play('C', "contrite_full", 'C')
+            if opp_last == 'D' and zr['contrite']:
+                zr['opp_len'] += 1
+                zr_push3(opp_last)
+                zr['opp_defects'] += 1
+                if my_prev == 'C':
+                    zr['opp_defects_after_my_C'] += 1
+                if step > zr_late_threshold():
+                    zr['late_defects'] += 1
+                zr['clean_peace'] = 0
+                if my_prev == 'D':
+                    zr['my_D'] += 1
+                else:
+                    zr['my_C'] += 1
+                zr['contrite'] = False
+                zr['consecutive_forgiven'] += 1
+                if zr['opp_len'] % 5 == 0:
+                    zr['intent'] = zr_detect_intent()
+                    zr['tactical'] = zr_classify_tactical()
+                    zr_update_target_warmth()
+                zr_align_warmth(step)
+                zr['epoch_step'] += 1
+                zr_close_epoch()
+                return zr_play('C', "contrite", 'C')
+            zr['opp_len'] += 1
+            zr_push3(opp_last)
+            if opp_last == 'D':
+                zr['opp_defects'] += 1
+                if my_prev == 'C':
+                    zr['opp_defects_after_my_C'] += 1
+                if step > zr_late_threshold():
+                    zr['late_defects'] += 1
+                if my_prev == 'D':
+                    zr['opp_defects_after_my_D'] += 1
+                zr_on_defect(step)
+                zr['clean_peace'] = 0
+            else:
+                if my_prev == 'D':
+                    zr['opp_coops_after_my_D'] += 1
+                if my_prev == 'C':
+                    zr['opp_coops_after_my_C'] += 1
+                    zr['clean_peace'] += 1
+                else:
+                    zr['clean_peace'] = 0
+            if my_prev == 'D':
+                zr['my_D'] += 1
+            else:
+                zr['my_C'] += 1
+        if game_round > 0:
+            if step == 2 and opp_hist[0] == 'D':
+                zr['opening_d'] = True
+                zr['queue'].clear()
+                zr['debt'] = 0
+                zr['systemic'] = 0
+                zr['state'] = 'COOPERATIVE'
+                return zr_play('D', "opening_retort", 'D')
+            if step == 3 and zr['opening_d']:
+                if opp_hist[1] == 'C':
+                    zr['queue'].clear()
+                    zr['debt'] = 0
+                    zr['systemic'] = 0
+                    zr['state'] = 'COOPERATIVE'
+                    zr['echo_forgive'] = max(zr['echo_forgive'], 1)
+                    return zr_play('C', "opening_resync", 'C')
+                zr['queue'].clear()
+                zr['debt'] = max(zr['debt'], 1)
+                zr['state'] = 'EQUALIZING'
+                return zr_play('D', "opening_dd", 'D')
+        if zr['nl_harvest_scheduled_at'] != 0 and step >= zr['nl_harvest_scheduled_at']:
+            if game_round > 0 and opp_hist[-1] == 'C':
+                zr['nl_harvest_left'] = zr['nl_harvest_size']
+                zr['nl_harvest_scheduled_at'] = 0
+                zr['nl_provoked_until'] = step + zr['nl_harvest_size'] + 3
+            elif zr['nl_harvest_postponed'] < 2:
+                zr['nl_harvest_postponed'] += 1
+                zr['nl_harvest_scheduled_at'] = step + 3
+            else:
+                zr['nl_harvest_scheduled_at'] = 0
+                zr['nl_harvest_size'] = 0
+        if zr['nl_harvest_left'] > 0:
+            zr['nl_harvest_left'] -= 1
+            return zr_play('D', "nl_harvest_comp", 'D')
+ 
+        zr['nl_scheduled'] = [r for r in zr['nl_scheduled'] if r["turn"] >= step]
+        due = next((r for r in zr['nl_scheduled'] if r["turn"] == step), None)
+        if due is not None:
+            zr['nl_scheduled'].remove(due)
+            last3 = zr['opp_last3'][-3:]
+            if len(last3) >= 3 and all(mv == 'C' for mv in last3) and zr['opp_defects_after_my_D'] == 0:
+                zr['nl_debt_ledger'] += 1
+                zr['nl_pardoned'] += 1
+                zr['nl_pardon_step'] = step
+                if step in zr['queue']:
+                    zr['queue'].remove(step)
+                    zr['debt'] = max(0, zr['debt'] - 1)
+                zr['pending_reason'] = "nl_pardon"
+            else:
+                zr['queue'].append(step)
+                zr['nl_debt_ledger'] = max(0, zr['nl_debt_ledger'] - 1)
+ 
+        if zr['opp_len'] % 5 == 0:
+            zr['intent'] = zr_detect_intent()
+            zr['tactical'] = zr_classify_tactical()
+            zr_update_target_warmth()
+        zr_align_warmth(step)
+        if zr['intent'] != "noise" and not zr_is_noisy():
+            if len(zr['opp_last3']) >= 3 and zr['opp_last3'][-3:] == ['D', 'D', 'D']:
+                nl_governs = zr_nl_active() and all(m == 'C' for m in my_hist[-4:-1])
+                if (
+                    not nl_governs
+                    and not zr['contrite']
+                    and not zr['bad_standing']
+                    and zr['consecutive_forgiven'] < 2
+                    and not zr['apology_mode']
+                ):
+                    zr_enter_red_line()
+                    if zr['state'] == 'RED_LINE':
+                        return zr_play('D', "red_line", 'D')
+        if zr_is_hostile() and not zr['contrite'] and not zr['bad_standing'] and not zr['apology_mode']:
+            if not zr_is_noisy():
+                zr_enter_red_line()
+        if zr['is_red_line']:
+            if zr['state'] == 'RED_LINE_COOLDOWN':
+                if zr['red_line_cooldown'] <= 0:
+                    zr['red_line_cooldown'] = int(15 + 10 * (1 - min(zr['p_noise_est'] * 5, 0.8)))
+                    zr['epoch_step'] += 1
+                    zr_close_epoch()
+                    return zr_play('C', "red_line_probe", 'C')
+                zr['red_line_cooldown'] -= 1
+                return zr_play('D', "red_line_cooldown", 'D')
+            return zr_play('D', "red_line", 'D')
+        if zr['deadlock'] >= 3:
+            zr['deadlock'] = 0
+            zr['queue'].clear()
+            zr['debt'] = 0
+            zr['echo_forgive'] = 0
+            zr['state'] = 'COOPERATIVE'
+            zr['systemic'] = max(0, zr['systemic'] - 1)
+            zr['epoch_step'] += 1
+            zr_close_epoch()
+            zr['contrite'] = False
+            zr['bad_standing'] = False
+            return zr_play('C', "normal", 'C')
+        if zr['opp_len'] > 30 and remaining <= zr['harvest_window']:
+            harvested = zr_harvest_action(remaining)
+            if harvested is not None:
+                reason = "harvest" if harvested == 'D' else "harvest_keep_C"
+                if zr['probe_fired'] and harvested == 'D':
+                    reason = "probe"
+                return zr_play(harvested, reason, harvested)
+        if step in zr['queue']:
+            if zr['contrite'] or zr['bad_standing'] or zr['apology_mode']:
+                zr['queue'].remove(step)
+                zr['queue'].append(step + 1)
+                zr['epoch_step'] += 1
+                zr_close_epoch()
+                return zr_play('C', "contrite" if zr['contrite'] else "apology", 'C')
+            zr['queue'].remove(step)
+            zr['debt'] = max(0, zr['debt'] - 1)
+            echo_val = 2 if zr_is_noisy() else 1
+            zr['echo_forgive'] = max(zr['echo_forgive'], echo_val)
+            zr_close_epoch()
+            return zr_play('D', "retaliation", 'D')
+        zr['epoch_step'] += 1
+        zr_close_epoch()
+        if zr['contrite']:
+            zr['contrite'] = False
+        zr['bad_standing'] = False
+        reason = zr['pending_reason'] if zr['pending_reason'] is not None else "normal"
+        zr['pending_reason'] = None
+        return zr_play('C', reason, 'C')
+    elif strategy == 'ZeroResp':
+        zr0 = think_memory[417]
+        step = game_round + 1
+        base_epoch = 25
+        eff_len = tournament_avg_round
+        late_threshold = int(eff_len * 0.75)
+        def zr0_live_coop():
+            return 1.0 if zr0['opp_len'] == 0 else 1.0 - (zr0['opp_defects'] / zr0['opp_len'])
+        def zr0_is_hostile():
+            return zr0['opp_len'] >= 10 and zr0_live_coop() < 0.4
+        def zr0_is_soft_hostile():
+            return zr0['opp_len'] >= 10 and zr0_live_coop() < 0.7
+        def zr0_enter_red_line():
+            zr0['state'] = 'RED_LINE'
+            zr0['is_red_line'] = True
+            zr0['queue'].clear()
+        def zr0_close_epoch():
+            if zr0['is_red_line'] or zr0['state'] == 'RED_LINE':
+                return
+            if zr0['epoch_step'] >= base_epoch and zr0['debt'] <= 0 and not zr0['queue']:
+                zr0['epoch_step'] = 0
+                zr0['systemic'] = 0
+                zr0['state'] = 'COOPERATIVE'
+        def zr0_play(action):
+            zr0['last_my'] = action
+            if action == 'D':
+                zr0['my_D'] += 1
+            return action
+        def zr0_on_defect(st):
+            if zr0['debt'] > 0 or zr0['queue'] or zr0['state'] == 'EQUALIZING':
+                zr0['systemic'] += 1
+            zr0['debt'] += 1
+            zr0['state'] = 'EQUALIZING'
+            threshold = 3
+            if zr0['systemic'] >= 1 or zr0_is_soft_hostile() or zr0['late_defects'] > 0:
+                threshold = 2
+            if zr0['systemic'] >= threshold:
+                zr0_enter_red_line()
+                return
+            if zr0_is_hostile() or zr0['late_defects'] > 0:
+                delay = 1
+            else:
+                delay = 5 + rnd.randint(1, 10)
+            zr0['queue'].append(st + delay)
+        if game_round > 0:
+            opp_last = memory[-1][opp_index]
+            zr0['opp_len'] += 1
+            if opp_last == 'D':
+                zr0['opp_defects'] += 1
+                if step > late_threshold:
+                    zr0['late_defects'] += 1
+                zr0_on_defect(step)
+            else:
+                if zr0['last_my'] == 'D':
+                    zr0['opp_coops_after_my_D'] += 1
+        if zr0_is_hostile():
+            zr0_enter_red_line()
+        if zr0['late_defects'] >= 2:
+            zr0_enter_red_line()
+            return zr0_play('D')
+        if zr0['is_red_line'] or zr0['state'] == 'RED_LINE':
+            return zr0_play('D')
+        if step in zr0['queue']:
+            zr0['queue'].remove(step)
+            zr0['debt'] = max(0, zr0['debt'] - 1)
+            zr0_close_epoch()
+            return zr0_play('D')
+        zr0['epoch_step'] += 1
+        zr0_close_epoch()
+        return zr0_play('C')
+    elif strategy == '4-Duality Optimizer 1':
+        waves_greater_than_one = 0
+        current_wave_length = 0
+        for m in memory:
+            if m[opp_index] == 'D':
+                current_wave_length += 1
+            else:
+                if current_wave_length > 1:
+                    waves_greater_than_one += 1
+                current_wave_length = 0
+        consecutive_our_defections = 0
+        for i in range(game_round - 1, -1, -1):
+            if memory[i][self_index] == 'D':
+                consecutive_our_defections += 1
+            else:
+                break
+        consecutive_opp_defections = 0
+        for i in range(game_round - 1, -1, -1):
+            if memory[i][opp_index] == 'D':
+                consecutive_opp_defections += 1
+            else:
+                break
+        if consecutive_opp_defections >= 2:
+            return 'D'
+        if consecutive_our_defections > 0 and consecutive_our_defections < waves_greater_than_one:
+            return 'D'
+        return 'C'
+    elif strategy == 'Bayesian Forgiver':
+        if not game_round:
+            return 'C'
+        if memory[-1][opp_index] == 'C':
+            think_memory[418]['Alpha'] += 1.0
+        else:
+            think_memory[418]['Beta'] += 1.0
+        total = think_memory[418]['Alpha'] + think_memory[418]['Beta']
+        mean_cooperation = think_memory[418]['Alpha'] / total
+        variance = (think_memory[418]['Alpha'] * think_memory[418]['Beta']) / (total * total * (total + 1))
+        uncertainty = variance**0.5
+        forgiveness_threshold = (
+            think_memory[418]['Forgiveness Threshold']
+            + think_memory[418]['Uncertainty Factor'] * uncertainty
+        )
+        if memory[-1][opp_index] == 'C':
+            return 'C'
+        else:
+            if mean_cooperation >= forgiveness_threshold:
+                return 'C'
+            else:
+                return 'D'
+    elif strategy == 'Geller':
+        memo = immortal_memory[9]
+        if game_round > 2:
+            if memo.get(opp_name) == None:
+                memo[opp_name] = {
+                    'CCCC':[0,0],'CCCD':[0,0],'CCDC':[0,0],'CCDD':[0,0],
+                    'CDCC':[0,0],'CDCD':[0,0],'CDDC':[0,0],'CDDD':[0,0],
+                    'DCCC':[0,0],'DCCD':[0,0],'DCDC':[0,0],'DCDD':[0,0],
+                    'DDCC':[0,0],'DDCD':[0,0],'DDDC':[0,0],'DDDD':[0,0]
+                }
+            cond1 = memory[-3][opp_index] + memory[-3][self_index] + memory[-2][opp_index] + memory[-2][self_index]
+            memo[opp_name][cond1][0] += (memory[-1][opp_index] == 'C')
+            memo[opp_name][cond1][1] += 1
+            cond2 = memory[-2][opp_index] + memory[-2][self_index] + memory[-1][opp_index] + memory[-1][self_index]
+            t_c = memo[opp_name][cond2][0]
+            total = memo[opp_name][cond2][1]
+            if total > 0:
+                return rnd_prob(t_c / total)
+        return rnd_prob(0.5)
+    elif strategy == 'Geller Cooperator':
+        memo = immortal_memory[10]
+        if game_round > 2:
+            if memo.get(opp_name) == None:
+                memo[opp_name] = {
+                    'CCCC':[0,0],'CCCD':[0,0],'CCDC':[0,0],'CCDD':[0,0],
+                    'CDCC':[0,0],'CDCD':[0,0],'CDDC':[0,0],'CDDD':[0,0],
+                    'DCCC':[0,0],'DCCD':[0,0],'DCDC':[0,0],'DCDD':[0,0],
+                    'DDCC':[0,0],'DDCD':[0,0],'DDDC':[0,0],'DDDD':[0,0]
+                }
+            cond1 = memory[-3][opp_index] + memory[-3][self_index] + memory[-2][opp_index] + memory[-2][self_index]
+            memo[opp_name][cond1][0] += (memory[-1][opp_index] == 'C')
+            memo[opp_name][cond1][1] += 1
+            cond2 = memory[-2][opp_index] + memory[-2][self_index] + memory[-1][opp_index] + memory[-1][self_index]
+            t_c = memo[opp_name][cond2][0]
+            total = memo[opp_name][cond2][1]
+            if total > 0:
+                return rnd_prob(t_c / total)
+        return 'C'
+    elif strategy == 'Geller Defector':
+        memo = immortal_memory[11]
+        if game_round > 2:
+            if memo.get(opp_name) == None:
+                memo[opp_name] = {
+                    'CCCC':[0,0],'CCCD':[0,0],'CCDC':[0,0],'CCDD':[0,0],
+                    'CDCC':[0,0],'CDCD':[0,0],'CDDC':[0,0],'CDDD':[0,0],
+                    'DCCC':[0,0],'DCCD':[0,0],'DCDC':[0,0],'DCDD':[0,0],
+                    'DDCC':[0,0],'DDCD':[0,0],'DDDC':[0,0],'DDDD':[0,0]
+                }
+            cond1 = memory[-3][opp_index] + memory[-3][self_index] + memory[-2][opp_index] + memory[-2][self_index]
+            memo[opp_name][cond1][0] += (memory[-1][opp_index] == 'C')
+            memo[opp_name][cond1][1] += 1
+            cond2 = memory[-2][opp_index] + memory[-2][self_index] + memory[-1][opp_index] + memory[-1][self_index]
+            t_c = memo[opp_name][cond2][0]
+            total = memo[opp_name][cond2][1]
+            if total > 0:
+                return rnd_prob(t_c / total)
+        return 'D'
+    elif strategy == 'Longterm Tit For Tat':
+        if not game_round:
+            try:
+                think_memory[419]['noise'] = noise_prob
+            except NameError:
+                think_memory[419]['noise'] = 0.0
+            return 'C'
+        if game_round == 1:
+            return memory[-1][opp_index]
+        if memory[-2][self_index] == 'C':
+            think_memory[419]['n_tft_would_c'] += 1
+            if memory[-1][opp_index] == 'D':
+                think_memory[419]['n_d_when_tft_would_c'] += 1
+            n_expected_ds = think_memory[419]['n_tft_would_c'] * think_memory[419]['noise']
+            std_expected_ds = np.sqrt(
+                think_memory[419]['noise'] * (1 - think_memory[419]['noise']) * think_memory[419]['n_tft_would_c']
+            )
+            think_memory[419]['z'] = (think_memory[419]['n_d_when_tft_would_c'] - n_expected_ds) / max(
+                1.0, std_expected_ds
+            )
+        if think_memory[419]['n_tft_would_c'] >= 5 and think_memory[419]['z'] < 2:
+            return 'C'
+        else:
+            return memory[-1][opp_index]
+    elif strategy == 'ISO':
+        if not game_round:
+            return 'C'
+        mem = think_memory[420]
+        self_history = [m[self_index] for m in memory]
+        opp_history = [m[opp_index] for m in memory]
+        def _get_reward(my_strat, opp_strat, init_idx, p_end=1e-2, p_noise=0.0):
+            own = my_strat + p_noise * (1.0 - 2.0 * my_strat)
+            opp = opp_strat[[0, 2, 1, 3]]
+            trans_mat = np.array([
+                own * opp,
+                own * (1.0 - opp),
+                (1.0 - own) * opp,
+                (1.0 - own) * (1.0 - opp),
+            ]).T
+            rewards = np.array([RPST['R'], RPST['S'], RPST['T'], RPST['P']], dtype=float)
+            inv = np.linalg.inv(np.eye(4) - (1.0 - p_end) * trans_mat)
+            init_vec = np.zeros(4, dtype=np.float32)
+            init_vec[init_idx] = 1.0
+            reward = init_vec @ (inv @ rewards - rewards)
+            return p_end * float(reward) / (1.0 - p_end)
+        def _optimize(opp_model, init_idx):
+            opp = np.clip(opp_model, 0.0, 1.0)
+            def obj(p):
+                return -_get_reward(p, opp, init_idx)
+            x0 = np.array([0.5, 0.5, 0.5, 0.5])
+            bnds = [(0.0, 1.0)] * 4
+            res = minimize(obj, x0, method="L-BFGS-B", bounds=bnds, options={"maxiter": 50})
+            return -res.fun, res.x
+        def _update_single_ewma(state_ewma, action_val):
+            df = mem["discount_factor"]
+            state_ewma[0] = df * state_ewma[0] + action_val
+            state_ewma[1] = df * state_ewma[1] + 1.0
+            return state_ewma[0] / state_ewma[1]
+        if game_round >= 2:
+            prev_state = (self_history[-2], opp_history[-2])
+            opp_act = 1.0 if opp_history[-1] == 'C' else 0.0
+            if prev_state == ('C', 'C'):
+                mem["opp_model"][0] = _update_single_ewma(mem["ewma_CC"], opp_act)
+            elif prev_state == ('C', 'D'):
+                mem["opp_model"][2] = _update_single_ewma(mem["ewma_CD"], opp_act)
+            elif prev_state == ('D', 'C'):
+                mem["opp_model"][1] = _update_single_ewma(mem["ewma_DC"], opp_act)
+            elif prev_state == ('D', 'D'):
+                mem["opp_model"][3] = _update_single_ewma(mem["ewma_DD"], opp_act)
+        state_map = {('C', 'C'): 0, ('C', 'D'): 1, ('D', 'C'): 2, ('D', 'D'): 3}
+        current_state = (self_history[-1], opp_history[-1]) if self_history else ('C', 'C')
+        state_idx = state_map.get(current_state, 0)
+        expected, my_policy = _optimize(mem["opp_model"], state_idx)
+        mem["my_policy"] = my_policy
+        return rnd_prob(mem["my_policy"][state_idx])
+    elif strategy == 'Cooperate ISO':
+        if not game_round:
+            return 'C'
+        mem = think_memory[421]
+        self_history = [m[self_index] for m in memory[:game_round]]
+        opp_history = [m[opp_index] for m in memory[:game_round]]
+        last_pair = (self_history[-1], opp_history[-1])
+        if last_pair == ('C', 'C'):
+            mem["reward_history"].append(RPST['R'])
+        elif last_pair == ('C', 'D'):
+            mem["reward_history"].append(RPST['S'])
+        elif last_pair == ('D', 'C'):
+            mem["reward_history"].append(RPST['T'])
+        elif last_pair == ('D', 'D'):
+            mem["reward_history"].append(RPST['P'])
+        iso_mem = mem["iso_mem"]
+        def _get_reward_iso(my_strat, opp_strat, init_idx, p_end=1e-2, p_noise=0.0):
+            own = my_strat + p_noise * (1.0 - 2.0 * my_strat)
+            opp = opp_strat[[0, 2, 1, 3]]
+            trans_mat = np.array([
+                own * opp,
+                own * (1.0 - opp),
+                (1.0 - own) * opp,
+                (1.0 - own) * (1.0 - opp),
+            ]).T
+            rewards = np.array([RPST['R'], RPST['S'], RPST['T'], RPST['P']], dtype=float)
+            inv = np.linalg.inv(np.eye(4) - (1.0 - p_end) * trans_mat)
+            init_vec = np.zeros(4, dtype=np.float32)
+            init_vec[init_idx] = 1.0
+            reward = init_vec @ (inv @ rewards - rewards)
+            return p_end * float(reward) / (1.0 - p_end)
+        def _optimize_iso(opp_model, init_idx):
+            opp = np.clip(opp_model, 0.0, 1.0)
+            def obj(p):
+                return -_get_reward_iso(p, opp, init_idx)
+            x0 = np.array([0.5, 0.5, 0.5, 0.5])
+            bnds = [(0.0, 1.0)] * 4
+            res = minimize(obj, x0, method="L-BFGS-B", bounds=bnds, options={"maxiter": 50})
+            return -res.fun, res.x
+        def _update_ewma_iso(state_ewma, val):
+            df = iso_mem["discount_factor"]
+            state_ewma[0] = df * state_ewma[0] + val
+            state_ewma[1] = df * state_ewma[1] + 1.0
+            return state_ewma[0] / state_ewma[1]
+        if game_round >= 2:
+            prev_state = (self_history[-2], opp_history[-2])
+            opp_act = 1.0 if opp_history[-1] == 'C' else 0.0
+            if prev_state == ('C', 'C'):
+                iso_mem["opp_model"][0] = _update_ewma_iso(iso_mem["ewma_CC"], opp_act)
+            elif prev_state == ('C', 'D'):
+                iso_mem["opp_model"][2] = _update_ewma_iso(iso_mem["ewma_CD"], opp_act)
+            elif prev_state == ('D', 'C'):
+                iso_mem["opp_model"][1] = _update_ewma_iso(iso_mem["ewma_DC"], opp_act)
+            elif prev_state == ('D', 'D'):
+                iso_mem["opp_model"][3] = _update_ewma_iso(iso_mem["ewma_DD"], opp_act)
+        state_map = {('C', 'C'): 0, ('C', 'D'): 1, ('D', 'C'): 2, ('D', 'D'): 3}
+        state_idx = state_map.get(last_pair, 0)
+        expected, my_policy = _optimize_iso(iso_mem["opp_model"], state_idx)
+        iso_mem["my_policy"] = my_policy
+        if mem["playing_iso"]:
+            return rnd_prob(iso_mem["my_policy"][state_idx])
+        if game_round == 1:
+            return opp_history[-1]
+        if self_history[-2] == 'C':
+            mem["n_tft_would_c"] += 1
+            if opp_history[-1] == 'D':
+                mem["n_d_when_tft_would_c"] += 1
+            mem["z"] = (mem["n_d_when_tft_would_c"]) / max(1.0, np.sqrt(mem["n_tft_would_c"]))
+        reward_hist = mem["reward_history"]
+        expected_gain = expected - np.mean(reward_hist)
+        if (
+            len(reward_hist) >= 10
+            and expected_gain > 2.0 * np.std(reward_hist) / np.sqrt(len(reward_hist))
+            and expected_gain > 0.05 * (RPST['R'] - RPST['P'])
+        ):
+            mem["playing_iso"] = True
+            return rnd_prob(iso_mem["my_policy"][state_idx])
+        if mem["n_tft_would_c"] >= 5 and mem["z"] < 2:
+            return 'C'
+        else:
+            return opp_history[-1]
         
     # Strategies That From This Tournament
     elif strategy == 'Pavlov Tester':
@@ -8398,11 +9630,11 @@ def call_strategy(strategy,opp_index,opp_name):
             semua_mode = x.strip().rstrip(',').split(',')
             for item in semua_mode:
                 if not item: continue
-                nomor_mode, isi_aksi = item.split(':')
-                aksi_0_str, aksi_1_str = isi_aksi.split('|')
-                aksi_0 = [aksi_0_str[0], aksi_0_str[1:]]
-                aksi_1 = [aksi_1_str[0], aksi_1_str[1:]]
-                rule[nomor_mode] = [aksi_0, aksi_1]
+                mode_number, action = item.split(':')
+                action_0_str, action_1_str = action.split('|')
+                action_0 = [action_0_str[0], action_0_str[1:]]
+                action_1 = [action_1_str[0], action_1_str[1:]]
+                rule[mode_number] = [action_0, action_1]
             return rule
         instruction = translating(instruction_string)
         alan_rule = instruction[think_memory[28]][(memory[-1][opp_index] == 'D')]
@@ -13231,17 +14463,18 @@ def call_strategy(strategy,opp_index,opp_name):
         if game_round == 1:
             return memory[-1][opp_index]
         level = 5
+        num_samples = 25
         totals = [
-            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('C', 'C')) for i in range(min(25, game_round), 1, -1)]),
-            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('C', 'D')) for i in range(min(25, game_round), 1, -1)]),
-            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('D', 'C')) for i in range(min(25, game_round), 1, -1)]),
-            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('D', 'D')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('C', 'C')) for i in range(min(num_samples, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('C', 'D')) for i in range(min(num_samples, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('D', 'C')) for i in range(min(num_samples, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index]) == ('D', 'D')) for i in range(min(num_samples, game_round), 1, -1)]),
         ]
         c_responses = [
-            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('C', 'C', 'C')) for i in range(min(25, game_round), 1, -1)]),
-            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('C', 'D', 'C')) for i in range(min(25, game_round), 1, -1)]),
-            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('D', 'C', 'C')) for i in range(min(25, game_round), 1, -1)]),
-            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('D', 'D', 'C')) for i in range(min(25, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('C', 'C', 'C')) for i in range(min(num_samples, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('C', 'D', 'C')) for i in range(min(num_samples, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('D', 'C', 'C')) for i in range(min(num_samples, game_round), 1, -1)]),
+            sum([((memory[-i][self_index], memory[-i][opp_index], memory[-i + 1][opp_index]) == ('D', 'D', 'C')) for i in range(min(num_samples, game_round), 1, -1)]),
         ]
         p_cc = (c_responses[0] / totals[0]) if totals[0] > 0 else 0.5
         p_cd = (c_responses[1] / totals[1]) if totals[1] > 0 else 0.5
@@ -13279,7 +14512,7 @@ def call_strategy(strategy,opp_index,opp_name):
         if think_memory[408] > 1 and (memory[-2][opp_index], memory[-1][opp_index]) == ('C', 'C'):
             think_memory[408] = 0
         if think_memory[408] == 3 and memory[-1][opp_index] == 'D':
-            next_chat[0] = rnd.choice(['YOU ATHEIST!😡', 'YOU ROBBER!😡', 'YOU JEALOUS!😡'])
+            next_chat[0] = rnd.choice(['YOU ROBBER!😡', 'YOU JEALOUS!😡'])
         if think_memory[408] == 2 and memory[-1][opp_index] == 'D':
             next_chat[0] = 'HEY! DON\'T YOU DARE TAKE MY GIFT FROM THE SUPERNATURAL WORLD!😡'
             think_memory[408] = 3
@@ -13293,6 +14526,34 @@ def call_strategy(strategy,opp_index,opp_name):
             think_memory[408] = max(1, think_memory[408])
             return 'D'
         return memory[-1][opp_index]
+    elif strategy == 'ZD-MD / Zero Determinant Middle':
+        if not game_round:
+            return 'C'
+        phi = 0.5
+        l = (RPST['P'] + RPST['R']) / 2
+        s_min = -min((RPST['T'] - l) / (l - RPST['S']), (l - RPST['S']) / (RPST['T'] - l))
+        s = (s_min + 1) / 2
+        p1 = 1 - phi * (1 - s) * (RPST['R'] - l)
+        p2 = 1 - phi * (s * (l - RPST['S']) + (RPST['T'] - l))
+        p3 = phi * ((l - RPST['S']) + s * (RPST['T'] - l))
+        p4 = phi * (1 - s) * (l - RPST['P'])
+        four_vector = [p1, p2, p3, p4]
+        return 'C' if rnd.random() <= four_vector[((2 * (memory[-1][self_index] == 'D')) + (memory[-1][opp_index] == 'D'))] else 'D'
+    elif strategy == 'Hill Climb Attariq Version':
+        if not game_round:
+            return 'C'
+        d = 1 / 10
+        if memory[-1][opp_index] == 'C':
+            if(think_memory[422] + d >= 1):
+                think_memory[422] = (think_memory[422] + 1) / 2
+            else:
+                think_memory[422] += d
+        else:
+            if(think_memory[422] - d <= 0):
+                think_memory[422] = think_memory[422] / 2
+            else:
+                think_memory[422] -= d
+        return rnd_prob(think_memory[422])
     else:
         print(f'ERROR NAME: {strategy}')
         return None
@@ -13336,9 +14597,9 @@ def run_match(args):
         game_round += 1
     return (i, j, score[0], score[1])
 
-strategies = ['2 Tits For 2 Tats / Hard Tit For 2 Tats', '2 Tits For 2 Tats Eckhart Arnold Version', '2 Tits For Tat', '3 Seconds Mirror', '3 Tits For Tat / Hard Tit For Tat', '3-Tree Of Prediction', 'A-A&C / A-Actor&Critic', 'ALLC OR ALLD', 'AMERICA! / Freedoom / USA', 'AON2', 'AQUA', 'Absurdistan 1', 'Acquaintance & Trust', 'Adaptive', 'Adaptive Hhhpraise Version', 'Adaptive Pavlov 2006', 'Adaptive Pavlov 2011', 'Adaptive Tit For Tat', 'Adaptive Tit For Tat Attariq Version', 'Adaptor Brief', 'Adaptor Long', 'Aggravater', 'Alan', 'Alcohol / Ethanol', 'Alexei / End Game Cheater', 'Alternator / Second By Duisman', 'Alternator Hunter', 'Always Cooperate / Cooperator / Dove / Saint', 'Always Defect / Defector / Hawk / Shark', 'Always Out / Outtor', 'Amazon / Piraha', 'Analogy', 'Anatol', 'Angry Tit For Tat', 'Anti Cycler', 'Anti Noise Tit For Tat', 'Anti Tit For Tat / Psycho', 'Appeaser', 'Arrogant Q-Learner', 'Average Copier', 'BBE / Burn Both Ends', 'Back Stabber', 'Backrooms', 'Bahlil', 'Bandit', 'Bandit UCB', 'Bayes Attariq Version', 'Bayes Foomii Version', 'Benjo', 'Beta Tester', 'Better & Better', 'Bluff', 'Bluff Master', 'Boltzmann Brain', 'Bookend Cooperator', 'Boxer', 'Bros Mind', 'Bully / Reverse Tit For Tat', 'Burn The Bridge Strategy', 'Bush Mosteller', 'Buzzer', 'CS / Collective Strategy', 'Caerbannog', 'Calamity', 'Calculator', 'Calculator The Nerd Of AI Version', 'Capitalist', 'Capri', 'Cautious Q-Learner', 'Caveman', 'Cerebrum', 'Charity', 'Chatter', 'Clement Coldridge', 'Coin', 'Collatz', 'Communalist', 'Continuous Q-Learner Avg', 'Continuous Q-Learner Max', 'Contrite Grudger', 'Contrite Tit For Tat', 'Control 1', 'Control 10', 'Control 11', 'Control 2', 'Control 3', 'Control 4', 'Control 5', 'Control 6', 'Control 7', 'Control 8', 'Control 9', 'Cooperate Once', 'Cooperator Hunter', 'Crabby', 'Crabby Attariq Version', 'Cruelity', 'Cult Bishop A', 'Cult Bishop B', 'Cult Citizen A', 'Cult Citizen B', 'Cult Citizen C', 'Cult Leader', 'Curiosity', 'Cycle Hunter', 'Cycler CCCCCD', 'Cycler CCCD', 'Cycler CCCDCD', 'Cycler CCD', 'Cycler DC', 'Cycler DCCCC', 'Cycler DDC', 'DBS / Derived Belief Strategy', 'DDoS', 'Darwin', 'Deadlock Breaker', 'Decay Given', 'Defect Once', 'Defector Hunter', 'Delayed AON1', 'Desire', 'Desprate', 'Detective', 'Devil Staircase', 'Diplomat', 'Dont Bite The Hand That Feeds You', 'Double Crosser', 'Double Q-Learner', 'Double Resurrection', 'Doubler', 'Downing Benjjo Version', 'Downing Eckhart Arnold Version', 'Dumpty 10', 'Dyna Q-Learner', 'Dynamic 2 Tits For Tat', 'Dynocat', 'EGOist', 'Easy Go / Reverse Grudger', 'Echo Adaptive', 'Echo Fisher', 'Egoist A-Learner', 'Eliza / Therapist', 'Entropy Sentinel', 'Envy', 'Eric', 'Eugine Nier', 'Euler', 'Eventual Cycle Hunter', 'Evil Alliance', 'Evolvable Cycler Attariq Version', 'Evolved FSM 16', 'Evolved FSM 16 Noise 05', 'Evolved FSM 4', 'Evolved FSM 6', 'Evolved HMM 5', 'Evolved Looker Up 1_1_1', 'Evolved Looker Up 2_2_2', 'Exploratory Lenient Grim 2', 'Exploratory Tit For 3 Tats', 'FAWS', 'False Cooperator', 'Falsity', 'Female / Woman', 'Fibonacci', 'Finger Print', 'Firm But Fair / Firm For Tat', 'First By Davis', 'First By Downing', 'First By Downing, But Get Revised By Axelrod', 'First By Feld', 'First By Graaskamp / Second By Mauk', 'First By Grofman', 'First By Grudger / Grim Trigger', 'First By Joss / Naive Prober', 'First By Named Withheld', 'First By Nydegger', 'First By Shubik', 'First By Stein & Rapoport', 'First By Tideman & Chieruzzi', 'First By Tit For Tat', 'First By Tullock', 'Fixed Pattern', 'Fool Me Once', 'Forest-RND', 'Forest-XG', 'Forgetable Gradual', 'Forgetful Fool Me Once', 'Forgetful Grudger', 'Forgetful Majority Bot', 'Forgiver', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14', 'Forgiving', 'Forgiving Fate', 'Forgiving Grudger', 'Forgiving Tit For Tat', 'Fortress 3', 'Fortress 4', 'Frankl', 'Free Rider', 'Frequency Analyzer', 'Freud', 'Friendly Human', 'GT-E / Game Theory Explorer', 'Gambler Attariq Version', 'Gaslighter', 'Gen 1_64_200_30_0.3_A', 'Gen 2_64_200_30_0.3_A', 'Gen 3_64_200_30_0.3_A', 'Gen 4_64_200_30_0.3_A', 'Gen 5_64_200_30_0.3_A', 'Generic Downing', 'Generic Downing Friendly', 'Generous Tit For Tat', 'Generous Tit For Tat Axelrod Project Contributor Team Version', 'Generous Tit For Tat Benjjo Version', 'Generous Tit For Tat Eckhart Arnold Version 1', 'Generous Tit For Tat Eckhart Arnold Version 2', 'Generous Tit For Tat Less Wrong Version', 'Genetic Algo 1', 'Genetic Algo 2', 'George', 'Go By Majority / Second By Grisell / Soft Go By Majority', 'Go By Minority', 'Gold Digger', 'Golden Mean', 'Good', 'GossipAgent', 'Graaskamp Benjjo Version', 'Gradual', 'Gradual Cristal Version', 'Gradual Killer', 'Grateful / S9', 'Grudger Alternator', 'Grumpy', 'HER / MENACE', 'HMM Player', 'Half Sin Square', 'Handshake', 'Hard Go By Majority', 'Hard Prober', 'Hesitant Q-Learner', 'Hopeless', 'Hot Coffee', 'Humpty 10', 'Hungry', 'Inequality / SOVIET UNION! / USSR', 'Inequity Averse Q-Learner', 'Inverse', 'Inverse Punisher', 'Is There Something New?', 'Isolated Clan', 'Isolated Tit For Tat', 'Japan Empire Emperor', 'Japan Empire Soldier 1', 'Japan Empire Soldier 10', 'Japan Empire Soldier 2', 'Japan Empire Soldier 3', 'Japan Empire Soldier 4', 'Japan Empire Soldier 5', 'Japan Empire Soldier 6', 'Japan Empire Soldier 7', 'Japan Empire Soldier 8', 'Japan Empire Soldier 9', 'Javelin', 'Jem', 'Jester', 'Jesus Petry', 'Josuah', 'Jung', 'Karen', 'Keyman', 'Killer', 'King Of 48 Laws Of Power', 'Knowledgeable Worse & Worse', 'Konflikt Blue', 'Konflikt Green', 'L-BODOR / Learning Based On Derivative Of Reward', 'LCG', 'Laran', 'Laws', 'Learner', 'Lenient Grim 2', 'Lenient Grim 3', 'Less Grim', 'Level Punisher', 'Liar Person', 'Lighty-Darky', 'Limited Retaliate', 'Limited Retaliate 2', 'Limited Retaliate 3', 'Line', 'Little Grudger', 'Long Horse', 'Long Term Strategist', 'Look Ahead / Look Up', 'Loyal', 'MARS / Mimicry And Relative Similarity', 'MCMC / Markov Chain Monte Carlo', 'MEM2', 'MSAgent', 'Mafia A', 'Mafia B', 'Mafia C', 'Mafia D', 'Majapahit', 'Male / Man', 'Malthrin', 'Man In The Middle', 'Manipulator', 'Manipulity', 'Markov', 'Matcher', 'Math Constant Hunter', 'Memory 1', 'Memory Decay', 'Mensa', 'Meta Hunter', 'Meta Majority', 'Meta Minority', 'Meta Mixer', 'Meta Winner', 'Meta Winner Ensemble', 'Michaelos', 'Mirror', 'Mystical Logic', 'Modal Defector', 'Modal Tit For Tat', 'Momentum', 'Monkey See, Monkey Do', 'Mosquito', 'MrX', 'N Pavlov', 'N Tits For M Tats', 'Naive Q-Learner', 'Nash', 'Nasty Tit For Tat', 'Negation', 'Neil A', 'Newton', 'Nydegger Benjjo Version', 'Observant', 'Odd-Even Go By Majority', 'Odysseus / Ὀδυσσεύς', 'Omega Tit For Tat', 'Once Bitten', 'Opportunist', 'Opposite Grudger', 'Out For Tat', 'PIN', 'PSO Gambler 1_1_1', 'PSO Gambler 2_2_2', 'PSO Gambler 2_2_2 Noise 05', 'PSO Gambler Mem 1', 'Paradoxic Grim / S21', 'Parameterized Tit For Tat', 'Paranoid', 'Passive Tit For Tat', 'Patient Cooperator', 'Pattern Reader', 'Patterned Adaptive Fortress', 'Patterned Adaptive Fortress 2', 'Pavlov / Win-Stay, Lose-Shift', 'Pavlov D / Suspicious Pavlov', 'Pavlov Tester', 'Pavolovo', 'Pawlow', 'Perceptron', 'Phi', 'Pi', 'Prabowo', 'Praedator', 'Predator', 'Probable Coop', 'Probe & Exploit', 'Probe & Punish', 'Prober', 'Prober 2', 'Prober 3', 'Prober 4', 'Prober Abdullah-arif-swe version', 'Procastinater', 'Psycho Attariq Version', 'Pun 1', 'Punisher', 'Q-Learning A-Learner', 'REINFORCE', 'RLAgent', 'RLGossipAgent', 'RNN & RTRL', 'Racister', 'Rack Block Shooter', 'Raider', 'Random', 'Random Exploiter 1', 'Random Exploiter 2', 'Random Exploiter 3', 'Random Exploiter 4', 'Random Hunter', 'Random Tit For Tat', 'Reactive Player', 'Rememberable Grudger', 'Remorseful Prober', 'Resurrection', 'Retaliate', 'Retaliate 2', 'Retaliate 3', 'Rice Field', 'Ripoff', 'Risky Q-Learner', 'Rogers & Maslow', 'Rover', 'Rwallace', 'S11', 'S12 / Suspicious Forgiver', 'S18', 'S19', 'S2', 'S23', 'S24', 'S6', 'S7', 'SURPRISE ATTACK!', 'Sample / Second By Tit For 2 Tats', 'Sarsa Q-Learner', 'Scorched Earth', 'Score Equalizer', 'Second By Almy', 'Second By Ambuehl & Hickey', 'Second By Anderson', 'Second By Appold', 'Second By Batell', 'Second By Black', 'Second By Borufsen', 'Second By Cave', 'Second By Champion', 'Second By Colbert', 'Second By Dawes & Batell', 'Second By Eatherley', 'Second By Falk & Langsted', 'Second By Feld', 'Second By Friedland', 'Second By Friedland, But Get Revised By Axelrod', 'Second By George Hufford', 'Second By Getzler', 'Second By Gladstein / Tester', 'Second By Graaskamp & Katzen', 'Second By Grofman', 'Second By Hall', 'Second By Harrington', 'Second By Hollander', 'Second By Hotz', 'Second By Jones', 'Second By Joss', 'Second By Kluepfel', 'Second By Lefevre', 'Second By Leyland', 'Second By Leyvraz', 'Second By Mcgurrin', 'Second By Mikkelson', 'Second By Named Withheld', 'Second By Newman', 'Second By Nussbacher', 'Second By Nydegger', 'Second By Pebly', 'Second By Pinkley', 'Second By Quayle', 'Second By Rabbie', 'Second By Richard Hufford', 'Second By Robert Adams', 'Second By Robertson', 'Second By Rowsam', 'Second By Schurmann', 'Second By Smith', 'Second By Smoody', 'Second By Snodgrass', 'Second By Tideman & Chieruzzi', 'Second By Tranquilizer', 'Second By Weiderman', 'Second By Weiner', 'Second By White', 'Second By Wiliam Adams', 'Second By Yamachi', 'Second By Zimmerman', 'Second Chance', 'Second Chance Attariq Version', 'Self Steem', 'Self-Love A-Learner', 'Short Mem', 'Signaling Cheater', 'Simple ANN', 'Simple Exploiter', 'Simple Identity ChecK', 'Simpleton', 'Skinner', 'Slanger', 'Slow Tit For Tat', 'Smart', 'Smart Cat', 'Smart Generous Tit For Tat', 'Smart Go By Majority', 'Smart Snake', 'Smart-Clever', 'Smarter Tat For Tit', 'Smooth Grudger', 'Smooth Tit For Tat', 'Sneaky Tit For Tat', 'Social Average', 'Social Engineering', 'Socio', 'Soft Grim', 'Soft Grudger', 'Solution B1', 'Solution B5', 'Sort', 'Spectrum Attacker', 'Spiteful CC', 'Spiteful Tit For Tat', 'Split Brain Syndrome', 'Springter', 'Stabilize', 'Stalker', 'Star S', 'Star SL', 'Star SN', 'Star Slave 1', 'Star Slave 10', 'Star Slave 2', 'Star Slave 3', 'Star Slave 4', 'Star Slave 5', 'Star Slave 6', 'Star Slave 7', 'Star Slave 8', 'Star Slave 9', 'Statistical Strategy', 'Stefan Pennartz', 'Stochastic Cooperator', 'Stochastic WSLS', 'Stoic Mirror', 'Stoicalist', 'Strategist', 'Stupidiot', 'Sugar Strategy / Treasure Hunt', 'Sumobox Fighter', 'Sun Tzu Bot', 'Suspicious Alternator', 'Suspicious Tit For Tat', 'Sweet Heart', 'Syifa', 'TF 1', 'TF 2', 'TF 3', 'TF2T & 2TFT', 'TOM Level 1 / Theory Of Mind Level 1', 'TOM Level 2 / Theory Of Mind Level 2', 'TOM Level 3 / Theory Of Mind Level 3', 'TPMS / Tree Predictive Matrix Strategy', 'Tages', 'Teacher Pee While Standing, Student Pee While Running', 'Tester Eckhart Arnold Version', 'The Calculated Mirror With A Fuse', 'The Cave Breaker', 'The Nasty A', 'Theseus', 'Three Times Out', 'Threshold Punisher', 'Thresholded Trust Bot', 'Thue Morse', 'Thue Morse Inverse', 'Thumper', 'Tiny Brain', 'Tip For Tap', 'Tit For 3 Tats', 'Tit For Increasing Tat', 'Tit For Tat But Not Too Forgiving', 'Tit For Tat Killer', 'Toxic Mirror', 'Trader', 'Tranquilizer Eckhart Arnold Version', 'Tri-Brain', 'Tricky Cooperator', 'Tricky Defector', 'Tricky Level Punisher', 'Trust Ledger', 'Trust Score Sigmoid', 'Trusty', 'Turan', 'Tweedledee', 'Tweedledum', 'Tweetypie', 'Unpredictable Tit For Tat', 'Uranium', 'Usually Cooperates', 'Usually Defects', 'Vandal', 'Vengeful', 'Vengeful Cheater', 'Verity', 'Very Bad', 'WHAgent', 'Whale', 'William', 'Willing', 'Win-Shift, Lose-Stay', 'Winner 12', 'Winner 21', 'Worse & Worse / Worse & Worse 1', 'Worse & Worse 2', 'Worse & Worse 3', 'Your Choice Or My Choice', 'ZD-2026 / Zero Determinant 2026', 'ZD-G / Zero Determinant Generous', 'ZD-GTFT / Zero Determinant Generous Tit For Tat', 'ZD-M2 / Zero Determinant Memory 2', 'ZD-MS / Zero Determinant Mischief', 'ZD-PW2026 / Zero Determinant Psychological War 2026', 'ZD-Q / Zero Determinant Equalizer', 'ZD-S / Zero Determinant Set', 'ZD-X / Zero Determinant Extortion', 'Zero Day']
-strategies_creator = {'2 Tits For 2 Tats / Hard Tit For 2 Tats': 'A. J. Stewart & J. B. Plotkin / Robert Axelrod', '2 Tits For 2 Tats Eckhart Arnold Version': 'Eckhart Arnold', '2 Tits For Tat': 'John Maynard Smith', '3 Seconds Mirror': 'Meta', '3 Tits For Tat / Hard Tit For Tat': '[PD2017]', '3-Tree Of Prediction': 'M. A. M. Attariq', 'A-A&C / A-Actor&Critic': 'M. A. M. Attariq & Gemini', 'ALLC OR ALLD': 'Marc Harper', 'AMERICA! / Freedoom / USA': 'M. A. M. Attariq', 'AON2': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'AQUA': 'M. A. M. Attariq', 'Absurdistan 1': 'Christian Erlen', 'Acquaintance & Trust': 'Philip Seehausen', 'Adaptive': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Hhhpraise Version': 'Hhhpraise', 'Adaptive Pavlov 2006': 'J. Li', 'Adaptive Pavlov 2011': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Tit For Tat': 'E. Tzafestas', 'Adaptive Tit For Tat Attariq Version': 'M. A. M. Attariq', 'Adaptor Brief': 'Christoph Hauert & Olaf Stenull', 'Adaptor Long': 'Christoph Hauert & Olaf Stenull', 'Aggravater': 'Thomas Campbell', 'Alan': 'M. A. M. Attariq, Inspired From Alan Turing', 'Alcohol / Ethanol': 'M. A. M. Attariq', 'Alexei / End Game Cheater': 'Alexei / Eckhart Arnold', 'Alternator / Second By Duisman': 'Robert Axelrod / George Duisman', 'Alternator Hunter': 'Karol Langner', 'Always Cooperate / Cooperator / Dove / Saint': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / John Maynard Smith & George R. Price / Robert Trivers & Richard Dawkins', 'Always Defect / Defector / Hawk / Shark': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / John Maynard Smith & George R. Price / Robert Trivers & Richard Dawkins', 'Always Out / Outtor': 'M. A. M. Attariq', 'Amazon / Piraha': 'M. A. M. Attariq', 'Analogy': 'Robert Gladstein', 'Anatol': 'M. A. M. Attariq', 'Angry Tit For Tat': 'M. A. M. Attariq', 'Anti Cycler': 'Marc Harper', 'Anti Noise Tit For Tat': 'M. A. M. Attariq', 'Anti Tit For Tat / Psycho': 'C. Hilbe & M. A. Nowak & A. Traulsen / D. Ashlock & E. Y. Kim & W. Ashlock', 'Appeaser': 'Jochen Muller', 'Arrogant Q-Learner': 'Geraint Palmer', 'Average Copier': 'Geraint Palmer', 'BBE / Burn Both Ends': 'Louis Marinoff', 'Back Stabber': 'Thomas Campbell', 'Backrooms': 'M. A. M. Attariq', 'Bahlil': 'M. A. M. Attariq', 'Bandit': 'M. A. M. Attariq & Gemini', 'Bandit UCB': 'Auer & Cesa-Bianchi & Fischer', 'Bayes Attariq Version': 'M. A. M. Attariq', 'Bayes Foomii Version': 'Foomii', 'Benjo': 'benjjo', 'Beta Tester': 'M. A. M. Attariq', 'Better & Better': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Bluff': 'M. A. M. Attariq & My Aunt', 'Bluff Master': 'Perplexity', 'Boltzmann Brain': 'M. A. M. Attariq, Inspired From Ludwig Boltzmann', 'Bookend Cooperator': 'Explerify.com', 'Boxer': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bros Mind': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bully / Reverse Tit For Tat': 'John Nachbar', 'Burn The Bridge Strategy': 'tigressine', 'Bush Mosteller': 'Luis R. Izquierdo & Segismundo S. Izquierdo', 'Buzzer': 'M. A. M. Attariq', 'CS / Collective Strategy': 'J. Li & G. Kendall', 'Caerbannog': 'Caerbannog', 'Calamity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Calculator': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Calculator The Nerd Of AI Version': 'The Nerd Of AI', 'Capitalist': 'Chat-GPT', 'Capri': 'Y. Murase Et Al', 'Cautious Q-Learner': 'Geraint Palmer', 'Caveman': 'M. A. M. Attariq', 'Cerebrum': 'M. A. M. Attariq & Chat-GPT & Gemini', 'Charity': 'M. A. M. Attariq', 'Chatter': 'M. A. M. Attariq', 'Clement Coldridge': 'M. A. M. Attariq', 'Coin': 'M. A. M. Attariq', 'Collatz': 'M. A. M. Attariq', 'Communalist': 'Chat-GPT', 'Continuous Q-Learner Avg': 'M. A. M. Attariq', 'Continuous Q-Learner Max': 'M. A. M. Attariq', 'Contrite Grudger': 'M. A. M. Attariq', 'Contrite Tit For Tat': 'J. Wu & Robert Axelrod', 'Control 1': '[Less Wrong]', 'Control 10': '[Less Wrong]', 'Control 11': '[Less Wrong]', 'Control 2': '[Less Wrong]', 'Control 3': '[Less Wrong]', 'Control 4': '[Less Wrong]', 'Control 5': '[Less Wrong]', 'Control 6': '[Less Wrong]', 'Control 7': '[Less Wrong]', 'Control 8': '[Less Wrong]', 'Control 9': '[Less Wrong]', 'Cooperate Once': 'benjjo', 'Cooperator Hunter': 'Karol Langner', 'Crabby': 'Zachary Danziger', 'Crabby Attariq Version': 'M. A. M. Attariq', 'Cruelity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Cult Bishop A': 'M. A. M. Attariq', 'Cult Bishop B': 'M. A. M. Attariq', 'Cult Citizen A': 'M. A. M. Attariq', 'Cult Citizen B': 'M. A. M. Attariq', 'Cult Citizen C': 'M. A. M. Attariq', 'Cult Leader': 'M. A. M. Attariq', 'Curiosity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Cycle Hunter': 'Marc Harper', 'Cycler CCCCCD': 'Marc Harper', 'Cycler CCCD': 'Marc Harper', 'Cycler CCCDCD': 'Marc Harper', 'Cycler CCD': 'Marc Harper', 'Cycler DC': 'Marc Harper', 'Cycler DCCCC': 'M. A. M. Attariq', 'Cycler DDC': 'Marc Harper', 'DBS / Derived Belief Strategy': 'T.-C. Au & D. S. Nau', 'DDoS': 'M. A. M. Attariq', 'Darwin': 'Paul Slavin', 'Deadlock Breaker': 'D. Ashlock & E. Y. Kim ', 'Decay Given': 'M. A. M. Attariq', 'Defect Once': 'benjjo', 'Defector Hunter': 'Karol Langner', 'Delayed AON1': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'Desire': 'M. A. M. Attariq', 'Desprate': 'P. Van Den Berg & F. J. Weissing', 'Detective': 'Nicky Case', 'Devil Staircase': 'M. A. M. Attariq', 'Diplomat': 'Perplexity', 'Dont Bite The Hand That Feeds You': 'M. A. M. Attariq', 'Double Crosser': 'Thomas Campbell', 'Double Q-Learner': 'M. A. M. Attariq', 'Double Resurrection': 'Eckhart Arnold', 'Doubler': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Downing Benjjo Version': 'benjjo', 'Downing Eckhart Arnold Version': 'Eckhart Arnold', 'Dumpty 10': 'Eckhart Arnold', 'Dyna Q-Learner': 'M. A. M. Attariq', 'Dynamic 2 Tits For Tat': 'Grant Garrett-Grossman', 'Dynocat': 'rexmhall09', 'EGOist': 'M. A. M. Attariq', 'Easy Go / Reverse Grudger': "LIFL(Laboratoire d'Informatique Fondamentale de Lille) / J. Li & P. Hingston & G. Kendall", 'Echo Adaptive': 'Copilot', 'Echo Fisher': 'M. A. M. Attariq', 'Egoist A-Learner': 'M. A. M. Attariq', 'Eliza / Therapist': 'M. A. M. Attariq, Inspired From Joseph Weizenbaum', 'Entropy Sentinel': 'Chat-GPT', 'Envy': 'Bernd Lahno', 'Eric': 'M. A. M. Attariq & Erik & Chat-GPT', 'Eugine Nier': 'Eugine Nier', 'Euler': 'Timothy Standen', 'Eventual Cycle Hunter': 'Marc Harper', 'Evil Alliance': 'ArisKatsaris', 'Evolvable Cycler Attariq Version': 'M. A. M. Attariq', 'Evolved FSM 16': 'Marc Harper', 'Evolved FSM 16 Noise 05': 'Marc Harper', 'Evolved FSM 4': 'Marc Harper', 'Evolved FSM 6': 'Frederick Vincent & Dashiell Fryer', 'Evolved HMM 5': 'Marc Harper', 'Evolved Looker Up 1_1_1': 'Marc Harper', 'Evolved Looker Up 2_2_2': 'Marc Harper', 'Exploratory Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Exploratory Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'FAWS': 'FAWS', 'False Cooperator': 'Yaroslav Rosokha & Julian Romero', 'Falsity': 'M. A. M. Attariq, Inspired From Xqree', 'Female / Woman': 'M. A. M. Attariq', 'Fibonacci': 'M. A. M. Attariq', 'Finger Print': 'Eckhart Arnold', 'Firm But Fair / Firm For Tat': 'Marcus R. Frean', 'First By Davis': 'Morton Davis', 'First By Downing': 'Leslie Downing', 'First By Downing, But Get Revised By Axelrod': 'Leslie Downing', 'First By Feld': 'Scott Feld', 'First By Graaskamp / Second By Mauk': 'Jim Graaskamp / Fred Mauk', 'First By Grofman': 'Bernard Grofman', 'First By Grudger / Grim Trigger': 'James W. Friedman', 'First By Joss / Naive Prober': 'Johann Joss / J. Li & P. Hingston & G. Kendall', 'First By Named Withheld': 'Anonymous', 'First By Nydegger': 'Rudy Nydegger', 'First By Shubik': 'Martin Shubik', 'First By Stein & Rapoport': 'Stein & Anatol Rapoport', 'First By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'First By Tit For Tat': 'Anatol Rapoport', 'First By Tullock': 'Gordon Tullock', 'Fixed Pattern': 'Eckhart Arnold', 'Fool Me Once': 'Marc Harper', 'Forest-RND': 'M. A. M. Attariq', 'Forest-XG': 'M. A. M. Attariq', 'Forgetable Gradual': 'M. A. M. Attariq', 'Forgetful Fool Me Once': 'Marc Harper', 'Forgetful Grudger': 'Geraint Palmer', 'Forgetful Majority Bot': 'abdullah-arif-swe', 'Forgiver': 'Thomas Campbell', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Forgiving': 'Hhhpraise', 'Forgiving Fate': 'M. A. M. Attariq & Nabilah Shafirah', 'Forgiving Grudger': 'Explerify.com', 'Forgiving Tit For Tat': 'Thomas Campbell', 'Fortress 3': 'W. Ashlock & D. Ashlock', 'Fortress 4': 'W. Ashlock & D. Ashlock', 'Frankl': 'M. A. M. Attariq, Inspired From Viktor Frankl', 'Free Rider': 'Enquist & Leimar', 'Frequency Analyzer': 'Ian Miller', 'Freud': 'M. A. M. Attariq, Inspired From Sigmund Freud', 'Friendly Human': 'Alex Mainzer', 'GT-E / Game Theory Explorer': 'M. A. M. Attariq', 'Gambler Attariq Version': 'M. A. M. Attariq', 'Gaslighter': 'M. A. M. Attariq & Nabilah Shafirah', 'Gen 1_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 2_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 3_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 4_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 5_64_200_30_0.3_A': 'M. A. M. Attariq', 'Generic Downing': 'Sven Sommer', 'Generic Downing Friendly': 'Sven Sommer', 'Generous Tit For Tat': 'Robert Axelrod', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'Axelrod Project Contributor Team', 'Generous Tit For Tat Benjjo Version': 'benjjo', 'Generous Tit For Tat Eckhart Arnold Version 1': 'Eckhart Arnold', 'Generous Tit For Tat Eckhart Arnold Version 2': 'Eckhart Arnold', 'Generous Tit For Tat Less Wrong Version': '[Less Wrong]', 'Genetic Algo 1': 'M. A. M. Attariq', 'Genetic Algo 2': 'M. A. M. Attariq', 'George': 'M. A. M. Attariq', 'Go By Majority / Second By Grisell / Soft Go By Majority': 'Robert Axelrod / Gail Grisell / S. Mittal & K. Deb', 'Go By Minority': 'M. A. M. Attariq', 'Gold Digger': 'Foomii', 'Golden Mean': 'Dola', 'Good': 'M. A. M. Attariq', 'GossipAgent': 'remcofl', 'Graaskamp Benjjo Version': 'benjjo', 'Gradual': 'B. Beaufils & J. Delahaye & P. Mathieu', 'Gradual Cristal Version': 'CRISTAL Lab & SMAC Team', 'Gradual Killer': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Grateful / S9': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Grudger Alternator': 'Geraint Palmer', 'Grumpy': 'Jason Young', 'HER / MENACE': 'M. A. M. Attariq, Inspired From Martin Gardner & Donald Michie', 'HMM Player': 'Marc Harper', 'Half Sin Square': 'M. A. M. Attariq', 'Handshake': 'Arthur J. Robson', 'Hard Go By Majority': 'S. Mittal & K. Deb', 'Hard Prober': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Hesitant Q-Learner': 'Geraint Palmer', 'Hopeless': 'P. Van Den Berg & F. J. Weissing', 'Hot Coffee': 'M. A. M. Attariq', 'Humpty 10': 'Eckhart Arnold', 'Hungry': 'M. A. M. Attariq', 'Inequality / SOVIET UNION! / USSR': 'M. A. M. Attariq', 'Inequity Averse Q-Learner': 'M. A. M. Attariq', 'Inverse': 'Karol Langner', 'Inverse Punisher': 'Geraint Palmer', 'Is There Something New?': 'M. A. M. Attariq', 'Isolated Clan': 'M. A. M. Attariq', 'Isolated Tit For Tat': 'M. A. M. Attariq', 'Japan Empire Emperor': 'M. A. M. Attariq', 'Japan Empire Soldier 1': 'M. A. M. Attariq', 'Japan Empire Soldier 10': 'M. A. M. Attariq', 'Japan Empire Soldier 2': 'M. A. M. Attariq', 'Japan Empire Soldier 3': 'M. A. M. Attariq', 'Japan Empire Soldier 4': 'M. A. M. Attariq', 'Japan Empire Soldier 5': 'M. A. M. Attariq', 'Japan Empire Soldier 6': 'M. A. M. Attariq', 'Japan Empire Soldier 7': 'M. A. M. Attariq', 'Japan Empire Soldier 8': 'M. A. M. Attariq', 'Japan Empire Soldier 9': 'M. A. M. Attariq', 'Javelin': 'M. A. M. Attariq & Angga Febriansyah', 'Jem': 'Jem', 'Jester': 'parzhitsky', 'Jesus Petry': 'Jesus Petry', 'Josuah': 'M. A. M. Attariq', 'Jung': 'M. A. M. Attariq, Inspired From Carl Jung', 'Karen': 'M. A. M. Attariq', 'Keyman': 'M. A. M. Attariq', 'Killer': 'Zachary Danziger', 'King Of 48 Laws Of Power': 'M. A. M. Attariq, Inspired From Robert Greene', 'Knowledgeable Worse & Worse': 'Adam Pohl', 'Konflikt Blue': 'M. A. M. Attariq', 'Konflikt Green': 'M. A. M. Attariq', 'L-BODOR / Learning Based On Derivative Of Reward': 'M. A. M. Attariq', 'LCG': 'M. A. M. Attariq', 'Laran': 'Elio Piccolo & Giovanni Squillero', 'Laws': 'M. A. M. Attariq', 'Learner': 'M. A. M. Attariq', 'Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Lenient Grim 3': 'Yaroslav Rosokha & Julian Romero', 'Less Grim': 'Sven Sommer', 'Level Punisher': 'Eckhart Arnold', 'Liar Person': 'M. A. M. Attariq & Angga Febriansyah', 'Lighty-Darky': 'M. A. M. Attariq', 'Limited Retaliate': 'Owen Campbell', 'Limited Retaliate 2': 'Owen Campbell', 'Limited Retaliate 3': 'Owen Campbell', 'Line': 'M. A. M. Attariq', 'Little Grudger': 'M. A. M. Attariq', 'Long Horse': 'M. A. M. Attariq, Inspired From LookOut2DD', 'Long Term Strategist': 'The Nerd Of AI', 'Look Ahead / Look Up': 'Alan Gaines', 'Loyal': 'Foomii', 'MARS / Mimicry And Relative Similarity': 'T. L. B. M. Silva & A. L. V. Coelho & C. H. C. Ribeiro', 'MCMC / Markov Chain Monte Carlo': 'Nicholas Metropolis & W.K. Hastings, but implemented by Tuomas Sandholm & Robert Crites', 'MEM2': 'J. Li & G. Kendall', 'MSAgent': 'remcofl', 'Mafia A': 'M. A. M. Attariq', 'Mafia B': 'M. A. M. Attariq', 'Mafia C': 'M. A. M. Attariq', 'Mafia D': 'M. A. M. Attariq', 'Majapahit': 'M. A. M. Attariq', 'Male / Man': 'M. A. M. Attariq', 'Malthrin': 'Malthrin', 'Man In The Middle': 'M. A. M. Attariq', 'Manipulator': 'The Nerd Of AI', 'Manipulity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Markov': 'M. A. M. Attariq, Inspired From Andrey Andreyevich Markov', 'Matcher': 'M. A. M. Attariq', 'Math Constant Hunter': 'Karol Langner', 'Memory 1': 'SidZRed', 'Memory Decay': 'Axelrod Project Contributor Team', 'Mensa': 'Zachary Danziger', 'Meta Hunter': 'Karol Langner', 'Meta Majority': 'Karol Langner', 'Meta Minority': 'Karol Langner', 'Meta Mixer': 'Karol Langner', 'Meta Winner': 'Karol Langner', 'Meta Winner Ensemble': 'Marc Harper', 'Michaelos': 'Michaelos', 'Mirror': 'Foomii', 'Mystical Logic': 'M. A. M. Attariq', 'Modal Defector': 'benjjo', 'Modal Tit For Tat': 'benjjo', 'Momentum': 'Dong Won Moon', 'Monkey See, Monkey Do': 'M. A. M. Attariq', 'Mosquito': 'M. A. M. Attariq', 'MrX': 'Bjoern Van Den Bruck', 'N Pavlov': 'SidZRed', 'N Tits For M Tats': 'Marc Harper', 'Naive Q-Learner': 'M. A. M. Attariq', 'Nash': 'M. A. M. Attariq, Inspired From John Forbes Nash Jr', 'Nasty Tit For Tat': 'Axelrod Project Contributor Team', 'Negation': '[PD2017]', 'Neil A': 'M. A. M. Attariq', 'Newton': 'M. A. M. Attariq, Inspired From Newton Second Law', 'Nydegger Benjjo Version': 'benjjo', 'Observant': 'Zachary Danziger', 'Odd-Even Go By Majority': 'M. A. M. Attariq', 'Odysseus / Ὀδυσσεύς': 'M. A. M. Attariq', 'Omega Tit For Tat': 'W. Slany & W. Kienreich', 'Once Bitten': 'Holly Marissa', 'Opportunist': 'The Nerd Of AI', 'Opposite Grudger': 'Geraint Palmer', 'Out For Tat': 'M. A. M. Attariq', 'PIN': 'Philip Seehausen', 'PSO Gambler 1_1_1': 'Marc Harper', 'PSO Gambler 2_2_2': 'Georgios Koutsovoulos & Marc Harper', 'PSO Gambler 2_2_2 Noise 05': 'Marc Harper', 'PSO Gambler Mem 1': 'Marc Harper', 'Paradoxic Grim / S21': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Parameterized Tit For Tat': 'Eckhart Arnold', 'Paranoid': 'M. A. M. Attariq', 'Passive Tit For Tat': 'M. A. M. Attariq', 'Patient Cooperator': 'Explerify.com', 'Pattern Reader': 'Explerify.com', 'Patterned Adaptive Fortress': 'M. A. M. Attariq & Claude & Gemini & Chat-GPT & Copilot', 'Patterned Adaptive Fortress 2': 'M. A. M. Attariq & Claude & Gemini & Chat-GPT & DeepSeek & Dola', 'Pavlov / Win-Stay, Lose-Shift': 'David Kraines & Vivian Kraines', 'Pavlov D / Suspicious Pavlov': 'Zhen Ji', 'Pavlov Tester': 'M. A. M. Attariq', 'Pavolovo': 'M. A. M. Attariq', 'Pawlow': 'M. A. M. Attariq', 'Perceptron': 'M. A. M. Attariq', 'Phi': 'Timothy Standen', 'Pi': 'Timothy Standen', 'Prabowo': 'M. A. M. Attariq', 'Praedator': 'M. A. M. Attariq', 'Predator': 'W. Ashlock & D. Ashlock', 'Probable Coop': 'SidZRed', 'Probe & Exploit': 'Explerify.com', 'Probe & Punish': 'Eneasz', 'Prober': 'J. Li & P. Hingston & G. Kendall', 'Prober 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 4': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober Abdullah-arif-swe version': 'abdullah-arif-swe', 'Procastinater': 'M. A. M. Attariq', 'Psycho Attariq Version': 'M. A. M. Attariq', 'Pun 1': 'D. Ashlock & E. Y. Kim & N. Leahy', 'Punisher': 'Geraint Palmer', 'Q-Learning A-Learner': 'M. A. M. Attariq', 'REINFORCE': 'M. A. M. Attariq', 'RLAgent': 'remcofl', 'RLGossipAgent': 'remcofl', 'RNN & RTRL': 'M. A. M. Attariq', 'Racister': 'M. A. M. Attariq', 'Rack Block Shooter': 'Nic Smith', 'Raider': 'W. Ashlock & J. Tsang & D. Ashlock', 'Random': 'Robert Axelrod', 'Random Exploiter 1': 'M. A. M. Attariq', 'Random Exploiter 2': 'M. A. M. Attariq', 'Random Exploiter 3': 'M. A. M. Attariq', 'Random Exploiter 4': 'M. A. M. Attariq', 'Random Hunter': 'Karol Langner', 'Random Tit For Tat': 'Zachary M. Taylor', 'Reactive Player': 'Martin Nowak & Karl Sigmund', 'Rememberable Grudger': 'M. A. M. Attariq', 'Remorseful Prober': 'J. Li & P. Hingston & G. Kendall', 'Resurrection': 'Eckhart Arnold', 'Retaliate': 'Owen Campbell', 'Retaliate 2': 'Owen Campbell', 'Retaliate 3': 'Owen Campbell', 'Rice Field': 'Meta', 'Ripoff': 'D. Ashlock & E. Y. Kim', 'Risky Q-Learner': 'Geraint Palmer', 'Rogers & Maslow': 'M. A. M. Attariq, Inspired From Carl Rogers & Abraham Maslow', 'Rover': 'Dugatkin & Wilson', 'Rwallace': 'Rwallace', 'S11': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S12 / Suspicious Forgiver': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S18': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S19': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S2': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S23': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S24': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S6': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S7': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'SURPRISE ATTACK!': 'M. A. M. Attariq', 'Sample / Second By Tit For 2 Tats': 'Robert Axelrod / John Maynard Smith', 'Sarsa Q-Learner': 'M. A. M. Attariq', 'Scorched Earth': 'Explerify.com', 'Score Equalizer': 'M. A. M. Attariq', 'Second By Almy': 'Tom Almy', 'Second By Ambuehl & Hickey': 'Dennis Ambuehl & Kevin Hickey', 'Second By Anderson': 'R. D. Anderson', 'Second By Appold': 'Scott Appold', 'Second By Batell': 'Mark F. Batell', 'Second By Black': 'Paul E. Black', 'Second By Borufsen': 'Otto Borufsen', 'Second By Cave': 'Rob Cave', 'Second By Champion': 'Danny C. Champion', 'Second By Colbert': 'John Willaim Colbert', 'Second By Dawes & Batell': 'Robyn M. Dawes & Mark Batell', 'Second By Eatherley': 'Graham J. Eatherley', 'Second By Falk & Langsted': 'Robert B. Falk & James M. Langsted', 'Second By Feld': 'Scott Feld', 'Second By Friedland': 'Edward Friedland', 'Second By Friedland, But Get Revised By Axelrod': 'Robert Axelrod', 'Second By George Hufford': 'George Hufford', 'Second By Getzler': 'Abraham Getzler', 'Second By Gladstein / Tester': 'David Gladstein', 'Second By Graaskamp & Katzen': 'Jim Graaskamp & Ken Katzen', 'Second By Grofman': 'Bernard Grofman', 'Second By Hall': 'James E. Hall', 'Second By Harrington': 'Paul D. Harrington', 'Second By Hollander': 'Howard R. Hollander', 'Second By Hotz': 'Roger Hotz', 'Second By Jones': 'Martyn Jones', 'Second By Joss': 'Johann Joss', 'Second By Kluepfel': 'Charles Kluepfel', 'Second By Lefevre': 'George Lefevre', 'Second By Leyland': 'Robert A. Leyland', 'Second By Leyvraz': 'Fransois Leyvraz', 'Second By Mcgurrin': 'Michael F. McGurrin', 'Second By Mikkelson': 'Ray Mikkelson', 'Second By Named Withheld': 'Anonymous2', 'Second By Newman': 'Steve Newman', 'Second By Nussbacher': 'Henry Nussbacher', 'Second By Nydegger': 'Rudy Nydegger', 'Second By Pebly': 'Robert Pebly', 'Second By Pinkley': 'Jonathan Pinkley', 'Second By Quayle': 'Stanley F. Quayle', 'Second By Rabbie': 'Harold Rabbie', 'Second By Richard Hufford': 'Richard Hufford', 'Second By Robert Adams': 'Robert Adams', 'Second By Robertson': 'William H. Robertson', 'Second By Rowsam': 'Glen Rowsam', 'Second By Schurmann': 'E. E. H. Schurmann', 'Second By Smith': 'David A. Smith', 'Second By Smoody': 'Rik Smoody', 'Second By Snodgrass': 'Gene Snodgrass', 'Second By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'Second By Tranquilizer': 'Craig Feathers', 'Second By Weiderman': 'Nelson Weiderman', 'Second By Weiner': 'Herb Weiner', 'Second By White': 'Edward C. White Jr', 'Second By Wiliam Adams': 'William Adams', 'Second By Yamachi': 'Brian Yamachi', 'Second By Zimmerman': 'George Zimmerman', 'Second Chance': 'Benelliott', 'Second Chance Attariq Version': 'M. A. M. Attariq, Inspired From My Father', 'Self Steem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Self-Love A-Learner': 'M. A. M. Attariq', 'Short Mem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Signaling Cheater': 'Eckhart Arnold', 'Simple ANN': 'M. A. M. Attariq', 'Simple Exploiter': 'M. A. M. Attariq', 'Simple Identity ChecK': 'Red75', 'Simpleton': 'Eckhart Arnold', 'Skinner': 'M. A. M. Attariq, Inspired From B.F. Skinner', 'Slanger': 'M. A. M. Attariq', 'Slow Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Smart': 'Sven Sommer', 'Smart Cat': 'M. A. M. Attariq & Syarif', 'Smart Generous Tit For Tat': 'M. A. M. Attariq', 'Smart Go By Majority': 'M. A. M. Attariq', 'Smart Snake': 'M. A. M. Attariq, Inspired From Simulife Hub', 'Smart-Clever': 'M. A. M. Attariq', 'Smarter Tat For Tit': 'Eckhart Arnold', 'Smooth Grudger': 'M. A. M. Attariq', 'Smooth Tit For Tat': 'M. A. M. Attariq', 'Sneaky Tit For Tat': 'Karol Langner', 'Social Average': 'Chat-GPT', 'Social Engineering': 'M. A. M. Attariq', 'Socio': 'M. A. M. Attariq', 'Soft Grim': 'Eckhart Arnold', 'Soft Grudger': 'J. Li & P. Hingston & G. Kendall', 'Solution B1': 'D. Ashlock & J. A. Brown & P. Hingston', 'Solution B5': 'D. Ashlock & J. A. Brown & P. Hingston', 'Sort': 'M. A. M. Attariq', 'Spectrum Attacker': 'M. A. M. Attariq', 'Spiteful CC': 'P. Mathieu & J. Delahaye', 'Spiteful Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Split Brain Syndrome': 'Dola', 'Springter': 'M. A. M. Attariq', 'Stabilize': 'Paul Boehm', 'Stalker': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Star S': 'Gopal Ramchurn', 'Star SL': 'Gopal Ramchurn', 'Star SN': 'Gopal Ramchurn', 'Star Slave 1': 'Gopal Ramchurn', 'Star Slave 10': 'Gopal Ramchurn', 'Star Slave 2': 'Gopal Ramchurn', 'Star Slave 3': 'Gopal Ramchurn', 'Star Slave 4': 'Gopal Ramchurn', 'Star Slave 5': 'Gopal Ramchurn', 'Star Slave 6': 'Gopal Ramchurn', 'Star Slave 7': 'Gopal Ramchurn', 'Star Slave 8': 'Gopal Ramchurn', 'Star Slave 9': 'Gopal Ramchurn', 'Statistical Strategy': 'd0minik2', 'Stefan Pennartz': 'Stefan Pennartz', 'Stochastic Cooperator': 'C. Adami & A. Hintze', 'Stochastic WSLS': 'Marc Harper', 'Stoic Mirror': 'Gemini', 'Stoicalist': 'M. A. M. Attariq & Gemini', 'Strategist': 'Explerify.com', 'Stupidiot': 'M. A. M. Attariq', 'Sugar Strategy / Treasure Hunt': 'D. Ashlock & W. Ashlock', 'Sumobox Fighter': 'M. A. M. Attariq, Inspired From Simulife Hub', 'Sun Tzu Bot': 'M. A. M. Attariq, Inspired From Sun Tzu', 'Suspicious Alternator': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Suspicious Tit For Tat': 'C. Hilbe & M. A. Nowak & A. Traulsen', 'Sweet Heart': 'DeepSeek', 'Syifa': 'M. A. M. Attariq & Syifa', 'TF 1': 'Marc Harper', 'TF 2': 'Marc Harper', 'TF 3': 'Marc Harper', 'TF2T & 2TFT': 'M. A. M. Attariq', 'TOM Level 1 / Theory Of Mind Level 1': 'M. A. M. Attariq', 'TOM Level 2 / Theory Of Mind Level 2': 'M. A. M. Attariq', 'TOM Level 3 / Theory Of Mind Level 3': 'M. A. M. Attariq', 'TPMS / Tree Predictive Matrix Strategy': 'M. A. M. Attariq', 'Tages': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Teacher Pee While Standing, Student Pee While Running': 'M. A. M. Attariq', 'Tester Eckhart Arnold Version': 'Eckhart Arnold', 'The Calculated Mirror With A Fuse': 'Gemini', 'The Cave Breaker': 'M. A. M. Attariq & Gemini', 'The Nasty A': 'M. A. M. Attariq', 'Theseus': 'M. A. M. Attariq, Inspired From Claude Shannon', 'Three Times Out': 'Philip Seehausen', 'Threshold Punisher': 'Copilot', 'Thresholded Trust Bot': 'M. A. M. Attariq', 'Thue Morse': 'Geraint Palmer', 'Thue Morse Inverse': 'Geraint Palmer', 'Thumper': 'D. Ashlock & E. Y. Kim', 'Tiny Brain': 'M. A. M. Attariq', 'Tip For Tap': 'M. A. M. Attariq', 'Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'Tit For Increasing Tat': 'Claude', 'Tit For Tat But Not Too Forgiving': 'M. A. M. Attariq', 'Tit For Tat Killer': 'M. A. M. Attariq', 'Toxic Mirror': 'DeepSeek', 'Trader': 'M. A. M. Attariq & Gemini', 'Tranquilizer Eckhart Arnold Version': 'Eckhart Arnold', 'Tri-Brain': 'M. A. M. Attariq', 'Tricky Cooperator': 'Karol Langner', 'Tricky Defector': 'Karol Langner', 'Tricky Level Punisher': 'Eckhart Arnold', 'Trust Ledger': 'Chat-GPT', 'Trust Score Sigmoid': 'Claude', 'Trusty': 'Foomii', 'Turan': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Tweedledee': 'Eckhart Arnold', 'Tweedledum': 'Eckhart Arnold', 'Tweetypie': 'Eckhart Arnold', 'Unpredictable Tit For Tat': 'M. A. M. Attariq', 'Uranium': 'M. A. M. Attariq', 'Usually Cooperates': 'D. Ashlock & E. Y. Kim & W. Ashlock', 'Usually Defects': 'D. Ashlock & E. Y.Kim & W. Ashlock', 'Vandal': 'Foomii', 'Vengeful': 'D. Ashlock', 'Vengeful Cheater': 'Vaniver', 'Verity': 'M. A. M. Attariq & Gemini, Inspired From ThatMob', 'Very Bad': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'WHAgent': 'remcofl', 'Whale': 'M. A. M. Attariq & DeepSeek', 'William': 'M. A. M. Attariq', 'Willing': 'P. Van Den Berg & F. J. Weissing', 'Win-Shift, Lose-Stay': 'J. Li & P. Hingston & G. Kendall', 'Winner 12': 'P. Mathieu & J. Delahaye', 'Winner 21': 'P. Mathieu & J. Delahaye', 'Worse & Worse / Worse & Worse 1': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Your Choice Or My Choice': 'M. A. M. Attariq', 'ZD-2026 / Zero Determinant 2026': 'M. A. M. Attariq', 'ZD-G / Zero Determinant Generous': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-GTFT / Zero Determinant Generous Tit For Tat': "A. J. Stewart & J. B. Plotkin, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-M2 / Zero Determinant Memory 2': 'Marc Harper', 'ZD-MS / Zero Determinant Mischief': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-PW2026 / Zero Determinant Psychological War 2026': 'Gemini', 'ZD-Q / Zero Determinant Equalizer': "William H. Press & Freeman Dyson, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-S / Zero Determinant Set': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-X / Zero Determinant Extortion': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Day': 'M. A. M. Attariq'}
-strategies_category = {'2 Tits For 2 Tats / Hard Tit For 2 Tats': 'NICE', '2 Tits For 2 Tats Eckhart Arnold Version': 'NASTY', '2 Tits For Tat': 'NICE', '3 Seconds Mirror': 'NICE', '3 Tits For Tat / Hard Tit For Tat': 'NICE', '3-Tree Of Prediction': 'NICE', 'A-A&C / A-Actor&Critic': 'NASTY', 'ALLC OR ALLD': 'NASTY', 'AMERICA! / Freedoom / USA': 'NASTY', 'AON2': 'NICE', 'AQUA': 'NICE', 'Absurdistan 1': 'NICE', 'Acquaintance & Trust': 'NICE', 'Adaptive': 'NASTY', 'Adaptive Hhhpraise Version': 'NICE', 'Adaptive Pavlov 2006': 'NICE', 'Adaptive Pavlov 2011': 'NICE', 'Adaptive Tit For Tat': 'NICE', 'Adaptive Tit For Tat Attariq Version': 'NICE', 'Adaptor Brief': 'NASTY', 'Adaptor Long': 'NASTY', 'Aggravater': 'NASTY', 'Alan': 'NICE', 'Alcohol / Ethanol': 'NASTY', 'Alexei / End Game Cheater': 'NASTY', 'Alternator / Second By Duisman': 'NASTY', 'Alternator Hunter': 'NICE', 'Always Cooperate / Cooperator / Dove / Saint': 'NICE', 'Always Defect / Defector / Hawk / Shark': 'NASTY', 'Always Out / Outtor': 'NICE', 'Amazon / Piraha': 'NICE', 'Analogy': 'NASTY', 'Anatol': 'NICE', 'Angry Tit For Tat': 'NICE', 'Anti Cycler': 'NASTY', 'Anti Noise Tit For Tat': 'NICE', 'Anti Tit For Tat / Psycho': 'NASTY', 'Appeaser': 'NICE', 'Arrogant Q-Learner': 'NASTY', 'Average Copier': 'NASTY', 'BBE / Burn Both Ends': 'NASTY', 'Back Stabber': 'NICE', 'Backrooms': 'NASTY', 'Bahlil': 'NASTY', 'Bandit': 'NASTY', 'Bandit UCB': 'NASTY', 'Bayes Attariq Version': 'NICE', 'Bayes Foomii Version': 'NICE', 'Benjo': 'NICE', 'Beta Tester': 'NASTY', 'Better & Better': 'NASTY', 'Bluff': 'NASTY', 'Bluff Master': 'NASTY', 'Boltzmann Brain': 'NASTY', 'Bookend Cooperator': 'NASTY', 'Boxer': 'NICE', 'Bros Mind': 'NICE', 'Bully / Reverse Tit For Tat': 'NASTY', 'Burn The Bridge Strategy': 'NASTY', 'Bush Mosteller': 'NASTY', 'Buzzer': 'NASTY', 'CS / Collective Strategy': 'NASTY', 'Caerbannog': 'NASTY', 'Calamity': 'NASTY', 'Calculator': 'NASTY', 'Calculator The Nerd Of AI Version': 'NICE', 'Capitalist': 'NASTY', 'Capri': 'NICE', 'Cautious Q-Learner': 'NASTY', 'Caveman': 'NASTY', 'Cerebrum': 'NICE', 'Charity': 'NICE', 'Chatter': 'NICE', 'Clement Coldridge': 'NICE', 'Coin': 'NASTY', 'Collatz': 'NASTY', 'Communalist': 'NICE', 'Continuous Q-Learner Avg': 'NASTY', 'Continuous Q-Learner Max': 'NASTY', 'Contrite Grudger': 'NICE', 'Contrite Tit For Tat': 'NICE', 'Control 1': 'NASTY', 'Control 10': 'NASTY', 'Control 11': 'NASTY', 'Control 2': 'NICE', 'Control 3': 'NASTY', 'Control 4': 'NASTY', 'Control 5': 'NASTY', 'Control 6': 'NICE', 'Control 7': 'NASTY', 'Control 8': 'NASTY', 'Control 9': 'NICE', 'Cooperate Once': 'NASTY', 'Cooperator Hunter': 'NASTY', 'Crabby': 'NICE', 'Crabby Attariq Version': 'NASTY', 'Cruelity': 'NICE', 'Cult Bishop A': 'NASTY', 'Cult Bishop B': 'NASTY', 'Cult Citizen A': 'NASTY', 'Cult Citizen B': 'NASTY', 'Cult Citizen C': 'NASTY', 'Cult Leader': 'NASTY', 'Curiosity': 'NICE', 'Cycle Hunter': 'NASTY', 'Cycler CCCCCD': 'NASTY', 'Cycler CCCD': 'NASTY', 'Cycler CCCDCD': 'NASTY', 'Cycler CCD': 'NASTY', 'Cycler DC': 'NASTY', 'Cycler DCCCC': 'NASTY', 'Cycler DDC': 'NASTY', 'DBS / Derived Belief Strategy': 'NICE', 'DDoS': 'NICE', 'Darwin': 'NICE', 'Deadlock Breaker': 'NICE', 'Decay Given': 'NICE', 'Defect Once': 'NASTY', 'Defector Hunter': 'NICE', 'Delayed AON1': 'NICE', 'Desire': 'NICE', 'Desprate': 'NASTY', 'Detective': 'NASTY', 'Devil Staircase': 'NICE', 'Diplomat': 'NICE', 'Dont Bite The Hand That Feeds You': 'NICE', 'Double Crosser': 'NICE', 'Double Q-Learner': 'NASTY', 'Double Resurrection': 'NASTY', 'Doubler': 'NICE', 'Downing Benjjo Version': 'NICE', 'Downing Eckhart Arnold Version': 'NASTY', 'Dumpty 10': 'NASTY', 'Dyna Q-Learner': 'NASTY', 'Dynamic 2 Tits For Tat': 'NICE', 'Dynocat': 'NASTY', 'EGOist': 'NASTY', 'Easy Go / Reverse Grudger': 'NASTY', 'Echo Adaptive': 'NICE', 'Echo Fisher': 'NASTY', 'Egoist A-Learner': 'NICE', 'Eliza / Therapist': 'NICE', 'Entropy Sentinel': 'NASTY', 'Envy': 'NICE', 'Eric': 'NICE', 'Eugine Nier': 'NASTY', 'Euler': 'NASTY', 'Eventual Cycle Hunter': 'NICE', 'Evil Alliance': 'NASTY', 'Evolvable Cycler Attariq Version': 'NASTY', 'Evolved FSM 16': 'NICE', 'Evolved FSM 16 Noise 05': 'NICE', 'Evolved FSM 4': 'NICE', 'Evolved FSM 6': 'NASTY', 'Evolved HMM 5': 'NICE', 'Evolved Looker Up 1_1_1': 'NICE', 'Evolved Looker Up 2_2_2': 'NICE', 'Exploratory Lenient Grim 2': 'NASTY', 'Exploratory Tit For 3 Tats': 'NASTY', 'FAWS': 'NASTY', 'False Cooperator': 'NASTY', 'Falsity': 'NICE', 'Female / Woman': 'NASTY', 'Fibonacci': 'NASTY', 'Finger Print': 'NASTY', 'Firm But Fair / Firm For Tat': 'NICE', 'First By Davis': 'NICE', 'First By Downing': 'NASTY', 'First By Downing, But Get Revised By Axelrod': 'NICE', 'First By Feld': 'NASTY', 'First By Graaskamp / Second By Mauk': 'NASTY', 'First By Grofman': 'NICE', 'First By Grudger / Grim Trigger': 'NICE', 'First By Joss / Naive Prober': 'NASTY', 'First By Named Withheld': 'NASTY', 'First By Nydegger': 'NICE', 'First By Shubik': 'NICE', 'First By Stein & Rapoport': 'NASTY', 'First By Tideman & Chieruzzi': 'NICE', 'First By Tit For Tat': 'NICE', 'First By Tullock': 'NASTY', 'Fixed Pattern': 'NASTY', 'Fool Me Once': 'NICE', 'Forest-RND': 'NICE', 'Forest-XG': 'NICE', 'Forgetable Gradual': 'NICE', 'Forgetful Fool Me Once': 'NICE', 'Forgetful Grudger': 'NICE', 'Forgetful Majority Bot': 'NICE', 'Forgiver': 'NICE', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14': 'NICE', 'Forgiving': 'NICE', 'Forgiving Fate': 'NICE', 'Forgiving Grudger': 'NICE', 'Forgiving Tit For Tat': 'NICE', 'Fortress 3': 'NASTY', 'Fortress 4': 'NASTY', 'Frankl': 'NICE', 'Free Rider': 'NASTY', 'Frequency Analyzer': 'NICE', 'Freud': 'NICE', 'Friendly Human': 'NICE', 'GT-E / Game Theory Explorer': 'NICE', 'Gambler Attariq Version': 'NASTY', 'Gaslighter': 'NASTY', 'Gen 1_64_200_30_0.3_A': 'NASTY', 'Gen 2_64_200_30_0.3_A': 'NASTY', 'Gen 3_64_200_30_0.3_A': 'NASTY', 'Gen 4_64_200_30_0.3_A': 'NASTY', 'Gen 5_64_200_30_0.3_A': 'NASTY', 'Generic Downing': 'NASTY', 'Generic Downing Friendly': 'NASTY', 'Generous Tit For Tat': 'NICE', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'NICE', 'Generous Tit For Tat Benjjo Version': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 1': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 2': 'NICE', 'Generous Tit For Tat Less Wrong Version': 'NICE', 'Genetic Algo 1': 'NICE', 'Genetic Algo 2': 'NICE', 'George': 'NASTY', 'Go By Majority / Second By Grisell / Soft Go By Majority': 'NICE', 'Go By Minority': 'NASTY', 'Gold Digger': 'NASTY', 'Golden Mean': 'NICE', 'Good': 'NICE', 'GossipAgent': 'NASTY', 'Graaskamp Benjjo Version': 'NASTY', 'Gradual': 'NICE', 'Gradual Cristal Version': 'NICE', 'Gradual Killer': 'NASTY', 'Grateful / S9': 'NASTY', 'Grudger Alternator': 'NICE', 'Grumpy': 'NICE', 'HER / MENACE': 'NICE', 'HMM Player': 'NASTY', 'Half Sin Square': 'NICE', 'Handshake': 'NASTY', 'Hard Go By Majority': 'NICE', 'Hard Prober': 'NASTY', 'Hesitant Q-Learner': 'NASTY', 'Hopeless': 'NASTY', 'Hot Coffee': 'NICE', 'Humpty 10': 'NASTY', 'Hungry': 'NASTY', 'Inequality / SOVIET UNION! / USSR': 'NASTY', 'Inequity Averse Q-Learner': 'NASTY', 'Inverse': 'NICE', 'Inverse Punisher': 'NICE', 'Is There Something New?': 'NICE', 'Isolated Clan': 'NASTY', 'Isolated Tit For Tat': 'NICE', 'Japan Empire Emperor': 'NICE', 'Japan Empire Soldier 1': 'NICE', 'Japan Empire Soldier 10': 'NICE', 'Japan Empire Soldier 2': 'NICE', 'Japan Empire Soldier 3': 'NICE', 'Japan Empire Soldier 4': 'NICE', 'Japan Empire Soldier 5': 'NICE', 'Japan Empire Soldier 6': 'NICE', 'Japan Empire Soldier 7': 'NICE', 'Japan Empire Soldier 8': 'NICE', 'Japan Empire Soldier 9': 'NICE', 'Javelin': 'NICE', 'Jem': 'NASTY', 'Jester': 'NASTY', 'Jesus Petry': 'NASTY', 'Josuah': 'NASTY', 'Jung': 'NICE', 'Karen': 'NASTY', 'Keyman': 'NASTY', 'Killer': 'NASTY', 'King Of 48 Laws Of Power': 'NICE', 'Knowledgeable Worse & Worse': 'NASTY', 'Konflikt Blue': 'NASTY', 'Konflikt Green': 'NICE', 'L-BODOR / Learning Based On Derivative Of Reward': 'NICE', 'LCG': 'NASTY', 'Laran': 'NASTY', 'Laws': 'NICE', 'Learner': 'NICE', 'Lenient Grim 2': 'NICE', 'Lenient Grim 3': 'NICE', 'Less Grim': 'NICE', 'Level Punisher': 'NICE', 'Liar Person': 'NASTY', 'Lighty-Darky': 'NASTY', 'Limited Retaliate': 'NICE', 'Limited Retaliate 2': 'NICE', 'Limited Retaliate 3': 'NICE', 'Line': 'NICE', 'Little Grudger': 'NICE', 'Long Horse': 'NASTY', 'Long Term Strategist': 'NICE', 'Look Ahead / Look Up': 'NASTY', 'Loyal': 'NICE', 'MARS / Mimicry And Relative Similarity': 'NICE', 'MCMC / Markov Chain Monte Carlo': 'NICE', 'MEM2': 'NICE', 'MSAgent': 'NASTY', 'Mafia A': 'NASTY', 'Mafia B': 'NASTY', 'Mafia C': 'NASTY', 'Mafia D': 'NASTY', 'Majapahit': 'NICE', 'Male / Man': 'NICE', 'Malthrin': 'NASTY', 'Man In The Middle': 'NASTY', 'Manipulator': 'NASTY', 'Manipulity': 'NASTY', 'Markov': 'NICE', 'Matcher': 'NICE', 'Math Constant Hunter': 'NICE', 'Memory 1': 'NASTY', 'Memory Decay': 'NASTY', 'Mensa': 'NASTY', 'Meta Hunter': 'NASTY', 'Meta Majority': 'NICE', 'Meta Minority': 'NASTY', 'Meta Mixer': 'NASTY', 'Meta Winner': 'NASTY', 'Meta Winner Ensemble': 'NASTY', 'Michaelos': 'NASTY', 'Mirror': 'NICE', 'Mystical Logic': 'NASTY', 'Modal Defector': 'NASTY', 'Modal Tit For Tat': 'NICE', 'Momentum': 'NICE', 'Monkey See, Monkey Do': 'NASTY', 'Mosquito': 'NASTY', 'MrX': 'NASTY', 'N Pavlov': 'NASTY', 'N Tits For M Tats': 'NICE', 'Naive Q-Learner': 'NASTY', 'Nash': 'NICE', 'Nasty Tit For Tat': 'NASTY', 'Negation': 'NASTY', 'Neil A': 'NICE', 'Newton': 'NASTY', 'Nydegger Benjjo Version': 'NICE', 'Observant': 'NICE', 'Odd-Even Go By Majority': 'NICE', 'Odysseus / Ὀδυσσεύς': 'NICE', 'Omega Tit For Tat': 'NICE', 'Once Bitten': 'NICE', 'Opportunist': 'NASTY', 'Opposite Grudger': 'NASTY', 'Out For Tat': 'NICE', 'PIN': 'NASTY', 'PSO Gambler 1_1_1': 'NICE', 'PSO Gambler 2_2_2': 'NICE', 'PSO Gambler 2_2_2 Noise 05': 'NICE', 'PSO Gambler Mem 1': 'NICE', 'Paradoxic Grim / S21': 'NASTY', 'Parameterized Tit For Tat': 'NASTY', 'Paranoid': 'NASTY', 'Passive Tit For Tat': 'NICE', 'Patient Cooperator': 'NICE', 'Pattern Reader': 'NICE', 'Patterned Adaptive Fortress': 'NICE', 'Patterned Adaptive Fortress 2': 'NICE', 'Pavlov / Win-Stay, Lose-Shift': 'NICE', 'Pavlov D / Suspicious Pavlov': 'NASTY', 'Pavlov Tester': 'NASTY', 'Pavolovo': 'NASTY', 'Pawlow': 'NICE', 'Perceptron': 'NASTY', 'Phi': 'NASTY', 'Pi': 'NASTY', 'Prabowo': 'NASTY', 'Praedator': 'NASTY', 'Predator': 'NASTY', 'Probable Coop': 'NASTY', 'Probe & Exploit': 'NASTY', 'Probe & Punish': 'NICE', 'Prober': 'NASTY', 'Prober 2': 'NASTY', 'Prober 3': 'NASTY', 'Prober 4': 'NASTY', 'Prober Abdullah-arif-swe version': 'NASTY', 'Procastinater': 'NICE', 'Psycho Attariq Version': 'NICE', 'Pun 1': 'NASTY', 'Punisher': 'NICE', 'Q-Learning A-Learner': 'NICE', 'REINFORCE': 'NASTY', 'RLAgent': 'NASTY', 'RLGossipAgent': 'NASTY', 'RNN & RTRL': 'NASTY', 'Racister': 'NASTY', 'Rack Block Shooter': 'NASTY', 'Raider': 'NASTY', 'Random': 'NASTY', 'Random Exploiter 1': 'NICE', 'Random Exploiter 2': 'NICE', 'Random Exploiter 3': 'NICE', 'Random Exploiter 4': 'NICE', 'Random Hunter': 'NICE', 'Random Tit For Tat': 'NASTY', 'Reactive Player': 'NASTY', 'Rememberable Grudger': 'NICE', 'Remorseful Prober': 'NASTY', 'Resurrection': 'NICE', 'Retaliate': 'NICE', 'Retaliate 2': 'NICE', 'Retaliate 3': 'NICE', 'Rice Field': 'NASTY', 'Ripoff': 'NASTY', 'Risky Q-Learner': 'NASTY', 'Rogers & Maslow': 'NICE', 'Rover': 'NASTY', 'Rwallace': 'NASTY', 'S11': 'NASTY', 'S12 / Suspicious Forgiver': 'NASTY', 'S18': 'NASTY', 'S19': 'NASTY', 'S2': 'NASTY', 'S23': 'NASTY', 'S24': 'NASTY', 'S6': 'NASTY', 'S7': 'NASTY', 'SURPRISE ATTACK!': 'NASTY', 'Sample / Second By Tit For 2 Tats': 'NICE', 'Sarsa Q-Learner': 'NASTY', 'Scorched Earth': 'NICE', 'Score Equalizer': 'NICE', 'Second By Almy': 'NASTY', 'Second By Ambuehl & Hickey': 'NICE', 'Second By Anderson': 'NASTY', 'Second By Appold': 'NICE', 'Second By Batell': 'NICE', 'Second By Black': 'NICE', 'Second By Borufsen': 'NICE', 'Second By Cave': 'NICE', 'Second By Champion': 'NICE', 'Second By Colbert': 'NASTY', 'Second By Dawes & Batell': 'NICE', 'Second By Eatherley': 'NICE', 'Second By Falk & Langsted': 'NICE', 'Second By Feld': 'NASTY', 'Second By Friedland': 'NASTY', 'Second By Friedland, But Get Revised By Axelrod': 'NASTY', 'Second By George Hufford': 'NASTY', 'Second By Getzler': 'NICE', 'Second By Gladstein / Tester': 'NASTY', 'Second By Graaskamp & Katzen': 'NICE', 'Second By Grofman': 'NICE', 'Second By Hall': 'NASTY', 'Second By Harrington': 'NASTY', 'Second By Hollander': 'NASTY', 'Second By Hotz': 'NASTY', 'Second By Jones': 'NICE', 'Second By Joss': 'NASTY', 'Second By Kluepfel': 'NICE', 'Second By Lefevre': 'NICE', 'Second By Leyland': 'NASTY', 'Second By Leyvraz': 'NICE', 'Second By Mcgurrin': 'NASTY', 'Second By Mikkelson': 'NICE', 'Second By Named Withheld': 'NASTY', 'Second By Newman': 'NICE', 'Second By Nussbacher': 'NICE', 'Second By Nydegger': 'NICE', 'Second By Pebly': 'NICE', 'Second By Pinkley': 'NICE', 'Second By Quayle': 'NICE', 'Second By Rabbie': 'NASTY', 'Second By Richard Hufford': 'NASTY', 'Second By Robert Adams': 'NICE', 'Second By Robertson': 'NASTY', 'Second By Rowsam': 'NICE', 'Second By Schurmann': 'NICE', 'Second By Smith': 'NASTY', 'Second By Smoody': 'NASTY', 'Second By Snodgrass': 'NASTY', 'Second By Tideman & Chieruzzi': 'NICE', 'Second By Tranquilizer': 'NASTY', 'Second By Weiderman': 'NICE', 'Second By Weiner': 'NICE', 'Second By White': 'NICE', 'Second By Wiliam Adams': 'NICE', 'Second By Yamachi': 'NICE', 'Second By Zimmerman': 'NICE', 'Second Chance': 'NASTY', 'Second Chance Attariq Version': 'NICE', 'Self Steem': 'NASTY', 'Self-Love A-Learner': 'NICE', 'Short Mem': 'NICE', 'Signaling Cheater': 'NASTY', 'Simple ANN': 'NASTY', 'Simple Exploiter': 'NASTY', 'Simple Identity ChecK': 'NASTY', 'Simpleton': 'NASTY', 'Skinner': 'NICE', 'Slanger': 'NICE', 'Slow Tit For Tat': 'NICE', 'Smart': 'NICE', 'Smart Cat': 'NICE', 'Smart Generous Tit For Tat': 'NICE', 'Smart Go By Majority': 'NICE', 'Smart Snake': 'NICE', 'Smart-Clever': 'NICE', 'Smarter Tat For Tit': 'NASTY', 'Smooth Grudger': 'NICE', 'Smooth Tit For Tat': 'NICE', 'Sneaky Tit For Tat': 'NASTY', 'Social Average': 'NASTY', 'Social Engineering': 'NASTY', 'Socio': 'NICE', 'Soft Grim': 'NICE', 'Soft Grudger': 'NICE', 'Solution B1': 'NASTY', 'Solution B5': 'NASTY', 'Sort': 'NICE', 'Spectrum Attacker': 'NASTY', 'Spiteful CC': 'NICE', 'Spiteful Tit For Tat': 'NICE', 'Split Brain Syndrome': 'NICE', 'Springter': 'NICE', 'Stabilize': 'NICE', 'Stalker': 'NICE', 'Star S': 'NASTY', 'Star SL': 'NASTY', 'Star SN': 'NASTY', 'Star Slave 1': 'NASTY', 'Star Slave 10': 'NASTY', 'Star Slave 2': 'NASTY', 'Star Slave 3': 'NASTY', 'Star Slave 4': 'NASTY', 'Star Slave 5': 'NASTY', 'Star Slave 6': 'NASTY', 'Star Slave 7': 'NASTY', 'Star Slave 8': 'NASTY', 'Star Slave 9': 'NASTY', 'Statistical Strategy': 'NASTY', 'Stefan Pennartz': 'NICE', 'Stochastic Cooperator': 'NASTY', 'Stochastic WSLS': 'NASTY', 'Stoic Mirror': 'NICE', 'Stoicalist': 'NICE', 'Strategist': 'NASTY', 'Stupidiot': 'NASTY', 'Sugar Strategy / Treasure Hunt': 'NASTY', 'Sumobox Fighter': 'NICE', 'Sun Tzu Bot': 'NICE', 'Suspicious Alternator': 'NASTY', 'Suspicious Tit For Tat': 'NASTY', 'Sweet Heart': 'NASTY', 'Syifa': 'NASTY', 'TF 1': 'NASTY', 'TF 2': 'NASTY', 'TF 3': 'NICE', 'TF2T & 2TFT': 'NICE', 'TOM Level 1 / Theory Of Mind Level 1': 'NASTY', 'TOM Level 2 / Theory Of Mind Level 2': 'NASTY', 'TOM Level 3 / Theory Of Mind Level 3': 'NICE', 'TPMS / Tree Predictive Matrix Strategy': 'NICE', 'Tages': 'NASTY', 'Teacher Pee While Standing, Student Pee While Running': 'NICE', 'Tester Eckhart Arnold Version': 'NASTY', 'The Calculated Mirror With A Fuse': 'NASTY', 'The Cave Breaker': 'NASTY', 'The Nasty A': 'NASTY', 'Theseus': 'NICE', 'Three Times Out': 'NICE', 'Threshold Punisher': 'NICE', 'Thresholded Trust Bot': 'NICE', 'Thue Morse': 'NASTY', 'Thue Morse Inverse': 'NASTY', 'Thumper': 'NICE', 'Tiny Brain': 'NASTY', 'Tip For Tap': 'NICE', 'Tit For 3 Tats': 'NICE', 'Tit For Increasing Tat': 'NICE', 'Tit For Tat But Not Too Forgiving': 'NICE', 'Tit For Tat Killer': 'NASTY', 'Toxic Mirror': 'NASTY', 'Trader': 'NICE', 'Tranquilizer Eckhart Arnold Version': 'NASTY', 'Tri-Brain': 'NICE', 'Tricky Cooperator': 'NASTY', 'Tricky Defector': 'NASTY', 'Tricky Level Punisher': 'NICE', 'Trust Ledger': 'NICE', 'Trust Score Sigmoid': 'NASTY', 'Trusty': 'NICE', 'Turan': 'NASTY', 'Tweedledee': 'NICE', 'Tweedledum': 'NICE', 'Tweetypie': 'NASTY', 'Unpredictable Tit For Tat': 'NASTY', 'Uranium': 'NICE', 'Usually Cooperates': 'NICE', 'Usually Defects': 'NASTY', 'Vandal': 'NASTY', 'Vengeful': 'NICE', 'Vengeful Cheater': 'NASTY', 'Verity': 'NICE', 'Very Bad': 'NICE', 'WHAgent': 'NASTY', 'Whale': 'NICE', 'William': 'NICE', 'Willing': 'NASTY', 'Win-Shift, Lose-Stay': 'NASTY', 'Winner 12': 'NICE', 'Winner 21': 'NICE', 'Worse & Worse / Worse & Worse 1': 'NASTY', 'Worse & Worse 2': 'NASTY', 'Worse & Worse 3': 'NICE', 'Your Choice Or My Choice': 'NICE', 'ZD-2026 / Zero Determinant 2026': 'NICE', 'ZD-G / Zero Determinant Generous': 'NICE', 'ZD-GTFT / Zero Determinant Generous Tit For Tat': 'NICE', 'ZD-M2 / Zero Determinant Memory 2': 'NASTY', 'ZD-MS / Zero Determinant Mischief': 'NASTY', 'ZD-PW2026 / Zero Determinant Psychological War 2026': 'NICE', 'ZD-Q / Zero Determinant Equalizer': 'NASTY', 'ZD-S / Zero Determinant Set': 'NASTY', 'ZD-X / Zero Determinant Extortion': 'NASTY', 'Zero Day': 'NASTY'}
+strategies = ['Hill Climb Attariq Version','ISO','Cooperate ISO','Longterm Tit For Tat','Geller','Geller Cooperator','Geller Defector','ZD-MD / Zero Determinant Middle','Bayesian Forgiver','2 Tits For 2 Tats / Hard Tit For 2 Tats', '2 Tits For 2 Tats Eckhart Arnold Version', '2 Tits For Tat', '3 Seconds Mirror', '3 Tits For Tat / Hard Tit For Tat', '3-Tree Of Prediction', 'A-A&C / A-Actor&Critic', 'ALLC OR ALLD', 'AMERICA! / Freedoom / USA', 'AON2', 'AQUA', 'AZD / Adaptive Zero Determinant', 'Absurdistan 1', 'Acquaintance & Trust', 'Adaptive', 'Adaptive Cooperator', 'Adaptive Hhhpraise Version', 'Adaptive Pavlov 2006', 'Adaptive Pavlov 2011', 'Adaptive Tit For Tat', 'Adaptive Tit For Tat Attariq Version', 'Adaptor Brief', 'Adaptor Long', 'Aggravater', 'Alan', 'Alcohol / Ethanol', 'Alexei / End Game Cheater', 'Alternator / Second By Duisman', 'Alternator Hunter', 'Always Cooperate / Cooperator / Dove / Saint', 'Always Defect / Defector / Hawk / Shark', 'Always Out / Outtor', 'Amazon / Piraha', 'Analogy', 'Anatol', 'Angry Tit For Tat', 'Anti Cycler', 'Anti Noise Tit For Tat', 'Anti Tit For Tat / Psycho', 'Appeaser', 'Arrogant Q-Learner', 'Average Copier', 'BBE / Burn Both Ends', 'Back Stabber', 'Backrooms', 'Bahlil', 'Bandit', 'Bandit UCB', 'Bayes Attariq Version', 'Bayes Foomii Version', 'Benjo', 'Beta Tester', 'Better & Better', 'Bluff', 'Bluff Master', 'Boltzmann Brain', 'Bookend Cooperator', 'Boxer', 'Bros Mind', 'Bully / Reverse Tit For Tat', 'Burn The Bridge Strategy', 'Bush Mosteller', 'Buzzer', 'CS / Collective Strategy', 'Caerbannog', 'Calamity', 'Calculator', 'Calculator The Nerd Of AI Version', 'Capitalist', 'Capri', 'Cautious Q-Learner', 'Caveman', 'Cerebrum', 'Charity', 'Chatter', 'Chimera', 'Clement Coldridge', 'Coin', 'Collatz', 'Communalist', 'Continuous Q-Learner Avg', 'Continuous Q-Learner Max', 'Contrite Grudger', 'Contrite Tit For Tat', 'Control 1', 'Control 10', 'Control 11', 'Control 2', 'Control 3', 'Control 4', 'Control 5', 'Control 6', 'Control 7', 'Control 8', 'Control 9', 'Cooperate Once', 'Cooperator Hunter', 'Crabby', 'Crabby Attariq Version', 'Cruelity', 'Cult Bishop A', 'Cult Bishop B', 'Cult Citizen A', 'Cult Citizen B', 'Cult Citizen C', 'Cult Leader', 'Curiosity', 'Cycle Hunter', 'Cycler CCCCCD', 'Cycler CCCD', 'Cycler CCCDCD', 'Cycler CCD', 'Cycler DC', 'Cycler DCCCC', 'Cycler DDC', 'DBS / Derived Belief Strategy', 'DDoS', 'Darwin', 'Deadlock Breaker', 'Decay Given', 'Defect Once', 'Defector Hunter', 'Delayed AON1', 'Desire', 'Desprate', 'Detective', 'Devil Staircase', 'Diplomat', 'Dont Bite The Hand That Feeds You', 'Double Crosser', 'Double Q-Learner', 'Double Resurrection', 'Doubler', 'Downing Benjjo Version', 'Downing Eckhart Arnold Version', 'Dumpty 10', 'Dyna Q-Learner', 'Dynamic 2 Tits For Tat', 'Dynocat', 'EGOist', 'Easy Go / Reverse Grudger / Fool Me Forever', 'Echo Adaptive', 'Echo Fisher', 'Egoist A-Learner', 'Eliza / Therapist', 'Entropy Sentinel', 'Envy', 'Epsilon-Greedy', 'Eric', 'Eugine Nier', 'Euler', 'Eventual Cycle Hunter', 'Evil Alliance', 'Evolvable Cycler Attariq Version', 'Evolved FSM 16', 'Evolved FSM 16 Noise 05', 'Evolved FSM 4', 'Evolved FSM 6', 'Evolved HMM 5', 'Evolved Looker Up 1_1_1', 'Evolved Looker Up 2_2_2', 'Exploratory Lenient Grim 2', 'Exploratory Tit For 3 Tats', 'FAWS', 'False Cooperator', 'Falsity', 'Female / Woman', 'Fibonacci', 'Finger Print', 'Firm But Fair / Firm For Tat', 'First By Davis', 'First By Downing', 'First By Downing, But Get Revised By Axelrod', 'First By Feld', 'First By Graaskamp / Second By Mauk', 'First By Grofman', 'First By Grudger / Grim Trigger', 'First By Joss / Naive Prober', 'First By Named Withheld', 'First By Nydegger', 'First By Shubik', 'First By Stein & Rapoport', 'First By Tideman & Chieruzzi', 'First By Tit For Tat', 'First By Tullock', 'Fixed Pattern', 'Fool Me Once', 'Forest-RND', 'Forest-XG', 'Forgetable Gradual', 'Forgetful Fool Me Once', 'Forgetful Grudger', 'Forgetful Majority Bot', 'Forgiver', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14', 'Forgiving', 'Forgiving Fate', 'Forgiving Grudger', 'Forgiving Tit For Tat', 'Fortress 3', 'Fortress 4', 'Frankl', 'Free Rider', 'Frequency Analyzer', 'Freud', 'Friendly Human', 'GT-E / Game Theory Explorer', 'Gambler Attariq Version', 'Gaslighter', 'Gen 1_64_200_30_0.3_A', 'Gen 2_64_200_30_0.3_A', 'Gen 3_64_200_30_0.3_A', 'Gen 4_64_200_30_0.3_A', 'Gen 5_64_200_30_0.3_A', 'Generic Downing', 'Generic Downing Friendly', 'Generous Tit For Tat', 'Generous Tit For Tat Axelrod Project Contributor Team Version', 'Generous Tit For Tat Benjjo Version', 'Generous Tit For Tat Eckhart Arnold Version 1', 'Generous Tit For Tat Eckhart Arnold Version 2', 'Generous Tit For Tat Less Wrong Version', 'Genetic Algo 1', 'Genetic Algo 2', 'George', 'Go By Majority / Second By Grisell / Soft Go By Majority', 'Go By Minority', 'Gold Digger', 'Golden Mean', 'Good', 'GossipAgent', 'Graaskamp Benjjo Version', 'Gradual', 'Gradual Cristal Version', 'Gradual Killer', 'Grateful / S9', 'Greedy', 'Grudger Alternator', 'Grumpy', 'HER / MENACE', 'HMM Player', 'Half Sin Square', 'Handshake', 'Hard Go By Majority', 'Hard Prober', 'Hesitant Q-Learner', 'Hill Climb', 'Hopeless', 'Hot Coffee', 'Humpty 10', 'Hungry', 'Inequality / SOVIET UNION! / USSR', 'Inequity Averse Q-Learner', 'Inverse', 'Inverse Punisher', 'Is There Something New?', 'Isolated Clan', 'Isolated Tit For Tat', 'Japan Empire Emperor', 'Japan Empire Soldier 1', 'Japan Empire Soldier 10', 'Japan Empire Soldier 2', 'Japan Empire Soldier 3', 'Japan Empire Soldier 4', 'Japan Empire Soldier 5', 'Japan Empire Soldier 6', 'Japan Empire Soldier 7', 'Japan Empire Soldier 8', 'Japan Empire Soldier 9', 'Javelin', 'Jem', 'Jester', 'Jesus Petry', 'Josuah', 'Jung', 'Karen', 'Keyman', 'Killer', 'King Of 48 Laws Of Power', 'Knowledgeable Worse & Worse', 'Konflikt Blue', 'Konflikt Green', 'L-BODOR / Learning Based On Derivative Of Reward', 'LCG', 'Laran', 'Laws', 'Learner', 'Lenient Grim 2', 'Lenient Grim 3', 'Less Grim', 'Level Punisher', 'Liar Person', 'Lighty-Darky', 'Limited Retaliate', 'Limited Retaliate 2', 'Limited Retaliate 3', 'Line', 'Little Grudger', 'Long Horse', 'Long Term Strategist', 'Look Ahead / Look Up', 'Loyal', 'MARS / Mimicry And Relative Similarity', 'MCMC / Markov Chain Monte Carlo', 'MEM2', 'MSAgent', 'Mafia A', 'Mafia B', 'Mafia C', 'Mafia D', 'Majapahit', 'Male / Man', 'Malthrin', 'Man In The Middle', 'Manipulator', 'Manipulity', 'Markov', 'Matcher', 'Math Constant Hunter', 'Memory 1', 'Memory Decay', 'Mensa', 'Meta Hunter', 'Meta Majority', 'Meta Minority', 'Meta Mixer', 'Meta Winner', 'Meta Winner Ensemble', 'Michaelos', 'Mirror', 'Modal Defector', 'Modal Tit For Tat', 'Momentum', 'Monkey See, Monkey Do', 'Mosquito', 'MrX', 'Mystical Logic', 'N Pavlov', 'N Tits For M Tats', 'Naive Q-Learner', 'Nash', 'Nasty Tit For Tat', 'Negation', 'Neil A', 'Newton', 'Nydegger Benjjo Version', 'Observant', 'Odd-Even Go By Majority', 'Odysseus / Ὀδυσσεύς', 'Omega Tit For Tat', 'Once Bitten', 'Opportunist', 'Opposite Grudger', 'Out For Tat', 'PIN', 'PSO Gambler 1_1_1', 'PSO Gambler 2_2_2', 'PSO Gambler 2_2_2 Noise 05', 'PSO Gambler Mem 1', 'Paradoxic Grim / S21', 'Parameterized Tit For Tat', 'Paranoid', 'Passive Tit For Tat', 'Patient Cooperator', 'Pattern Reader', 'Patterned Adaptive Fortress', 'Patterned Adaptive Fortress 2', 'Pavlov / Win-Stay, Lose-Shift', 'Pavlov D / Suspicious Pavlov', 'Pavlov Tester', 'Pavolovo', 'Pawlow', 'Perceptron', 'Phi', 'Pi', 'Prabowo', 'Praedator', 'Predator', 'Probable Coop', 'Probe & Exploit', 'Probe & Punish', 'Prober', 'Prober 2', 'Prober 3', 'Prober 4', 'Prober Abdullah-arif-swe version', 'Procastinater', 'Psycho Attariq Version', 'Pun 1', 'Punisher', 'Q-Learning A-Learner', 'REINFORCE', 'RLAgent', 'RLGossipAgent', 'RNN & RTRL', 'Racister', 'Rack Block Shooter', 'Raider', 'Random', 'Random Exploiter 1', 'Random Exploiter 2', 'Random Exploiter 3', 'Random Exploiter 4', 'Random Hunter', 'Random Tit For Tat', 'Reactive Player', 'Rememberable Grudger', 'Remorseful Prober', 'Resurrection', 'Retaliate', 'Retaliate 2', 'Retaliate 3', 'Rice Field', 'Ripoff', 'Risky Q-Learner', 'Rogers & Maslow', 'Rover', 'Rwallace', 'S11', 'S12 / Suspicious Forgiver', 'S18', 'S19', 'S2', 'S23', 'S24', 'S6', 'S7', 'SURPRISE ATTACK!', 'Sample / Second By Tit For 2 Tats', 'Sarsa Q-Learner', 'Schwoba Sen Gnitz', 'Scorched Earth', 'Score Equalizer', 'Second By Almy', 'Second By Ambuehl & Hickey', 'Second By Anderson', 'Second By Appold', 'Second By Batell', 'Second By Black', 'Second By Borufsen', 'Second By Cave', 'Second By Champion', 'Second By Colbert', 'Second By Dawes & Batell', 'Second By Eatherley', 'Second By Falk & Langsted', 'Second By Feld', 'Second By Friedland', 'Second By Friedland, But Get Revised By Axelrod', 'Second By George Hufford', 'Second By Getzler', 'Second By Gladstein / Tester', 'Second By Graaskamp & Katzen', 'Second By Grofman', 'Second By Hall', 'Second By Harrington', 'Second By Hollander', 'Second By Hotz', 'Second By Jones', 'Second By Joss', 'Second By Kluepfel', 'Second By Lefevre', 'Second By Leyland', 'Second By Leyvraz', 'Second By Mcgurrin', 'Second By Mikkelson', 'Second By GRASR\'s Author', 'Second By Newman', 'Second By Nussbacher', 'Second By Nydegger', 'Second By Pebly', 'Second By Pinkley', 'Second By Quayle', 'Second By Rabbie', 'Second By Richard Hufford', 'Second By Robert Adams', 'Second By Robertson', 'Second By Rowsam', 'Second By Schurmann', 'Second By Smith', 'Second By Smoody', 'Second By Snodgrass', 'Second By Tideman & Chieruzzi', 'Second By Tranquilizer', 'Second By Weiderman', 'Second By Weiner', 'Second By White', 'Second By Wiliam Adams', 'Second By Yamachi', 'Second By Zimmerman', 'Second Chance', 'Second Chance Attariq Version', 'Self Steem', 'Self-Love A-Learner', 'Short Mem', 'Signaling Cheater', 'Simple ANN', 'Simple Exploiter', 'Simple Identity ChecK', 'Simpleton', 'Skinner', 'Slanger', 'Slow Tit For Tat', 'Smart', 'Smart Cat', 'Smart Generous Tit For Tat', 'Smart Go By Majority', 'Smart Snake', 'Smart-Clever', 'Smarter Tat For Tit', 'Smooth Grudger', 'Smooth Tit For Tat', 'Sneaky Tit For Tat', 'Social Average', 'Social Engineering', 'Socio', 'Soft Grim', 'Soft Grudger', 'Solution B1', 'Solution B5', 'Sort', 'Spectrum Attacker', 'Spiteful CC', 'Spiteful Tit For Tat', 'Split Brain Syndrome', 'Springter', 'Stabilize', 'Stalker', 'Star S', 'Star SL', 'Star SN', 'Star Slave 1', 'Star Slave 10', 'Star Slave 2', 'Star Slave 3', 'Star Slave 4', 'Star Slave 5', 'Star Slave 6', 'Star Slave 7', 'Star Slave 8', 'Star Slave 9', 'Statistical Strategy', 'Stefan Pennartz', 'Stochastic Cooperator', 'Stochastic WSLS', 'Stoic Mirror', 'Stoicalist', 'Strategist', 'Stupidiot', 'Sugar Strategy / Treasure Hunt', 'Sumobox Fighter', 'Sun Tzu Bot', 'Suspicious Alternator', 'Suspicious Tit For Tat', 'Sweet Heart', 'Syifa', 'TF 1', 'TF 2', 'TF 3', 'TF2T & 2TFT', 'TOM Level 1 / Theory Of Mind Level 1', 'TOM Level 2 / Theory Of Mind Level 2', 'TOM Level 3 / Theory Of Mind Level 3', 'TPMS / Tree Predictive Matrix Strategy', 'Tages', 'Teacher Pee While Standing, Student Pee While Running', 'Tester Eckhart Arnold Version', 'The Calculated Mirror With A Fuse', 'The Cave Breaker', 'The Nasty A', 'Theseus', 'Three Times Out', 'Threshold Punisher', 'Thresholded Trust Bot', 'Thue Morse', 'Thue Morse Inverse', 'Thumper', 'Tiny Brain', 'Tip For Tap', 'Tit For 3 Tats', 'Tit For Increasing Tat', 'Tit For Tat But Not Too Forgiving', 'Tit For Tat Killer', 'Toxic Mirror', 'Trader', 'Tranquilizer Eckhart Arnold Version', 'Tri-Brain', 'Tricky Cooperator', 'Tricky Defector', 'Tricky Level Punisher', 'Trust Ledger', 'Trust Score Sigmoid', 'Trusty', 'Turan', 'Tweedledee', 'Tweedledum', 'Tweetypie', 'Unpredictable Tit For Tat', 'Uranium', 'Usually Cooperates', 'Usually Defects', 'Vandal', 'Vengeful', 'Vengeful Cheater', 'Verity', 'Very Bad', 'WHAgent', 'Whale', 'William', 'Willing', 'Win-Shift, Lose-Stay', 'Winner 12', 'Winner 21', 'Worse & Worse / Worse & Worse 1', 'Worse & Worse 2', 'Worse & Worse 3', 'Your Choice Or My Choice', 'ZD-2026 / Zero Determinant 2026', 'ZD-G / Zero Determinant Generous', 'ZD-GTFT / Zero Determinant Generous Tit For Tat', 'ZD-M2 / Zero Determinant Memory 2', 'ZD-MS / Zero Determinant Mischief', 'ZD-PW2026 / Zero Determinant Psychological War 2026', 'ZD-Q / Zero Determinant Equalizer', 'ZD-S / Zero Determinant Set', 'ZD-X / Zero Determinant Extortion', 'Zero Day', 'ZeroResp', 'ZeroResp V5.3', '4-Duality Optimizer 1']
+strategies_creator = {'Hill Climb Attariq Version':'M. A. M. Attariq','ISO':'Adrian Hutter','Cooperate ISO':'Adrian Hutter','Longterm Tit For Tat':'Adrian Hutter','Geller':'Martin Chorley','Geller Cooperator':'Karol Langner','Geller Defector':'Karol Langner','ZD-MD / Zero Determinant Middle':'M. A. M. Attariq','Bayesian Forgiver':'Matt Hodges','2 Tits For 2 Tats / Hard Tit For 2 Tats': 'A. J. Stewart & J. B. Plotkin / Robert Axelrod', '2 Tits For 2 Tats Eckhart Arnold Version': 'Eckhart Arnold', '2 Tits For Tat': 'John Maynard Smith', '3 Seconds Mirror': 'Meta', '3 Tits For Tat / Hard Tit For Tat': '[PD2017]', '3-Tree Of Prediction': 'M. A. M. Attariq', 'A-A&C / A-Actor&Critic': 'M. A. M. Attariq & Gemini', 'ALLC OR ALLD': 'Marc Harper', 'AMERICA! / Freedoom / USA': 'M. A. M. Attariq', 'AON2': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'AQUA': 'M. A. M. Attariq', 'AZD / Adaptive Zero Determinant': 'Emmanuel Estrada & Dashiell Fryer', 'Absurdistan 1': 'Christian Erlen', 'Acquaintance & Trust': 'Philip Seehausen', 'Adaptive': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Cooperator': 'cjgwang & Vince Knight', 'Adaptive Hhhpraise Version': 'Hhhpraise', 'Adaptive Pavlov 2006': 'J. Li', 'Adaptive Pavlov 2011': 'J. Li & P. Hingston & G. Kendall', 'Adaptive Tit For Tat': 'E. Tzafestas', 'Adaptive Tit For Tat Attariq Version': 'M. A. M. Attariq', 'Adaptor Brief': 'Christoph Hauert & Olaf Stenull', 'Adaptor Long': 'Christoph Hauert & Olaf Stenull', 'Aggravater': 'Thomas Campbell', 'Alan': 'M. A. M. Attariq, Inspired From Alan Turing', 'Alcohol / Ethanol': 'M. A. M. Attariq', 'Alexei / End Game Cheater': 'Alexei / Eckhart Arnold', 'Alternator / Second By Duisman': 'Robert Axelrod / George Duisman', 'Alternator Hunter': 'Karol Langner', 'Always Cooperate / Cooperator / Dove / Saint': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / John Maynard Smith & George R. Price / Robert Trivers & Richard Dawkins', 'Always Defect / Defector / Hawk / Shark': 'Martin Nowak & Karl Sigmund & Robert May / Robert Axelrod / John Maynard Smith & George R. Price / Robert Trivers & Richard Dawkins', 'Always Out / Outtor': 'M. A. M. Attariq', 'Amazon / Piraha': 'M. A. M. Attariq', 'Analogy': 'Robert Gladstein', 'Anatol': 'M. A. M. Attariq', 'Angry Tit For Tat': 'M. A. M. Attariq', 'Anti Cycler': 'Marc Harper', 'Anti Noise Tit For Tat': 'M. A. M. Attariq', 'Anti Tit For Tat / Psycho': 'C. Hilbe & M. A. Nowak & A. Traulsen / D. Ashlock & E. Y. Kim & W. Ashlock', 'Appeaser': 'Jochen Muller', 'Arrogant Q-Learner': 'Geraint Palmer', 'Average Copier': 'Geraint Palmer', 'BBE / Burn Both Ends': 'Louis Marinoff', 'Back Stabber': 'Thomas Campbell', 'Backrooms': 'M. A. M. Attariq', 'Bahlil': 'M. A. M. Attariq', 'Bandit': 'M. A. M. Attariq & Gemini', 'Bandit UCB': 'Auer & Cesa-Bianchi & Fischer', 'Bayes Attariq Version': 'M. A. M. Attariq', 'Bayes Foomii Version': 'Foomii', 'Benjo': 'benjjo', 'Beta Tester': 'M. A. M. Attariq', 'Better & Better': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Bluff': 'M. A. M. Attariq & My Aunt', 'Bluff Master': 'Perplexity', 'Boltzmann Brain': 'M. A. M. Attariq, Inspired From Ludwig Boltzmann', 'Bookend Cooperator': 'Explerify.com', 'Boxer': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bros Mind': 'A. R. L. R. Cunha & A. L. V. Coelho', 'Bully / Reverse Tit For Tat': 'John Nachbar', 'Burn The Bridge Strategy': 'tigressine', 'Bush Mosteller': 'Luis R. Izquierdo & Segismundo S. Izquierdo', 'Buzzer': 'M. A. M. Attariq', 'CS / Collective Strategy': 'J. Li & G. Kendall', 'Caerbannog': 'Caerbannog', 'Calamity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Calculator': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Calculator The Nerd Of AI Version': 'The Nerd Of AI', 'Capitalist': 'Chat-GPT', 'Capri': 'Y. Murase Et Al', 'Cautious Q-Learner': 'Geraint Palmer', 'Caveman': 'M. A. M. Attariq', 'Cerebrum': 'M. A. M. Attariq & Chat-GPT & Gemini', 'Charity': 'M. A. M. Attariq', 'Chatter': 'M. A. M. Attariq', 'Chimera': 'Joep Vullinghs', 'Clement Coldridge': 'M. A. M. Attariq', 'Coin': 'M. A. M. Attariq', 'Collatz': 'M. A. M. Attariq', 'Communalist': 'Chat-GPT', 'Continuous Q-Learner Avg': 'M. A. M. Attariq', 'Continuous Q-Learner Max': 'M. A. M. Attariq', 'Contrite Grudger': 'M. A. M. Attariq', 'Contrite Tit For Tat': 'J. Wu & Robert Axelrod', 'Control 1': '[Less Wrong]', 'Control 10': '[Less Wrong]', 'Control 11': '[Less Wrong]', 'Control 2': '[Less Wrong]', 'Control 3': '[Less Wrong]', 'Control 4': '[Less Wrong]', 'Control 5': '[Less Wrong]', 'Control 6': '[Less Wrong]', 'Control 7': '[Less Wrong]', 'Control 8': '[Less Wrong]', 'Control 9': '[Less Wrong]', 'Cooperate Once': 'benjjo', 'Cooperator Hunter': 'Karol Langner', 'Crabby': 'Zachary Danziger', 'Crabby Attariq Version': 'M. A. M. Attariq', 'Cruelity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Cult Bishop A': 'M. A. M. Attariq', 'Cult Bishop B': 'M. A. M. Attariq', 'Cult Citizen A': 'M. A. M. Attariq', 'Cult Citizen B': 'M. A. M. Attariq', 'Cult Citizen C': 'M. A. M. Attariq', 'Cult Leader': 'M. A. M. Attariq', 'Curiosity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Cycle Hunter': 'Marc Harper', 'Cycler CCCCCD': 'Marc Harper', 'Cycler CCCD': 'Marc Harper', 'Cycler CCCDCD': 'Marc Harper', 'Cycler CCD': 'Marc Harper', 'Cycler DC': 'Marc Harper', 'Cycler DCCCC': 'M. A. M. Attariq', 'Cycler DDC': 'Marc Harper', 'DBS / Derived Belief Strategy': 'T.-C. Au & D. S. Nau', 'DDoS': 'M. A. M. Attariq', 'Darwin': 'Paul Slavin', 'Deadlock Breaker': 'D. Ashlock & E. Y. Kim ', 'Decay Given': 'M. A. M. Attariq', 'Defect Once': 'benjjo', 'Defector Hunter': 'Karol Langner', 'Delayed AON1': 'C. Hilbe & L. A. Martinez-Vaquero & K. Chatterjee & M. A. Nowak', 'Desire': 'M. A. M. Attariq', 'Desprate': 'P. Van Den Berg & F. J. Weissing', 'Detective': 'Nicky Case', 'Devil Staircase': 'M. A. M. Attariq', 'Diplomat': 'Perplexity', 'Dont Bite The Hand That Feeds You': 'M. A. M. Attariq', 'Double Crosser': 'Thomas Campbell', 'Double Q-Learner': 'M. A. M. Attariq', 'Double Resurrection': 'Eckhart Arnold', 'Doubler': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Downing Benjjo Version': 'benjjo', 'Downing Eckhart Arnold Version': 'Eckhart Arnold', 'Dumpty 10': 'Eckhart Arnold', 'Dyna Q-Learner': 'M. A. M. Attariq', 'Dynamic 2 Tits For Tat': 'Grant Garrett-Grossman', 'Dynocat': 'rexmhall09', 'EGOist': 'M. A. M. Attariq', 'Easy Go / Reverse Grudger / Fool Me Forever': "LIFL(Laboratoire d'Informatique Fondamentale de Lille) / J. Li & P. Hingston & G. Kendall / Marc Harper", 'Echo Adaptive': 'Copilot', 'Echo Fisher': 'M. A. M. Attariq', 'Egoist A-Learner': 'M. A. M. Attariq', 'Eliza / Therapist': 'M. A. M. Attariq, Inspired From Joseph Weizenbaum', 'Entropy Sentinel': 'Chat-GPT', 'Envy': 'Bernd Lahno', 'Epsilon-Greedy': 'Richard S. Sutton & Andrew G. Barto', 'Eric': 'M. A. M. Attariq & Erik & Chat-GPT', 'Eugine Nier': 'Eugine Nier', 'Euler': 'Timothy Standen', 'Eventual Cycle Hunter': 'Marc Harper', 'Evil Alliance': 'ArisKatsaris', 'Evolvable Cycler Attariq Version': 'M. A. M. Attariq', 'Evolved FSM 16': 'Marc Harper', 'Evolved FSM 16 Noise 05': 'Marc Harper', 'Evolved FSM 4': 'Marc Harper', 'Evolved FSM 6': 'Frederick Vincent & Dashiell Fryer', 'Evolved HMM 5': 'Marc Harper', 'Evolved Looker Up 1_1_1': 'Marc Harper', 'Evolved Looker Up 2_2_2': 'Marc Harper', 'Exploratory Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Exploratory Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'FAWS': 'FAWS', 'False Cooperator': 'Yaroslav Rosokha & Julian Romero', 'Falsity': 'M. A. M. Attariq, Inspired From Xqree', 'Female / Woman': 'M. A. M. Attariq', 'Fibonacci': 'M. A. M. Attariq', 'Finger Print': 'Eckhart Arnold', 'Firm But Fair / Firm For Tat': 'Marcus R. Frean', 'First By Davis': 'Morton Davis', 'First By Downing': 'Leslie Downing', 'First By Downing, But Get Revised By Axelrod': 'Robert Axelrod', 'First By Feld': 'Scott Feld', 'First By Graaskamp / Second By Mauk': 'Jim Graaskamp / Fred Mauk', 'First By Grofman': 'Bernard Grofman', 'First By Grudger / Grim Trigger': 'James W. Friedman', 'First By Joss / Naive Prober': 'Johann Joss / J. Li & P. Hingston & G. Kendall', 'First By Named Withheld': 'Anonymous', 'First By Nydegger': 'Rudy Nydegger', 'First By Shubik': 'Martin Shubik', 'First By Stein & Rapoport': 'Stein & Anatol Rapoport', 'First By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'First By Tit For Tat': 'Anatol Rapoport', 'First By Tullock': 'Gordon Tullock', 'Fixed Pattern': 'Eckhart Arnold', 'Fool Me Once': 'Marc Harper', 'Forest-RND': 'M. A. M. Attariq', 'Forest-XG': 'M. A. M. Attariq', 'Forgetable Gradual': 'M. A. M. Attariq', 'Forgetful Fool Me Once': 'Marc Harper', 'Forgetful Grudger': 'Geraint Palmer', 'Forgetful Majority Bot': 'abdullah-arif-swe', 'Forgiver': 'Thomas Campbell', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Forgiving': 'Hhhpraise', 'Forgiving Fate': 'M. A. M. Attariq & Nabilah Shafirah', 'Forgiving Grudger': 'Explerify.com', 'Forgiving Tit For Tat': 'Thomas Campbell', 'Fortress 3': 'W. Ashlock & D. Ashlock', 'Fortress 4': 'W. Ashlock & D. Ashlock', 'Frankl': 'M. A. M. Attariq, Inspired From Viktor Frankl', 'Free Rider': 'Enquist & Leimar', 'Frequency Analyzer': 'Ian Miller', 'Freud': 'M. A. M. Attariq, Inspired From Sigmund Freud', 'Friendly Human': 'Alex Mainzer', 'GT-E / Game Theory Explorer': 'M. A. M. Attariq', 'Gambler Attariq Version': 'M. A. M. Attariq', 'Gaslighter': 'M. A. M. Attariq & Nabilah Shafirah', 'Gen 1_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 2_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 3_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 4_64_200_30_0.3_A': 'M. A. M. Attariq', 'Gen 5_64_200_30_0.3_A': 'M. A. M. Attariq', 'Generic Downing': 'Sven Sommer', 'Generic Downing Friendly': 'Sven Sommer', 'Generous Tit For Tat': 'Robert Axelrod', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'Axelrod Project Contributor Team', 'Generous Tit For Tat Benjjo Version': 'benjjo', 'Generous Tit For Tat Eckhart Arnold Version 1': 'Eckhart Arnold', 'Generous Tit For Tat Eckhart Arnold Version 2': 'Eckhart Arnold', 'Generous Tit For Tat Less Wrong Version': '[Less Wrong]', 'Genetic Algo 1': 'M. A. M. Attariq', 'Genetic Algo 2': 'M. A. M. Attariq', 'George': 'M. A. M. Attariq', 'Go By Majority / Second By Grisell / Soft Go By Majority': 'Robert Axelrod / Gail Grisell / S. Mittal & K. Deb', 'Go By Minority': 'M. A. M. Attariq', 'Gold Digger': 'Foomii', 'Golden Mean': 'Dola', 'Good': 'M. A. M. Attariq', 'GossipAgent': 'remcofl', 'Graaskamp Benjjo Version': 'benjjo', 'Gradual': 'B. Beaufils & J. Delahaye & P. Mathieu', 'Gradual Cristal Version': 'CRISTAL Lab & SMAC Team', 'Gradual Killer': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Grateful / S9': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Greedy': 'Richard S. Sutton & Andrew G. Barto', 'Grudger Alternator': 'Geraint Palmer', 'Grumpy': 'Jason Young', 'HER / MENACE': 'M. A. M. Attariq, Inspired From Martin Gardner & Donald Michie', 'HMM Player': 'Marc Harper', 'Half Sin Square': 'M. A. M. Attariq', 'Handshake': 'Arthur J. Robson', 'Hard Go By Majority': 'S. Mittal & K. Deb', 'Hard Prober': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Hesitant Q-Learner': 'Geraint Palmer', 'Hill Climb': 'jodoyle29', 'Hopeless': 'P. Van Den Berg & F. J. Weissing', 'Hot Coffee': 'M. A. M. Attariq', 'Humpty 10': 'Eckhart Arnold', 'Hungry': 'M. A. M. Attariq', 'Inequality / SOVIET UNION! / USSR': 'M. A. M. Attariq', 'Inequity Averse Q-Learner': 'M. A. M. Attariq', 'Inverse': 'Karol Langner', 'Inverse Punisher': 'Geraint Palmer', 'Is There Something New?': 'M. A. M. Attariq', 'Isolated Clan': 'M. A. M. Attariq', 'Isolated Tit For Tat': 'M. A. M. Attariq', 'Japan Empire Emperor': 'M. A. M. Attariq', 'Japan Empire Soldier 1': 'M. A. M. Attariq', 'Japan Empire Soldier 10': 'M. A. M. Attariq', 'Japan Empire Soldier 2': 'M. A. M. Attariq', 'Japan Empire Soldier 3': 'M. A. M. Attariq', 'Japan Empire Soldier 4': 'M. A. M. Attariq', 'Japan Empire Soldier 5': 'M. A. M. Attariq', 'Japan Empire Soldier 6': 'M. A. M. Attariq', 'Japan Empire Soldier 7': 'M. A. M. Attariq', 'Japan Empire Soldier 8': 'M. A. M. Attariq', 'Japan Empire Soldier 9': 'M. A. M. Attariq', 'Javelin': 'M. A. M. Attariq & Angga Febriansyah', 'Jem': 'Jem', 'Jester': 'parzhitsky', 'Jesus Petry': 'Jesus Petry', 'Josuah': 'M. A. M. Attariq', 'Jung': 'M. A. M. Attariq, Inspired From Carl Jung', 'Karen': 'M. A. M. Attariq', 'Keyman': 'M. A. M. Attariq', 'Killer': 'Zachary Danziger', 'King Of 48 Laws Of Power': 'M. A. M. Attariq, Inspired From Robert Greene', 'Knowledgeable Worse & Worse': 'Adam Pohl', 'Konflikt Blue': 'M. A. M. Attariq', 'Konflikt Green': 'M. A. M. Attariq', 'L-BODOR / Learning Based On Derivative Of Reward': 'M. A. M. Attariq', 'LCG': 'M. A. M. Attariq', 'Laran': 'Elio Piccolo & Giovanni Squillero', 'Laws': 'M. A. M. Attariq', 'Learner': 'M. A. M. Attariq', 'Lenient Grim 2': 'Yaroslav Rosokha & Julian Romero', 'Lenient Grim 3': 'Yaroslav Rosokha & Julian Romero', 'Less Grim': 'Sven Sommer', 'Level Punisher': 'Eckhart Arnold', 'Liar Person': 'M. A. M. Attariq & Angga Febriansyah', 'Lighty-Darky': 'M. A. M. Attariq', 'Limited Retaliate': 'Owen Campbell', 'Limited Retaliate 2': 'Owen Campbell', 'Limited Retaliate 3': 'Owen Campbell', 'Line': 'M. A. M. Attariq', 'Little Grudger': 'M. A. M. Attariq', 'Long Horse': 'M. A. M. Attariq, Inspired From LookOut2DD', 'Long Term Strategist': 'The Nerd Of AI', 'Look Ahead / Look Up': 'Alan Gaines', 'Loyal': 'Foomii', 'MARS / Mimicry And Relative Similarity': 'T. L. B. M. Silva & A. L. V. Coelho & C. H. C. Ribeiro', 'MCMC / Markov Chain Monte Carlo': 'Nicholas Metropolis & W.K. Hastings, but implemented by Tuomas Sandholm & Robert Crites', 'MEM2': 'J. Li & G. Kendall', 'MSAgent': 'remcofl', 'Mafia A': 'M. A. M. Attariq', 'Mafia B': 'M. A. M. Attariq', 'Mafia C': 'M. A. M. Attariq', 'Mafia D': 'M. A. M. Attariq', 'Majapahit': 'M. A. M. Attariq', 'Male / Man': 'M. A. M. Attariq', 'Malthrin': 'Malthrin', 'Man In The Middle': 'M. A. M. Attariq', 'Manipulator': 'The Nerd Of AI', 'Manipulity': 'M. A. M. Attariq, Inspired From KhanhsKMC', 'Markov': 'M. A. M. Attariq, Inspired From Andrey Andreyevich Markov', 'Matcher': 'M. A. M. Attariq', 'Math Constant Hunter': 'Karol Langner', 'Memory 1': 'SidZRed', 'Memory Decay': 'Axelrod Project Contributor Team', 'Mensa': 'Zachary Danziger', 'Meta Hunter': 'Karol Langner', 'Meta Majority': 'Karol Langner', 'Meta Minority': 'Karol Langner', 'Meta Mixer': 'Karol Langner', 'Meta Winner': 'Karol Langner', 'Meta Winner Ensemble': 'Marc Harper', 'Michaelos': 'Michaelos', 'Mirror': 'Foomii', 'Modal Defector': 'benjjo', 'Modal Tit For Tat': 'benjjo', 'Momentum': 'Dong Won Moon', 'Monkey See, Monkey Do': 'M. A. M. Attariq', 'Mosquito': 'M. A. M. Attariq', 'MrX': 'Bjoern Van Den Bruck', 'Mystical Logic': 'M. A. M. Attariq', 'N Pavlov': 'SidZRed', 'N Tits For M Tats': 'Marc Harper', 'Naive Q-Learner': 'M. A. M. Attariq', 'Nash': 'M. A. M. Attariq, Inspired From John Forbes Nash Jr', 'Nasty Tit For Tat': 'Axelrod Project Contributor Team', 'Negation': '[PD2017]', 'Neil A': 'M. A. M. Attariq', 'Newton': 'M. A. M. Attariq, Inspired From Newton Second Law', 'Nydegger Benjjo Version': 'benjjo', 'Observant': 'Zachary Danziger', 'Odd-Even Go By Majority': 'M. A. M. Attariq', 'Odysseus / Ὀδυσσεύς': 'M. A. M. Attariq', 'Omega Tit For Tat': 'W. Slany & W. Kienreich', 'Once Bitten': 'Holly Marissa', 'Opportunist': 'The Nerd Of AI', 'Opposite Grudger': 'Geraint Palmer', 'Out For Tat': 'M. A. M. Attariq', 'PIN': 'Philip Seehausen', 'PSO Gambler 1_1_1': 'Marc Harper', 'PSO Gambler 2_2_2': 'Georgios Koutsovoulos & Marc Harper', 'PSO Gambler 2_2_2 Noise 05': 'Marc Harper', 'PSO Gambler Mem 1': 'Marc Harper', 'Paradoxic Grim / S21': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Parameterized Tit For Tat': 'Eckhart Arnold', 'Paranoid': 'M. A. M. Attariq', 'Passive Tit For Tat': 'M. A. M. Attariq', 'Patient Cooperator': 'Explerify.com', 'Pattern Reader': 'Explerify.com', 'Patterned Adaptive Fortress': 'M. A. M. Attariq & Claude & Gemini & Chat-GPT & Copilot', 'Patterned Adaptive Fortress 2': 'M. A. M. Attariq & Claude & Gemini & Chat-GPT & DeepSeek & Dola', 'Pavlov / Win-Stay, Lose-Shift': 'David Kraines & Vivian Kraines', 'Pavlov D / Suspicious Pavlov': 'Zhen Ji', 'Pavlov Tester': 'M. A. M. Attariq', 'Pavolovo': 'M. A. M. Attariq', 'Pawlow': 'M. A. M. Attariq', 'Perceptron': 'M. A. M. Attariq', 'Phi': 'Timothy Standen', 'Pi': 'Timothy Standen', 'Prabowo': 'M. A. M. Attariq', 'Praedator': 'M. A. M. Attariq', 'Predator': 'W. Ashlock & D. Ashlock', 'Probable Coop': 'SidZRed', 'Probe & Exploit': 'Explerify.com', 'Probe & Punish': 'Eneasz', 'Prober': 'J. Li & P. Hingston & G. Kendall', 'Prober 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober 4': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Prober Abdullah-arif-swe version': 'abdullah-arif-swe', 'Procastinater': 'M. A. M. Attariq', 'Psycho Attariq Version': 'M. A. M. Attariq', 'Pun 1': 'D. Ashlock & E. Y. Kim & N. Leahy', 'Punisher': 'Geraint Palmer', 'Q-Learning A-Learner': 'M. A. M. Attariq', 'REINFORCE': 'M. A. M. Attariq', 'RLAgent': 'remcofl', 'RLGossipAgent': 'remcofl', 'RNN & RTRL': 'M. A. M. Attariq', 'Racister': 'M. A. M. Attariq', 'Rack Block Shooter': 'Nic Smith', 'Raider': 'W. Ashlock & J. Tsang & D. Ashlock', 'Random': 'Robert Axelrod', 'Random Exploiter 1': 'M. A. M. Attariq', 'Random Exploiter 2': 'M. A. M. Attariq', 'Random Exploiter 3': 'M. A. M. Attariq', 'Random Exploiter 4': 'M. A. M. Attariq', 'Random Hunter': 'Karol Langner', 'Random Tit For Tat': 'Zachary M. Taylor', 'Reactive Player': 'Martin Nowak & Karl Sigmund', 'Rememberable Grudger': 'M. A. M. Attariq', 'Remorseful Prober': 'J. Li & P. Hingston & G. Kendall', 'Resurrection': 'Eckhart Arnold', 'Retaliate': 'Owen Campbell', 'Retaliate 2': 'Owen Campbell', 'Retaliate 3': 'Owen Campbell', 'Rice Field': 'Meta', 'Ripoff': 'D. Ashlock & E. Y. Kim', 'Risky Q-Learner': 'Geraint Palmer', 'Rogers & Maslow': 'M. A. M. Attariq, Inspired From Carl Rogers & Abraham Maslow', 'Rover': 'Dugatkin & Wilson', 'Rwallace': 'Rwallace', 'S11': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S12 / Suspicious Forgiver': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S18': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S19': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S2': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S23': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S24': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S6': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'S7': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'SURPRISE ATTACK!': 'M. A. M. Attariq', 'Sample / Second By Tit For 2 Tats': 'Robert Axelrod / John Maynard Smith', 'Sarsa Q-Learner': 'M. A. M. Attariq', 'Schwoba Sen Gnitz': 'Georg Hacky Hackberger Schmidt', 'Scorched Earth': 'Explerify.com', 'Score Equalizer': 'M. A. M. Attariq', 'Second By Almy': 'Tom Almy', 'Second By Ambuehl & Hickey': 'Dennis Ambuehl & Kevin Hickey', 'Second By Anderson': 'R. D. Anderson', 'Second By Appold': 'Scott Appold', 'Second By Batell': 'Mark F. Batell', 'Second By Black': 'Paul E. Black', 'Second By Borufsen': 'Otto Borufsen', 'Second By Cave': 'Rob Cave', 'Second By Champion': 'Danny C. Champion', 'Second By Colbert': 'John Willaim Colbert', 'Second By Dawes & Batell': 'Robyn M. Dawes & Mark Batell', 'Second By Eatherley': 'Graham J. Eatherley', 'Second By Falk & Langsted': 'Robert B. Falk & James M. Langsted', 'Second By Feld': 'Scott Feld', 'Second By Friedland': 'Edward Friedland', 'Second By Friedland, But Get Revised By Axelrod': 'Robert Axelrod', 'Second By George Hufford': 'George Hufford', 'Second By Getzler': 'Abraham Getzler', 'Second By Gladstein / Tester': 'David Gladstein', 'Second By Graaskamp & Katzen': 'Jim Graaskamp & Ken Katzen', 'Second By Grofman': 'Bernard Grofman', 'Second By Hall': 'James E. Hall', 'Second By Harrington': 'Paul D. Harrington', 'Second By Hollander': 'Howard R. Hollander', 'Second By Hotz': 'Roger Hotz', 'Second By Jones': 'Martyn Jones', 'Second By Joss': 'Johann Joss', 'Second By Kluepfel': 'Charles Kluepfel', 'Second By Lefevre': 'George Lefevre', 'Second By Leyland': 'Robert A. Leyland', 'Second By Leyvraz': 'Fransois Leyvraz', 'Second By Mcgurrin': 'Michael F. McGurrin', 'Second By Mikkelson': 'Ray Mikkelson', 'Second By GRASR\'s Author': 'Anonymous2', 'Second By Newman': 'Steve Newman', 'Second By Nussbacher': 'Henry Nussbacher', 'Second By Nydegger': 'Rudy Nydegger', 'Second By Pebly': 'Robert Pebly', 'Second By Pinkley': 'Jonathan Pinkley', 'Second By Quayle': 'Stanley F. Quayle', 'Second By Rabbie': 'Harold Rabbie', 'Second By Richard Hufford': 'Richard Hufford', 'Second By Robert Adams': 'Robert Adams', 'Second By Robertson': 'William H. Robertson', 'Second By Rowsam': 'Glen Rowsam', 'Second By Schurmann': 'E. E. H. Schurmann', 'Second By Smith': 'David A. Smith', 'Second By Smoody': 'Rik Smoody', 'Second By Snodgrass': 'Gene Snodgrass', 'Second By Tideman & Chieruzzi': 'T.Nicolaus Tideman & Paula Chieruzzi', 'Second By Tranquilizer': 'Craig Feathers', 'Second By Weiderman': 'Nelson Weiderman', 'Second By Weiner': 'Herb Weiner', 'Second By White': 'Edward C. White Jr', 'Second By Wiliam Adams': 'William Adams', 'Second By Yamachi': 'Brian Yamachi', 'Second By Zimmerman': 'George Zimmerman', 'Second Chance': 'Benelliott', 'Second Chance Attariq Version': 'M. A. M. Attariq, Inspired From My Father', 'Self Steem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Self-Love A-Learner': 'M. A. M. Attariq', 'Short Mem': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Signaling Cheater': 'Eckhart Arnold', 'Simple ANN': 'M. A. M. Attariq', 'Simple Exploiter': 'M. A. M. Attariq', 'Simple Identity ChecK': 'Red75', 'Simpleton': 'Eckhart Arnold', 'Skinner': 'M. A. M. Attariq, Inspired From B.F. Skinner', 'Slanger': 'M. A. M. Attariq', 'Slow Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Smart': 'Sven Sommer', 'Smart Cat': 'M. A. M. Attariq & Syarif', 'Smart Generous Tit For Tat': 'M. A. M. Attariq', 'Smart Go By Majority': 'M. A. M. Attariq', 'Smart Snake': 'M. A. M. Attariq, Inspired From Simulife Hub', 'Smart-Clever': 'M. A. M. Attariq', 'Smarter Tat For Tit': 'Eckhart Arnold', 'Smooth Grudger': 'M. A. M. Attariq', 'Smooth Tit For Tat': 'M. A. M. Attariq', 'Sneaky Tit For Tat': 'Karol Langner', 'Social Average': 'Chat-GPT', 'Social Engineering': 'M. A. M. Attariq', 'Socio': 'M. A. M. Attariq', 'Soft Grim': 'Eckhart Arnold', 'Soft Grudger': 'J. Li & P. Hingston & G. Kendall', 'Solution B1': 'D. Ashlock & J. A. Brown & P. Hingston', 'Solution B5': 'D. Ashlock & J. A. Brown & P. Hingston', 'Sort': 'M. A. M. Attariq', 'Spectrum Attacker': 'M. A. M. Attariq', 'Spiteful CC': 'P. Mathieu & J. Delahaye', 'Spiteful Tit For Tat': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Split Brain Syndrome': 'Dola', 'Springter': 'M. A. M. Attariq', 'Stabilize': 'Paul Boehm', 'Stalker': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'Star S': 'Gopal Ramchurn', 'Star SL': 'Gopal Ramchurn', 'Star SN': 'Gopal Ramchurn', 'Star Slave 1': 'Gopal Ramchurn', 'Star Slave 10': 'Gopal Ramchurn', 'Star Slave 2': 'Gopal Ramchurn', 'Star Slave 3': 'Gopal Ramchurn', 'Star Slave 4': 'Gopal Ramchurn', 'Star Slave 5': 'Gopal Ramchurn', 'Star Slave 6': 'Gopal Ramchurn', 'Star Slave 7': 'Gopal Ramchurn', 'Star Slave 8': 'Gopal Ramchurn', 'Star Slave 9': 'Gopal Ramchurn', 'Statistical Strategy': 'd0minik2', 'Stefan Pennartz': 'Stefan Pennartz', 'Stochastic Cooperator': 'C. Adami & A. Hintze', 'Stochastic WSLS': 'Marc Harper', 'Stoic Mirror': 'Gemini', 'Stoicalist': 'M. A. M. Attariq & Gemini', 'Strategist': 'Explerify.com', 'Stupidiot': 'M. A. M. Attariq', 'Sugar Strategy / Treasure Hunt': 'D. Ashlock & W. Ashlock', 'Sumobox Fighter': 'M. A. M. Attariq, Inspired From Simulife Hub', 'Sun Tzu Bot': 'M. A. M. Attariq, Inspired From Sun Tzu', 'Suspicious Alternator': 'Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak', 'Suspicious Tit For Tat': 'C. Hilbe & M. A. Nowak & A. Traulsen', 'Sweet Heart': 'DeepSeek', 'Syifa': 'M. A. M. Attariq & Syifa', 'TF 1': 'Marc Harper', 'TF 2': 'Marc Harper', 'TF 3': 'Marc Harper', 'TF2T & 2TFT': 'M. A. M. Attariq', 'TOM Level 1 / Theory Of Mind Level 1': 'M. A. M. Attariq', 'TOM Level 2 / Theory Of Mind Level 2': 'M. A. M. Attariq', 'TOM Level 3 / Theory Of Mind Level 3': 'M. A. M. Attariq', 'TPMS / Tree Predictive Matrix Strategy': 'M. A. M. Attariq', 'Tages': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Teacher Pee While Standing, Student Pee While Running': 'M. A. M. Attariq', 'Tester Eckhart Arnold Version': 'Eckhart Arnold', 'The Calculated Mirror With A Fuse': 'Gemini', 'The Cave Breaker': 'M. A. M. Attariq & Gemini', 'The Nasty A': 'M. A. M. Attariq', 'Theseus': 'M. A. M. Attariq, Inspired From Claude Shannon', 'Three Times Out': 'Philip Seehausen', 'Threshold Punisher': 'Copilot', 'Thresholded Trust Bot': 'M. A. M. Attariq', 'Thue Morse': 'Geraint Palmer', 'Thue Morse Inverse': 'Geraint Palmer', 'Thumper': 'D. Ashlock & E. Y. Kim', 'Tiny Brain': 'M. A. M. Attariq', 'Tip For Tap': 'M. A. M. Attariq', 'Tit For 3 Tats': 'Yaroslav Rosokha & Julian Romero', 'Tit For Increasing Tat': 'Claude', 'Tit For Tat But Not Too Forgiving': 'M. A. M. Attariq', 'Tit For Tat Killer': 'M. A. M. Attariq', 'Toxic Mirror': 'DeepSeek', 'Trader': 'M. A. M. Attariq & Gemini', 'Tranquilizer Eckhart Arnold Version': 'Eckhart Arnold', 'Tri-Brain': 'M. A. M. Attariq', 'Tricky Cooperator': 'Karol Langner', 'Tricky Defector': 'Karol Langner', 'Tricky Level Punisher': 'Eckhart Arnold', 'Trust Ledger': 'Chat-GPT', 'Trust Score Sigmoid': 'Claude', 'Trusty': 'Foomii', 'Turan': 'Marco Gaudesi & Elio Piccolo & Giovanni Squillero & Alberto Paolo Tonda', 'Tweedledee': 'Eckhart Arnold', 'Tweedledum': 'Eckhart Arnold', 'Tweetypie': 'Eckhart Arnold', 'Unpredictable Tit For Tat': 'M. A. M. Attariq', 'Uranium': 'M. A. M. Attariq', 'Usually Cooperates': 'D. Ashlock & E. Y. Kim & W. Ashlock', 'Usually Defects': 'D. Ashlock & E. Y.Kim & W. Ashlock', 'Vandal': 'Foomii', 'Vengeful': 'D. Ashlock', 'Vengeful Cheater': 'Vaniver', 'Verity': 'M. A. M. Attariq & Gemini, Inspired From ThatMob', 'Very Bad': 'L. C. Andre & P. Honovan & T. Felipe & G. Frederico', 'WHAgent': 'remcofl', 'Whale': 'M. A. M. Attariq & DeepSeek', 'William': 'M. A. M. Attariq', 'Willing': 'P. Van Den Berg & F. J. Weissing', 'Win-Shift, Lose-Stay': 'J. Li & P. Hingston & G. Kendall', 'Winner 12': 'P. Mathieu & J. Delahaye', 'Winner 21': 'P. Mathieu & J. Delahaye', 'Worse & Worse / Worse & Worse 1': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 2': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Worse & Worse 3': "LIFL(Laboratoire d'Informatique Fondamentale de Lille)", 'Your Choice Or My Choice': 'M. A. M. Attariq', 'ZD-2026 / Zero Determinant 2026': 'M. A. M. Attariq', 'ZD-G / Zero Determinant Generous': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-GTFT / Zero Determinant Generous Tit For Tat': "A. J. Stewart & J. B. Plotkin, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-M2 / Zero Determinant Memory 2': 'Marc Harper', 'ZD-MS / Zero Determinant Mischief': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-PW2026 / Zero Determinant Psychological War 2026': 'Gemini', 'ZD-Q / Zero Determinant Equalizer': "William H. Press & Freeman Dyson, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-S / Zero Determinant Set': "Steven Kuhn, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'ZD-X / Zero Determinant Extortion': "Lars Roemheld, But Implemented In this Code Using C. Hilbe, M. A. Nowak, & A. Traulsen 's Model", 'Zero Day': 'M. A. M. Attariq', 'ZeroResp':'Evreu1pro', 'ZeroResp V5.3':'Evreu1pro', '4-Duality Optimizer 1':'Paul Franceschi'}
+strategies_category = {'Hill Climb Attariq Version':'NASTY','ISO': 'NICE', 'Cooperate ISO': 'NICE', 'Longterm Tit For Tat': 'NICE', 'Geller': 'NASTY', 'Geller Cooperator': 'NICE', 'Geller Defector': 'NASTY', 'ZD-MD / Zero Determinant Middle': 'NASTY', 'Bayesian Forgiver': 'NICE', '2 Tits For 2 Tats / Hard Tit For 2 Tats': 'NICE', '2 Tits For 2 Tats Eckhart Arnold Version': 'NASTY', '2 Tits For Tat': 'NICE', '3 Seconds Mirror': 'NICE', '3 Tits For Tat / Hard Tit For Tat': 'NICE', '3-Tree Of Prediction': 'NICE', 'A-A&C / A-Actor&Critic': 'NASTY', 'ALLC OR ALLD': 'NASTY', 'AMERICA! / Freedoom / USA': 'NASTY', 'AON2': 'NICE', 'AQUA': 'NICE', 'AZD / Adaptive Zero Determinant': 'NICE', 'Absurdistan 1': 'NICE', 'Acquaintance & Trust': 'NICE', 'Adaptive': 'NASTY', 'Adaptive Cooperator': 'NICE', 'Adaptive Hhhpraise Version': 'NICE', 'Adaptive Pavlov 2006': 'NICE', 'Adaptive Pavlov 2011': 'NICE', 'Adaptive Tit For Tat': 'NICE', 'Adaptive Tit For Tat Attariq Version': 'NICE', 'Adaptor Brief': 'NASTY', 'Adaptor Long': 'NASTY', 'Aggravater': 'NASTY', 'Alan': 'NICE', 'Alcohol / Ethanol': 'NASTY', 'Alexei / End Game Cheater': 'NASTY', 'Alternator / Second By Duisman': 'NASTY', 'Alternator Hunter': 'NICE', 'Always Cooperate / Cooperator / Dove / Saint': 'NICE', 'Always Defect / Defector / Hawk / Shark': 'NASTY', 'Always Out / Outtor': 'NICE', 'Amazon / Piraha': 'NICE', 'Analogy': 'NASTY', 'Anatol': 'NICE', 'Angry Tit For Tat': 'NICE', 'Anti Cycler': 'NASTY', 'Anti Noise Tit For Tat': 'NICE', 'Anti Tit For Tat / Psycho': 'NASTY', 'Appeaser': 'NICE', 'Arrogant Q-Learner': 'NASTY', 'Average Copier': 'NASTY', 'BBE / Burn Both Ends': 'NASTY', 'Back Stabber': 'NICE', 'Backrooms': 'NASTY', 'Bahlil': 'NASTY', 'Bandit': 'NASTY', 'Bandit UCB': 'NASTY', 'Bayes Attariq Version': 'NICE', 'Bayes Foomii Version': 'NICE', 'Benjo': 'NICE', 'Beta Tester': 'NASTY', 'Better & Better': 'NASTY', 'Bluff': 'NASTY', 'Bluff Master': 'NASTY', 'Boltzmann Brain': 'NASTY', 'Bookend Cooperator': 'NASTY', 'Boxer': 'NICE', 'Bros Mind': 'NICE', 'Bully / Reverse Tit For Tat': 'NASTY', 'Burn The Bridge Strategy': 'NASTY', 'Bush Mosteller': 'NASTY', 'Buzzer': 'NASTY', 'CS / Collective Strategy': 'NASTY', 'Caerbannog': 'NASTY', 'Calamity': 'NASTY', 'Calculator': 'NASTY', 'Calculator The Nerd Of AI Version': 'NICE', 'Capitalist': 'NASTY', 'Capri': 'NICE', 'Cautious Q-Learner': 'NASTY', 'Caveman': 'NASTY', 'Cerebrum': 'NICE', 'Charity': 'NICE', 'Chatter': 'NICE', 'Chimera': 'NICE', 'Clement Coldridge': 'NICE', 'Coin': 'NASTY', 'Collatz': 'NASTY', 'Communalist': 'NICE', 'Continuous Q-Learner Avg': 'NASTY', 'Continuous Q-Learner Max': 'NASTY', 'Contrite Grudger': 'NICE', 'Contrite Tit For Tat': 'NICE', 'Control 1': 'NASTY', 'Control 10': 'NASTY', 'Control 11': 'NASTY', 'Control 2': 'NICE', 'Control 3': 'NASTY', 'Control 4': 'NASTY', 'Control 5': 'NASTY', 'Control 6': 'NICE', 'Control 7': 'NASTY', 'Control 8': 'NASTY', 'Control 9': 'NICE', 'Cooperate Once': 'NASTY', 'Cooperator Hunter': 'NASTY', 'Crabby': 'NICE', 'Crabby Attariq Version': 'NASTY', 'Cruelity': 'NICE', 'Cult Bishop A': 'NASTY', 'Cult Bishop B': 'NASTY', 'Cult Citizen A': 'NASTY', 'Cult Citizen B': 'NASTY', 'Cult Citizen C': 'NASTY', 'Cult Leader': 'NASTY', 'Curiosity': 'NICE', 'Cycle Hunter': 'NASTY', 'Cycler CCCCCD': 'NASTY', 'Cycler CCCD': 'NASTY', 'Cycler CCCDCD': 'NASTY', 'Cycler CCD': 'NASTY', 'Cycler DC': 'NASTY', 'Cycler DCCCC': 'NASTY', 'Cycler DDC': 'NASTY', 'DBS / Derived Belief Strategy': 'NICE', 'DDoS': 'NICE', 'Darwin': 'NICE', 'Deadlock Breaker': 'NICE', 'Decay Given': 'NICE', 'Defect Once': 'NASTY', 'Defector Hunter': 'NICE', 'Delayed AON1': 'NICE', 'Desire': 'NICE', 'Desprate': 'NASTY', 'Detective': 'NASTY', 'Devil Staircase': 'NICE', 'Diplomat': 'NICE', 'Dont Bite The Hand That Feeds You': 'NICE', 'Double Crosser': 'NICE', 'Double Q-Learner': 'NASTY', 'Double Resurrection': 'NASTY', 'Doubler': 'NICE', 'Downing Benjjo Version': 'NICE', 'Downing Eckhart Arnold Version': 'NASTY', 'Dumpty 10': 'NASTY', 'Dyna Q-Learner': 'NASTY', 'Dynamic 2 Tits For Tat': 'NICE', 'Dynocat': 'NASTY', 'EGOist': 'NASTY', 'Easy Go / Reverse Grudger / Fool Me Forever': 'NASTY', 'Echo Adaptive': 'NICE', 'Echo Fisher': 'NASTY', 'Egoist A-Learner': 'NICE', 'Eliza / Therapist': 'NICE', 'Entropy Sentinel': 'NASTY', 'Envy': 'NICE', 'Epsilon-Greedy': 'NASTY', 'Eric': 'NICE', 'Eugine Nier': 'NASTY', 'Euler': 'NASTY', 'Eventual Cycle Hunter': 'NICE', 'Evil Alliance': 'NASTY', 'Evolvable Cycler Attariq Version': 'NASTY', 'Evolved FSM 16': 'NICE', 'Evolved FSM 16 Noise 05': 'NICE', 'Evolved FSM 4': 'NICE', 'Evolved FSM 6': 'NASTY', 'Evolved HMM 5': 'NICE', 'Evolved Looker Up 1_1_1': 'NICE', 'Evolved Looker Up 2_2_2': 'NICE', 'Exploratory Lenient Grim 2': 'NASTY', 'Exploratory Tit For 3 Tats': 'NASTY', 'FAWS': 'NASTY', 'False Cooperator': 'NASTY', 'Falsity': 'NICE', 'Female / Woman': 'NASTY', 'Fibonacci': 'NASTY', 'Finger Print': 'NASTY', 'Firm But Fair / Firm For Tat': 'NICE', 'First By Davis': 'NICE', 'First By Downing': 'NASTY', 'First By Downing, But Get Revised By Axelrod': 'NICE', 'First By Feld': 'NASTY', 'First By Graaskamp / Second By Mauk': 'NASTY', 'First By Grofman': 'NICE', 'First By Grudger / Grim Trigger': 'NICE', 'First By Joss / Naive Prober': 'NASTY', 'First By Named Withheld': 'NASTY', 'First By Nydegger': 'NICE', 'First By Shubik': 'NICE', 'First By Stein & Rapoport': 'NASTY', 'First By Tideman & Chieruzzi': 'NICE', 'First By Tit For Tat': 'NICE', 'First By Tullock': 'NASTY', 'Fixed Pattern': 'NASTY', 'Fool Me Once': 'NICE', 'Forest-RND': 'NICE', 'Forest-XG': 'NICE', 'Forgetable Gradual': 'NICE', 'Forgetful Fool Me Once': 'NICE', 'Forgetful Grudger': 'NICE', 'Forgetful Majority Bot': 'NICE', 'Forgiver': 'NICE', 'Forgiver Benjamin M. Zagorsky & Johannes G. Reiter & Krishnendu Chatterjee & Martin A. Nowak Version / S14': 'NICE', 'Forgiving': 'NICE', 'Forgiving Fate': 'NICE', 'Forgiving Grudger': 'NICE', 'Forgiving Tit For Tat': 'NICE', 'Fortress 3': 'NASTY', 'Fortress 4': 'NASTY', 'Frankl': 'NICE', 'Free Rider': 'NASTY', 'Frequency Analyzer': 'NICE', 'Freud': 'NICE', 'Friendly Human': 'NICE', 'GT-E / Game Theory Explorer': 'NICE', 'Gambler Attariq Version': 'NASTY', 'Gaslighter': 'NASTY', 'Gen 1_64_200_30_0.3_A': 'NASTY', 'Gen 2_64_200_30_0.3_A': 'NASTY', 'Gen 3_64_200_30_0.3_A': 'NASTY', 'Gen 4_64_200_30_0.3_A': 'NASTY', 'Gen 5_64_200_30_0.3_A': 'NASTY', 'Generic Downing': 'NASTY', 'Generic Downing Friendly': 'NASTY', 'Generous Tit For Tat': 'NICE', 'Generous Tit For Tat Axelrod Project Contributor Team Version': 'NICE', 'Generous Tit For Tat Benjjo Version': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 1': 'NICE', 'Generous Tit For Tat Eckhart Arnold Version 2': 'NICE', 'Generous Tit For Tat Less Wrong Version': 'NICE', 'Genetic Algo 1': 'NICE', 'Genetic Algo 2': 'NICE', 'George': 'NASTY', 'Go By Majority / Second By Grisell / Soft Go By Majority': 'NICE', 'Go By Minority': 'NASTY', 'Gold Digger': 'NASTY', 'Golden Mean': 'NICE', 'Good': 'NICE', 'GossipAgent': 'NASTY', 'Graaskamp Benjjo Version': 'NASTY', 'Gradual': 'NICE', 'Gradual Cristal Version': 'NICE', 'Gradual Killer': 'NASTY', 'Grateful / S9': 'NASTY', 'Greedy': 'NICE', 'Grudger Alternator': 'NICE', 'Grumpy': 'NICE', 'HER / MENACE': 'NICE', 'HMM Player': 'NASTY', 'Half Sin Square': 'NICE', 'Handshake': 'NASTY', 'Hard Go By Majority': 'NICE', 'Hard Prober': 'NASTY', 'Hesitant Q-Learner': 'NASTY', 'Hill Climb': 'NASTY', 'Hopeless': 'NASTY', 'Hot Coffee': 'NICE', 'Humpty 10': 'NASTY', 'Hungry': 'NASTY', 'Inequality / SOVIET UNION! / USSR': 'NASTY', 'Inequity Averse Q-Learner': 'NASTY', 'Inverse': 'NICE', 'Inverse Punisher': 'NICE', 'Is There Something New?': 'NICE', 'Isolated Clan': 'NASTY', 'Isolated Tit For Tat': 'NICE', 'Japan Empire Emperor': 'NICE', 'Japan Empire Soldier 1': 'NICE', 'Japan Empire Soldier 10': 'NICE', 'Japan Empire Soldier 2': 'NICE', 'Japan Empire Soldier 3': 'NICE', 'Japan Empire Soldier 4': 'NICE', 'Japan Empire Soldier 5': 'NICE', 'Japan Empire Soldier 6': 'NICE', 'Japan Empire Soldier 7': 'NICE', 'Japan Empire Soldier 8': 'NICE', 'Japan Empire Soldier 9': 'NICE', 'Javelin': 'NICE', 'Jem': 'NASTY', 'Jester': 'NASTY', 'Jesus Petry': 'NASTY', 'Josuah': 'NASTY', 'Jung': 'NICE', 'Karen': 'NASTY', 'Keyman': 'NASTY', 'Killer': 'NASTY', 'King Of 48 Laws Of Power': 'NICE', 'Knowledgeable Worse & Worse': 'NASTY', 'Konflikt Blue': 'NASTY', 'Konflikt Green': 'NICE', 'L-BODOR / Learning Based On Derivative Of Reward': 'NICE', 'LCG': 'NASTY', 'Laran': 'NASTY', 'Laws': 'NICE', 'Learner': 'NICE', 'Lenient Grim 2': 'NICE', 'Lenient Grim 3': 'NICE', 'Less Grim': 'NICE', 'Level Punisher': 'NICE', 'Liar Person': 'NASTY', 'Lighty-Darky': 'NASTY', 'Limited Retaliate': 'NICE', 'Limited Retaliate 2': 'NICE', 'Limited Retaliate 3': 'NICE', 'Line': 'NICE', 'Little Grudger': 'NICE', 'Long Horse': 'NASTY', 'Long Term Strategist': 'NICE', 'Look Ahead / Look Up': 'NASTY', 'Loyal': 'NICE', 'MARS / Mimicry And Relative Similarity': 'NICE', 'MCMC / Markov Chain Monte Carlo': 'NICE', 'MEM2': 'NICE', 'MSAgent': 'NASTY', 'Mafia A': 'NASTY', 'Mafia B': 'NASTY', 'Mafia C': 'NASTY', 'Mafia D': 'NASTY', 'Majapahit': 'NICE', 'Male / Man': 'NICE', 'Malthrin': 'NASTY', 'Man In The Middle': 'NASTY', 'Manipulator': 'NASTY', 'Manipulity': 'NASTY', 'Markov': 'NICE', 'Matcher': 'NICE', 'Math Constant Hunter': 'NICE', 'Memory 1': 'NASTY', 'Memory Decay': 'NASTY', 'Mensa': 'NASTY', 'Meta Hunter': 'NASTY', 'Meta Majority': 'NICE', 'Meta Minority': 'NASTY', 'Meta Mixer': 'NASTY', 'Meta Winner': 'NASTY', 'Meta Winner Ensemble': 'NASTY', 'Michaelos': 'NASTY', 'Mirror': 'NICE', 'Modal Defector': 'NASTY', 'Modal Tit For Tat': 'NICE', 'Momentum': 'NICE', 'Monkey See, Monkey Do': 'NASTY', 'Mosquito': 'NASTY', 'MrX': 'NASTY', 'Mystical Logic': 'NASTY', 'N Pavlov': 'NASTY', 'N Tits For M Tats': 'NICE', 'Naive Q-Learner': 'NASTY', 'Nash': 'NICE', 'Nasty Tit For Tat': 'NASTY', 'Negation': 'NASTY', 'Neil A': 'NICE', 'Newton': 'NASTY', 'Nydegger Benjjo Version': 'NICE', 'Observant': 'NICE', 'Odd-Even Go By Majority': 'NICE', 'Odysseus / Ὀδυσσεύς': 'NICE', 'Omega Tit For Tat': 'NICE', 'Once Bitten': 'NICE', 'Opportunist': 'NASTY', 'Opposite Grudger': 'NASTY', 'Out For Tat': 'NICE', 'PIN': 'NASTY', 'PSO Gambler 1_1_1': 'NICE', 'PSO Gambler 2_2_2': 'NICE', 'PSO Gambler 2_2_2 Noise 05': 'NICE', 'PSO Gambler Mem 1': 'NICE', 'Paradoxic Grim / S21': 'NASTY', 'Parameterized Tit For Tat': 'NASTY', 'Paranoid': 'NASTY', 'Passive Tit For Tat': 'NICE', 'Patient Cooperator': 'NICE', 'Pattern Reader': 'NICE', 'Patterned Adaptive Fortress': 'NICE', 'Patterned Adaptive Fortress 2': 'NICE', 'Pavlov / Win-Stay, Lose-Shift': 'NICE', 'Pavlov D / Suspicious Pavlov': 'NASTY', 'Pavlov Tester': 'NASTY', 'Pavolovo': 'NASTY', 'Pawlow': 'NICE', 'Perceptron': 'NASTY', 'Phi': 'NASTY', 'Pi': 'NASTY', 'Prabowo': 'NASTY', 'Praedator': 'NASTY', 'Predator': 'NASTY', 'Probable Coop': 'NASTY', 'Probe & Exploit': 'NASTY', 'Probe & Punish': 'NICE', 'Prober': 'NASTY', 'Prober 2': 'NASTY', 'Prober 3': 'NASTY', 'Prober 4': 'NASTY', 'Prober Abdullah-arif-swe version': 'NASTY', 'Procastinater': 'NICE', 'Psycho Attariq Version': 'NICE', 'Pun 1': 'NASTY', 'Punisher': 'NICE', 'Q-Learning A-Learner': 'NICE', 'REINFORCE': 'NASTY', 'RLAgent': 'NASTY', 'RLGossipAgent': 'NASTY', 'RNN & RTRL': 'NASTY', 'Racister': 'NASTY', 'Rack Block Shooter': 'NASTY', 'Raider': 'NASTY', 'Random': 'NASTY', 'Random Exploiter 1': 'NICE', 'Random Exploiter 2': 'NICE', 'Random Exploiter 3': 'NICE', 'Random Exploiter 4': 'NICE', 'Random Hunter': 'NICE', 'Random Tit For Tat': 'NASTY', 'Reactive Player': 'NASTY', 'Rememberable Grudger': 'NICE', 'Remorseful Prober': 'NASTY', 'Resurrection': 'NICE', 'Retaliate': 'NICE', 'Retaliate 2': 'NICE', 'Retaliate 3': 'NICE', 'Rice Field': 'NASTY', 'Ripoff': 'NASTY', 'Risky Q-Learner': 'NASTY', 'Rogers & Maslow': 'NICE', 'Rover': 'NASTY', 'Rwallace': 'NASTY', 'S11': 'NASTY', 'S12 / Suspicious Forgiver': 'NASTY', 'S18': 'NASTY', 'S19': 'NASTY', 'S2': 'NASTY', 'S23': 'NASTY', 'S24': 'NASTY', 'S6': 'NASTY', 'S7': 'NASTY', 'SURPRISE ATTACK!': 'NASTY', 'Sample / Second By Tit For 2 Tats': 'NICE', 'Sarsa Q-Learner': 'NASTY', 'Schwoba Sen Gnitz': 'NICE', 'Scorched Earth': 'NICE', 'Score Equalizer': 'NICE', 'Second By Almy': 'NASTY', 'Second By Ambuehl & Hickey': 'NICE', 'Second By Anderson': 'NASTY', 'Second By Appold': 'NICE', 'Second By Batell': 'NICE', 'Second By Black': 'NICE', 'Second By Borufsen': 'NICE', 'Second By Cave': 'NICE', 'Second By Champion': 'NICE', 'Second By Colbert': 'NASTY', 'Second By Dawes & Batell': 'NICE', 'Second By Eatherley': 'NICE', 'Second By Falk & Langsted': 'NICE', 'Second By Feld': 'NASTY', 'Second By Friedland': 'NASTY', 'Second By Friedland, But Get Revised By Axelrod': 'NASTY', 'Second By George Hufford': 'NASTY', 'Second By Getzler': 'NICE', 'Second By Gladstein / Tester': 'NASTY', 'Second By Graaskamp & Katzen': 'NICE', 'Second By Grofman': 'NICE', 'Second By Hall': 'NASTY', 'Second By Harrington': 'NASTY', 'Second By Hollander': 'NASTY', 'Second By Hotz': 'NASTY', 'Second By Jones': 'NICE', 'Second By Joss': 'NASTY', 'Second By Kluepfel': 'NICE', 'Second By Lefevre': 'NICE', 'Second By Leyland': 'NASTY', 'Second By Leyvraz': 'NICE', 'Second By Mcgurrin': 'NASTY', 'Second By Mikkelson': 'NICE', "Second By GRASR's Author": 'NASTY', 'Second By Newman': 'NICE', 'Second By Nussbacher': 'NICE', 'Second By Nydegger': 'NICE', 'Second By Pebly': 'NICE', 'Second By Pinkley': 'NICE', 'Second By Quayle': 'NICE', 'Second By Rabbie': 'NASTY', 'Second By Richard Hufford': 'NASTY', 'Second By Robert Adams': 'NICE', 'Second By Robertson': 'NASTY', 'Second By Rowsam': 'NICE', 'Second By Schurmann': 'NICE', 'Second By Smith': 'NASTY', 'Second By Smoody': 'NASTY', 'Second By Snodgrass': 'NASTY', 'Second By Tideman & Chieruzzi': 'NICE', 'Second By Tranquilizer': 'NASTY', 'Second By Weiderman': 'NICE', 'Second By Weiner': 'NICE', 'Second By White': 'NICE', 'Second By Wiliam Adams': 'NICE', 'Second By Yamachi': 'NICE', 'Second By Zimmerman': 'NICE', 'Second Chance': 'NASTY', 'Second Chance Attariq Version': 'NICE', 'Self Steem': 'NASTY', 'Self-Love A-Learner': 'NICE', 'Short Mem': 'NICE', 'Signaling Cheater': 'NASTY', 'Simple ANN': 'NASTY', 'Simple Exploiter': 'NASTY', 'Simple Identity ChecK': 'NASTY', 'Simpleton': 'NASTY', 'Skinner': 'NICE', 'Slanger': 'NICE', 'Slow Tit For Tat': 'NICE', 'Smart': 'NICE', 'Smart Cat': 'NICE', 'Smart Generous Tit For Tat': 'NICE', 'Smart Go By Majority': 'NICE', 'Smart Snake': 'NICE', 'Smart-Clever': 'NICE', 'Smarter Tat For Tit': 'NASTY', 'Smooth Grudger': 'NICE', 'Smooth Tit For Tat': 'NICE', 'Sneaky Tit For Tat': 'NASTY', 'Social Average': 'NASTY', 'Social Engineering': 'NASTY', 'Socio': 'NICE', 'Soft Grim': 'NICE', 'Soft Grudger': 'NICE', 'Solution B1': 'NASTY', 'Solution B5': 'NASTY', 'Sort': 'NICE', 'Spectrum Attacker': 'NASTY', 'Spiteful CC': 'NICE', 'Spiteful Tit For Tat': 'NICE', 'Split Brain Syndrome': 'NICE', 'Springter': 'NICE', 'Stabilize': 'NICE', 'Stalker': 'NICE', 'Star S': 'NASTY', 'Star SL': 'NASTY', 'Star SN': 'NASTY', 'Star Slave 1': 'NASTY', 'Star Slave 10': 'NASTY', 'Star Slave 2': 'NASTY', 'Star Slave 3': 'NASTY', 'Star Slave 4': 'NASTY', 'Star Slave 5': 'NASTY', 'Star Slave 6': 'NASTY', 'Star Slave 7': 'NASTY', 'Star Slave 8': 'NASTY', 'Star Slave 9': 'NASTY', 'Statistical Strategy': 'NASTY', 'Stefan Pennartz': 'NICE', 'Stochastic Cooperator': 'NASTY', 'Stochastic WSLS': 'NASTY', 'Stoic Mirror': 'NICE', 'Stoicalist': 'NICE', 'Strategist': 'NASTY', 'Stupidiot': 'NASTY', 'Sugar Strategy / Treasure Hunt': 'NASTY', 'Sumobox Fighter': 'NICE', 'Sun Tzu Bot': 'NICE', 'Suspicious Alternator': 'NASTY', 'Suspicious Tit For Tat': 'NASTY', 'Sweet Heart': 'NASTY', 'Syifa': 'NASTY', 'TF 1': 'NASTY', 'TF 2': 'NASTY', 'TF 3': 'NICE', 'TF2T & 2TFT': 'NICE', 'TOM Level 1 / Theory Of Mind Level 1': 'NASTY', 'TOM Level 2 / Theory Of Mind Level 2': 'NASTY', 'TOM Level 3 / Theory Of Mind Level 3': 'NICE', 'TPMS / Tree Predictive Matrix Strategy': 'NICE', 'Tages': 'NASTY', 'Teacher Pee While Standing, Student Pee While Running': 'NICE', 'Tester Eckhart Arnold Version': 'NASTY', 'The Calculated Mirror With A Fuse': 'NASTY', 'The Cave Breaker': 'NASTY', 'The Nasty A': 'NASTY', 'Theseus': 'NICE', 'Three Times Out': 'NICE', 'Threshold Punisher': 'NICE', 'Thresholded Trust Bot': 'NICE', 'Thue Morse': 'NASTY', 'Thue Morse Inverse': 'NASTY', 'Thumper': 'NICE', 'Tiny Brain': 'NASTY', 'Tip For Tap': 'NICE', 'Tit For 3 Tats': 'NICE', 'Tit For Increasing Tat': 'NICE', 'Tit For Tat But Not Too Forgiving': 'NICE', 'Tit For Tat Killer': 'NASTY', 'Toxic Mirror': 'NASTY', 'Trader': 'NICE', 'Tranquilizer Eckhart Arnold Version': 'NASTY', 'Tri-Brain': 'NICE', 'Tricky Cooperator': 'NASTY', 'Tricky Defector': 'NASTY', 'Tricky Level Punisher': 'NICE', 'Trust Ledger': 'NICE', 'Trust Score Sigmoid': 'NASTY', 'Trusty': 'NICE', 'Turan': 'NASTY', 'Tweedledee': 'NICE', 'Tweedledum': 'NICE', 'Tweetypie': 'NASTY', 'Unpredictable Tit For Tat': 'NASTY', 'Uranium': 'NICE', 'Usually Cooperates': 'NICE', 'Usually Defects': 'NASTY', 'Vandal': 'NASTY', 'Vengeful': 'NICE', 'Vengeful Cheater': 'NASTY', 'Verity': 'NICE', 'Very Bad': 'NICE', 'WHAgent': 'NASTY', 'Whale': 'NICE', 'William': 'NICE', 'Willing': 'NASTY', 'Win-Shift, Lose-Stay': 'NASTY', 'Winner 12': 'NICE', 'Winner 21': 'NICE', 'Worse & Worse / Worse & Worse 1': 'NASTY', 'Worse & Worse 2': 'NASTY', 'Worse & Worse 3': 'NICE', 'Your Choice Or My Choice': 'NICE', 'ZD-2026 / Zero Determinant 2026': 'NICE', 'ZD-G / Zero Determinant Generous': 'NICE', 'ZD-GTFT / Zero Determinant Generous Tit For Tat': 'NICE', 'ZD-M2 / Zero Determinant Memory 2': 'NASTY', 'ZD-MS / Zero Determinant Mischief': 'NASTY', 'ZD-PW2026 / Zero Determinant Psychological War 2026': 'NICE', 'ZD-Q / Zero Determinant Equalizer': 'NASTY', 'ZD-S / Zero Determinant Set': 'NASTY', 'ZD-X / Zero Determinant Extortion': 'NASTY', 'Zero Day': 'NASTY', 'ZeroResp': 'NICE', 'ZeroResp V5.3': 'NASTY', '4-Duality Optimizer 1': 'NICE'}
 
 strategies_many_name = []
 for i in range(len(strategies)):
