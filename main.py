@@ -20,13 +20,13 @@ def plot_tournament_results(sorted_result, strategies_category, strategies_creat
     colors = ['#2ecc71' if strategies_category[n] == 'NICE' else '#e74c3c' for n in names]
     fig, axes = plt.subplots(1, 2, figsize=(16, max(6, len(names) * 0.32)))
     y_pos = np.arange(len(names))
-    title_prefix = 'Terburuk' if show_worst else 'Teratas'
+    title_prefix = 'Worst' if show_worst else 'Best'
     bars_left = axes[0].barh(y_pos, scores, color=colors)
     axes[0].set_yticks(y_pos)
     axes[0].set_yticklabels([])
     axes[0].invert_yaxis()
-    axes[0].set_xlabel('Rata-rata skor per turnamen')
-    axes[0].set_title(f'{title_prefix} {len(names)} Strategi berdasarkan Skor')
+    axes[0].set_xlabel('Average score per tournament')
+    axes[0].set_title(f'{title_prefix} {len(names)} Strategy based on the score')
     max_score = max(scores) if scores else 1
     for i, (bar, v, name) in enumerate(zip(bars_left, scores, names)):
         axes[0].text(max_score * 0.01, bar.get_y() + bar.get_height() / 2,
@@ -37,15 +37,14 @@ def plot_tournament_results(sorted_result, strategies_category, strategies_creat
     nice_patch = mpatches.Patch(color='#2ecc71', label='NICE')
     nasty_patch = mpatches.Patch(color='#e74c3c', label='NASTY')
     axes[0].legend(handles=[nice_patch, nasty_patch], loc='lower right', fontsize=8)
-    # === Panel kanan: stacked win/draw/loss ===
-    bars_win  = axes[1].barh(y_pos, wins, color='#3498db', label='Menang')
+    bars_win  = axes[1].barh(y_pos, wins, color='#3498db', label='Win')
     bars_draw = axes[1].barh(y_pos, draws, left=wins, color='#95a5a6', label='Seri')
     bars_lose = axes[1].barh(y_pos, loses, left=[w + d for w, d in zip(wins, draws)],
-                              color='#c0392b', label='Kalah')
+                              color='#c0392b', label='Lose')
     axes[1].set_yticks(y_pos)
     axes[1].set_yticklabels([])
     axes[1].invert_yaxis()
-    axes[1].set_xlabel('Rata-rata jumlah pertandingan per turnamen')
+    axes[1].set_xlabel('Average match per tournament')
     axes[1].set_title('Win / Draw / Loss')
     axes[1].legend(loc='lower right', fontsize=8)
     annot_left = axes[0].annotate("", xy=(0, 0), xytext=(15, 15), textcoords="offset points",
@@ -68,13 +67,12 @@ def plot_tournament_results(sorted_result, strategies_category, strategies_creat
                 continue
             found = False
             for idx in range(len(names)):
-                # cek batang yang sesuai baris ini (untuk panel kanan, bar index perlu di-mod)
                 bar = bars[idx % len(names)] if ax == axes[1] else bars[idx]
                 contains, _ = bar.contains(event)
                 if contains:
                     creator = strategies_creator.get(names[idx], 'Unknown')
                     annot.xy = (event.xdata, event.ydata)
-                    annot.set_text(f"{names[idx]}\nPencipta: {creator}")
+                    annot.set_text(f"{names[idx]}\nCreator: {creator}")
                     annot.set_visible(True)
                     found = True
                     redraw = True
